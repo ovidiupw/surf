@@ -1,0 +1,65 @@
+\documentclass[12pt,twoside]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{csquotes}
+\usepackage{lipsum}
+\usepackage{microtype}
+
+\graphicspath{ {images/} }
+
+\newenvironment{bottompar}{\par\vspace*{\fill}}{\clearpage}
+\newcommand{\GLOBALDATE}{29 August 2016}
+
+% Pagina titlu
+
+\begin{document}
+\title{
+	\large{Universitatea \enquote{Alexandru Ioan Cuza}, Ia\c{s}i} \\
+	\vspace{0.5cm}
+	\large{\textbf{Facultatea de informatic\u{a}}} \\
+      \vspace{2cm}
+	\LARGE{Surf} \\
+	\vspace{1cm}
+	\large{Parcurgere si procesare distribuita a paginilor web pentru extragerea informatiilor} \\
+	\vspace{1cm}
+	\vspace{1cm}
+	\includegraphics[width=2cm,height=3cm,keepaspectratio]{uaic_sigla.png}
+}
+
+\author{Ovidiu Pricop}
+\date{\GLOBALDATE}
+
+\maketitle
+
+% Declaratie originalitate
+
+\chapter*{
+	\large{
+		Declara\c{t}ie privind originalitate \c{s}i respectarea drepturilor de
+		autor
+	}
+}
+\input{
+	chapters/declaratie_originalitate.tex
+}
+
+% Declaratie consimtamant
+
+\chapter*{
+	\large{
+		Declara\c{t}ie de consim\c{t}\u{a}m\^{a}nt
+	}
+}
+\input{
+	chapters/declaratie_consimtamant.tex
+}
+
+% Rezumat
+
+\chapter*{\LARGE{Rezumat}}
+...
+
+\chapter{Cuprins}
+
+\end{document}

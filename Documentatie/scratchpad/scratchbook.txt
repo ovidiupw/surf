@@ -1,0 +1,81 @@
+Surf:
+
+########################
+###### Roadmap #########
+########################
+
+1) Scrap webpage for user requested (defined) data and save results to some database or files (or both)
+2) Notify user when requested webpage has new content
+3) Define a job (cron expression) for the user to be able to scrap webpage at regular intervals automatically
+4) Let user choose what data to scrap and see what scraped data he/she has through a GUI - statically served webpage
+5) Let user do pipelined scraping - get scraping results and perform an operation on them
+6) Use Google Search API to get semantic data about scraped content
+
+#################################
+###### General requests #########
+#################################
+
+Constraints & Observations:
+	- Each feature on the roadmap should be independent and able to plugin into the existing core (#1 on the Roadmap - Scrapper)
+	- Each application sub-component should log activity; user must be able to view his logging data; logging data should expire; #cujoJS
+	- Application should be deployable to independent users - enforce low amount of scraped data and limit overuse impact to individual users; the graphical user interface (be it a webpage) should run locally on the end user's machine; this also means that the end-user will have to keep its host running for the application to work
+	- Strive to create an api as a self-contained npm module that supports various plugins (enfornce plugin-ability of the application)
+	- Application should have an user-friendly use manual, a static or interactive tutorial - e.g. webpack is hard for newcommers because it takes long to figure out how to setup the webpack.config.js file
+
+Architecture & Design:
+	Application format: npm packages - independent by means of module (see roadmap items)
+	Programming languages: 
+		- Node.js, Python (for automation between node.js programs) (backend)
+		- Html + css + react.js + bootstrap for visual scraper (gui module/plugin)
+		- LaTeX for documentation
+	Persistence:
+		- localhost files for large scraped data (maybe - investigate using localhost mongodb for this)
+		- localhost mongoDB instance (packed into application's core)
+		- *.js config file for managing bot's behaviour - see webpack.config.js for some inspiration
+
+
+
+##################################
+###### Specific requests #########
+##################################
+
+Roadmap #1 - Scrap webpage:
+---------------------------
+
+Developer customer perspective:
+	What I want is an application that can surf webpages and get the content I specifically want; for example, only the first three images that appear in my news feed on facebook, or the first three videos recommended by my beloved tumblr buddy who posts ocasionally. I want the information to be either in serialized format (json) or in a view friendly format (html) such that I can quickly take a glance and see what information the bot got for me.
+
+Problem:
+	Input: 
+		- A page (represented by URL) (text-html)
+		- A series of jquery/css selectors (strings) (or html microdata schemas (e.g. https://health-lifesci.schema.org/Drug))
+	Output: 
+		- Contents of input page that matched the given selectors in the following formats (which should also be configurable - pluginable):
+			# json - for easy cross-application information sharing
+			# html - for easy user-related observations
+
+Constraints & Observations:
+	- ! the bot must perform (surf de webpages) like a human would
+		- automation engine shall be webdriver.io browser and cheerio (jquery/css selector)
+		- bot should be able to login into some login based websites as long as credentials are provided
+		- npm antigate - automatically solve captcha
+		- fake human delays
+		- do not scrap large amounts of data (i.e. for comercial purposes - spying, etc.)
+		- treat web-surfing errors with great care - log them like a human would remember them
+	- use npm yargs to start a node script and parse command line arguments into nice js object fields
+	- add suport for scraping content by using html microdata schemas
+	- bot (application core) configuration file that hooks application execution and orchestrates dependency activations and functionality
+		- surf.bot.config.js
+		- should support plugins, various setups (e.g. easy scraping, deep scraping, json scraping, html scraping) as execution targets (npm run $targetName)
+
+Architecture & Design:
+	- Web-surfing bot will have to orchestrate surfing tasks. 
+		- A task can be viewed as an encapsulation of all the necessary activities and task inputs for obtaining the user-expected ouput after running the bot.
+		- We're talking about concurrency - see how node.js cooperates with this!
+	-
+
+Roadmap #2 - User notifications:
+--------------------------------
+
+Developer customer perspective:
+	I usually surf webpages in search for data. I now have the possibility of going outside (hiking) and let my computer surf the webpages for me. However, I need my computer to send me a message whenever the automatic surfing has finished (bot completed its task(s)). I'd like to receive this information either through email or SMS. I would like to be able to configure which method I want to use. Maybe for task X I want an email and for task Y I want an SMS because task Y is much more critical for me to know about its status; and by status I also mean eventual errors that may arise while ewb-surfing.
