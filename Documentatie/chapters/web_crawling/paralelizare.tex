@@ -1,0 +1,8 @@
+\hyphenation{statica}
+"Surf" implementeaza un mecanism de crawling distribuit. Mai exact, exista posibilitatea de a imparti sarcinile de parcurgere a paginilor web prin rularea concurenta a mai multor instante de functii Lambda\footnote{Amazon Web Services Lambda Functions}.
+\\
+\\
+Exista doua moduri bine cunoscute de alocare a sarcinilor de web crawling: statica si dinamica\cite{distribution-of-crawling-tasks}. Aplicatia "Surf" implementeaza un mecanism de distribuire statica a sarcinilor:
+\begin{quote}
+	Fie \emph{n}, \emph{gradul de paralelizare}\footnote{Numarul maxim de executii simultane de sarcini de crawling} configurat pentru executia curenta a web crawler-ului. Alocarea statica va asocia fiecarui URL candidat pentru crawling un numar intreg in intervalul [1,\emph{n}] reprezentand identificatorul uneia dintre cele \emph{n} instante paralele ale web crawler-ului. Sarcina va fi distribuita pe acea instanta si va fi executata.
+\end{quote}

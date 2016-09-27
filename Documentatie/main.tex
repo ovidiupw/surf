@@ -1,4 +1,4 @@
-\documentclass[12pt,twoside]{report}
+\documentclass[12pt,oneside]{report}
 
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
@@ -6,10 +6,28 @@
 \usepackage{lipsum}
 \usepackage{microtype}
 
+% Document table of contents configuration
+\usepackage{tocloft}
+\cftsetindents{section}{0em}{2em}
+\cftsetindents{subsection}{0em}{2em}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+  
+% Document geometry configuration
+\usepackage[
+	a4paper,
+	textwidth={400pt}
+]{geometry}
+
 \graphicspath{ {images/} }
 
 \newenvironment{bottompar}{\par\vspace*{\fill}}{\clearpage}
+
 \newcommand{\GLOBALDATE}{29 August 2016}
+\newcommand{\chaptertitle}[1]{\LARGE{#1}}
+
+\renewcommand{\bibname}{\LARGE{Bibliografie}}
+\renewcommand{\tableofcontents}{\LARGE{Cuprins}}
+\renewcommand{\thesection}{\arabic{section}}
 
 % Pagina titlu
 
@@ -36,8 +54,7 @@
 
 \chapter*{
 	\large{
-		Declara\c{t}ie privind originalitate \c{s}i respectarea drepturilor de
-		autor
+		Declara\c{t}ie privind originalitate \c{s}i respectarea drepturilor de autor
 	}
 }
 \input{
@@ -57,9 +74,73 @@
 
 % Rezumat
 
-\chapter*{\LARGE{Rezumat}}
-...
+\chapter*{\chaptertitle{Rezumat}}
+\addcontentsline{toc}{chapter}{Rezumat}
+\input{
+	chapters/rezumat.tex
+}
+\newpage
 
-\chapter{Cuprins}
+
+% Cuprins
+
+\tableofcontents
+\clearpage
+
+% Introducere
+\chapter*{\chaptertitle{Introducere}}
+\addcontentsline{toc}{chapter}{Introducere}
+\input{
+	chapters/introducere.tex
+}
+\clearpage
+
+% Crawling-ul paginilor web
+\section{Crawling-ul paginilor web}
+\input{
+	chapters/web_crawling.tex
+}
+
+\subsection{Puncte de pornire}
+\input{
+	chapters/web_crawling/puncte_de_pornire.tex
+}
+
+\subsection{Parcurgere}
+\input{
+	chapters/web_crawling/parcurgere_recursiva.tex
+}
+
+\subsection{Selectia informatiilor}
+\input{
+	chapters/web_crawling/selectia_informatiilor.tex
+}
+
+\subsection{Viteza, politici de respingere si drepturi de autor}
+\input{
+	chapters/web_crawling/viteza.tex
+}
+
+\subsection{Paralelizare}
+\input{
+	chapters/web_crawling/paralelizare.tex
+}
+
+\subsection{Logarea actiunilor si retentia datelor}
+\input{
+	chapters/web_crawling/logare_retentie.tex
+}
+\clearpage
+
+% Crawling in Amazon Web Services
+\section{Crawling in Amazon Web Services}
+\input{
+	chapters/crawling_in_aws.tex
+}
+
+% Bibliografie
+\input{
+	chapters/bibliografie.tex
+}
 
 \end{document}

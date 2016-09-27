@@ -1,0 +1,25 @@
+Selectia informatiilor necesita parcurgerea siturilor web aflate la adresele URL pe care crawler-ul le are in vedere, parsarea informatiilor in functie de tipul lor (e.g. html, xml, json, text) si extragerea blocurilor de continut aferente.
+\\
+\\
+Un "bloc de continut" asociat unui URL reprezinta o parte a intregului continut aflat la URL-ul respectiv, filtrata dupa anumite caracteristici stabilite de utilizatorul serviciului web. Aceste caracteristici pot fi:
+
+\begin{itemize}
+	\item{Pentru fisiere HTML/XML:
+		\begin{itemize}
+			\item{selectori CSS/jQuery}
+			\item{cuvinte cheie}
+			\item{o combinatie logica a punctelor de mai sus (e.g. toate tagurile \textless{}p\textgreater{ }  in care se afla cuvintele cheie "om" si "luna")}
+		\end{itemize}			
+	}
+	\item{Pentru fisiere text:
+		\begin{itemize}
+			\item{cuvinte cheie}
+		\end{itemize}			
+	}
+\end{itemize}
+
+\noindent
+Pentru tipurile de continut enumerate mai sus sau pentru alte tipuri de continut aflate la adresele URL vizitate de crawler, utilizatorul poate defini filtre bazate pe continutul textual al URL-ului. Spre exemplu, se pot evita toate URL-urile care nu satisfac o anumita expresie regulata sau un anumit tip de continut  MIME\footnote{https://en.wikipedia.org/wiki/Media\_type} (e.g. "image/png"). 
+\\
+\\
+Evitarea selectarii informatiilor duplicate se amelioreaza prin normalizarea\footnote{https://en.wikipedia.org/wiki/URL\_normalization} URL-urilor parcurse de catre "crawler".

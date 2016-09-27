@@ -1,0 +1,19 @@
+Ca sens general, un crawler web reprezinta un program care parcurge, prin cereri succesive, situri web. Programatic, vom considera urmatoarele aspecte cheie in proiectarea unui crawler distribuit:
+
+\begin{enumerate}
+
+	\item{Punctele de pornire in parcurgerea siturilor web;}
+	
+	\item{Adancimea maxima a parcurgerii recursive a siturilor (i.e. cea mai indepartata pagina la care se poate ajunge, de la punctul de pornire, prin accesarea succesiva a legaturilor de tipul hyperlink;}
+	
+	\item{Politica de selectie a informatiilor din paginile parcurse\cite{web-crawler-selection-policy};}
+	
+	\item{Viteza de crawling, fisierul \emph{robots.txt}\footnote{http://www.robotstxt.org/robotstxt.html} si respectarea drepturilor de autor;}
+	
+	\item{Politica de paralelizare a procesului de web crawling;}
+	
+	\item{Politica de retentie temporara a rezultatelor parcurgerii siturilor web si logare a actiunilor serviciului de crawling;}
+	
+\end{enumerate}
+
+In cele ce urmeaza, se va descrie particularizarea aspectelor generale enumerate mai sus in contextul serviciului web "Surf". Se va crea, astfel, contextul dezvoltarii aplicatiei si se vor puncta principalele componente functionale implicate.

@@ -1,3 +1,15 @@
+------------------------------
+Documentatie Surf:
+
+Crawling:
+	- use duckduckgo as starting point
+
+Servicii web:
+	1) Descrierea unui serviciu web (arhitectura (distribuita), schimb de informatii intr-un serviciu web, availability, monetizare (i.e. pe ora de putere computationala consumata), load balancing la nivel de serviciu web, securitate,
+
+
+------------------------------
+
 Surf:
 
 ########################
@@ -6,8 +18,8 @@ Surf:
 
 1) Scrap webpage for user requested (defined) data and save results to some database or files (or both)
 2) Notify user when requested webpage has new content
-3) Define a job (cron expression) for the user to be able to scrap webpage at regular intervals automatically
-4) Let user choose what data to scrap and see what scraped data he/she has through a GUI - statically served webpage
+3) Let user choose what data to scrap and see what scraped data he/she has through a GUI - statically served webpage
+4) Define a job (cron expression) for the user to be able to scrap webpage at regular intervals automatically
 5) Let user do pipelined scraping - get scraping results and perform an operation on them
 6) Use Google Search API to get semantic data about scraped content
 
@@ -32,6 +44,9 @@ Architecture & Design:
 		- localhost files for large scraped data (maybe - investigate using localhost mongodb for this)
 		- localhost mongoDB instance (packed into application's core)
 		- *.js config file for managing bot's behaviour - see webpack.config.js for some inspiration
+	Distribution:
+		- deploy application web-scraping as a web service behind an nginx container
+		- see Amazon SWF documentation for building a distributed system orchestration mechanism
 
 
 
@@ -44,12 +59,15 @@ Roadmap #1 - Scrap webpage:
 
 Developer customer perspective:
 	What I want is an application that can surf webpages and get the content I specifically want; for example, only the first three images that appear in my news feed on facebook, or the first three videos recommended by my beloved tumblr buddy who posts ocasionally. I want the information to be either in serialized format (json) or in a view friendly format (html) such that I can quickly take a glance and see what information the bot got for me.
+	I want this process to be independent from the machine I am requesting the data (a high availability web-service)
 
 Problem:
 	Input: 
 		- A page (represented by URL) (text-html)
 		- A series of jquery/css selectors (strings) (or html microdata schemas (e.g. https://health-lifesci.schema.org/Drug))
+		- Output format
 	Output: 
+		- The restful endpoint to u
 		- Contents of input page that matched the given selectors in the following formats (which should also be configurable - pluginable):
 			# json - for easy cross-application information sharing
 			# html - for easy user-related observations
@@ -69,13 +87,81 @@ Constraints & Observations:
 		- should support plugins, various setups (e.g. easy scraping, deep scraping, json scraping, html scraping) as execution targets (npm run $targetName)
 
 Architecture & Design:
+	- investigate the possibility of using Sails.js as a backend node.js framework
 	- Web-surfing bot will have to orchestrate surfing tasks. 
 		- A task can be viewed as an encapsulation of all the necessary activities and task inputs for obtaining the user-expected ouput after running the bot.
 		- We're talking about concurrency - see how node.js cooperates with this!
-	-
+	- Web-surfing bot should be visible for the customer as a reliable service, but behind the scenes, the bot shall be implemented as a webservice with:
+		- Load balancing (see nginx.com)
+		- Web acceleration (see nginx.com)
+		- Security and anonimity (see nginx.com)
+		- Non-repudiation and key based api access
+	- End-user should be able to use an API (javascript) that should support long-polling for new server (web-scrapper) data
+		- Data should be placed in a queue (with a maximum size - be careful not to exceed server storage capacity for the concurrent users allowed - define a maximum per-user queue size)
+		- User can extract data from queue - if extraction successful, then delete data from queue
+		
 
 Roadmap #2 - User notifications:
 --------------------------------
 
 Developer customer perspective:
 	I usually surf webpages in search for data. I now have the possibility of going outside (hiking) and let my computer surf the webpages for me. However, I need my computer to send me a message whenever the automatic surfing has finished (bot completed its task(s)). I'd like to receive this information either through email or SMS. I would like to be able to configure which method I want to use. Maybe for task X I want an email and for task Y I want an SMS because task Y is much more critical for me to know about its status; and by status I also mean eventual errors that may arise while ewb-surfing.
+
+Problem:
+	Input: 
+		- A finished scraping-bot task (Succeeded/Failed/Interrupted etc.)
+		- A configuration wiring the task result to the notification mechanism
+	Output: 
+		- A message to be sent on the configured communication channel (found in the configuration wiring file)
+		- Send the message as configured in the configuration wiring file
+
+Constraints & Observations:
+	- web-scraping task could last way longer than expected; introduce web-scraping activity tasks timeouts (see Amazon SWF documentation on timeouts)
+	- notify user whenever abnormal activity status encountered
+	- make sure user can disable notifications within the email/sms (link included) for avoiding spam reporting (blacklisting app domain)
+
+Architecture & Design:
+	- see npm nodemailer for sending emails from node.js
+	- wire notification mechanism and automate the process within the web-scraping activities (see Amazon SWF documentation on how to wire distributed applications)
+	- maintain logs (besides notifications) on what user requested activities produced (error, success) for a limited amount of time
+		- make sure user is able to download those logs in chunks based on several key data characteristics like date, task exit code, etc - log indexation mechanism
+
+
+Roadmap #3 - Scraper input generation GUI:
+------------------------------------------
+
+Developer customer perspective:
+	I would like to have an easy way to get the underlying css/jquery selectors by visually selecting the parts of the page I am interested in. When I hover over a specific element of the webpage, I would like to receive feedback about what data I will receive from the web-scraper if I add that component to be scraped.
+
+Problem:
+	Input: 
+		- A webpage URL
+		- User clicking parts of the webpage
+		- User visually creating relational corellations among parts of webpage (e.g. to build the css selector "first sibling of clicked div")
+	Output: 
+		- Input to be fed to the web-scraping bot - "A series of jquery/css selectors (strings)"
+		- Highlight user clicked parts of the webpage to show that only the highlighted data will be scraped from the webpage
+
+Constraints & Observations:
+	- UI should be server-agnostic for the beggining - only a script to generate web-scraping bot input css/jquery selectors
+	- UI should include feedback on what the user already chose to be scraped (a list of "what to scrap")
+	- UI should include a GENERATE SCRAPING INPUT DATA button and the scraping input should be available for downlaod (http://stackoverflow.com/questions/13405129/javascript-create-and-save-file)
+		- or copy-paste to web-scraping request when calling API function
+
+Architecture & Design:
+	- use react + redux + bootstrap (see Grades GUI application example)
+
+
+Roadmap #4 - Defining scraping jobs to run at fixed dates (scheduling):
+-----------------------------------------------------------------------
+// TODO
+
+Roadmap #5 - Pipelined scraping:
+--------------------------------
+// TODO
+
+Roadmap #6 - Scrap data analysis (semantic analysis via google search API?):
+----------------------------------------------------------------------------
+// TODO
+
+

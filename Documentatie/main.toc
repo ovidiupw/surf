@@ -1,0 +1,10 @@
+\contentsline {chapter}{Rezumat}{3}
+\contentsline {chapter}{Introducere}{5}
+\contentsline {section}{\numberline {1}Crawling-ul paginilor web}{6}
+\contentsline {subsection}{\numberline {1.1}Puncte de pornire}{6}
+\contentsline {subsection}{\numberline {1.2}Parcurgere}{6}
+\contentsline {subsection}{\numberline {1.3}Selectia informatiilor}{7}
+\contentsline {subsection}{\numberline {1.4}Viteza, politici de respingere si drepturi de autor}{7}
+\contentsline {subsection}{\numberline {1.5}Paralelizare}{8}
+\contentsline {subsection}{\numberline {1.6}Logarea actiunilor si retentia datelor}{8}
+\contentsline {section}{\numberline {2}Crawling in Amazon Web Services}{10}
