@@ -6,11 +6,20 @@
 \usepackage{lipsum}
 \usepackage{microtype}
 
+% Packages for code style
+\usepackage{minted}
+\usepackage{mdframed}
+\definecolor{bg-grey}{rgb}{0.95,0.95,0.95}
+\usepackage{float}
+\renewcommand{\figurename}{Cuprins}
+
+
 % Document table of contents configuration
 \usepackage{tocloft}
 \cftsetindents{section}{0em}{2em}
-\cftsetindents{subsection}{0em}{2em}
+\cftsetindents{subsection}{0em}{4em}
 \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\contentsname}{Cuprins}
   
 % Document geometry configuration
 \usepackage[
@@ -18,15 +27,17 @@
 	textwidth={400pt}
 ]{geometry}
 
+% Hyphenation
+\hyphenation{con-fi-gu-ra-bil}
+
 \graphicspath{ {images/} }
 
 \newenvironment{bottompar}{\par\vspace*{\fill}}{\clearpage}
 
-\newcommand{\GLOBALDATE}{29 August 2016}
+\newcommand{\GLOBALDATE}{2 Octombrie 2016}
 \newcommand{\chaptertitle}[1]{\LARGE{#1}}
 
 \renewcommand{\bibname}{\LARGE{Bibliografie}}
-\renewcommand{\tableofcontents}{\LARGE{Cuprins}}
 \renewcommand{\thesection}{\arabic{section}}
 
 % Pagina titlu
@@ -39,7 +50,7 @@
       \vspace{2cm}
 	\LARGE{Surf} \\
 	\vspace{1cm}
-	\large{Parcurgere si procesare distribuita a paginilor web pentru extragerea informatiilor} \\
+	\large{Parcurgere \c{s}i procesare distribuit\u{a} a paginilor web \^{i}n cloud pentru extragerea informa\c{t}iilor} \\
 	\vspace{1cm}
 	\vspace{1cm}
 	\includegraphics[width=2cm,height=3cm,keepaspectratio]{uaic_sigla.png}
@@ -132,10 +143,16 @@
 }
 \clearpage
 
-% Crawling in Amazon Web Services
-\section{Crawling in Amazon Web Services}
+% Crawling in cloud
+\section{Crawling in cloud}
 \input{
 	chapters/crawling_in_aws.tex
+}
+\clearpage
+
+\subsection{Infrastructura}
+\input{
+	chapters/crawling_in_aws/infrastructura.tex
 }
 
 % Bibliografie

@@ -1,11 +1,12 @@
 ------------------------------
-Documentatie Surf:
+Documentatie Surf Roadmap:
+	- diagrama arhitectura
+	- descriere functionalitate distribuita crawleri (introducere crawling task + integrare cu swf, dynamoDB, s3, and all that sh*t)
+	- adaugare iconfinder.com si http://simpleicon.com/ ca surse pentru pictogramele din diagrame
+	- adaugare google openfont ca sursa pt opensans
 
 Crawling:
 	- use duckduckgo as starting point
-
-Servicii web:
-	1) Descrierea unui serviciu web (arhitectura (distribuita), schimb de informatii intr-un serviciu web, availability, monetizare (i.e. pe ora de putere computationala consumata), load balancing la nivel de serviciu web, securitate,
 
 
 ------------------------------
