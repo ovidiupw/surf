@@ -1,0 +1,6 @@
+{
+    "cfml": {
+        "wrap_line_length": 120,
+        "preserve_newlines": true
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 6,
+        "sourceType": "module",
+        "ecmaFeatures": {
+          "arrowFunctions": true,
+          "binaryLiterals": false,
+          "blockBindings": true,
+          "defaultParams": true,
+          "modules": true,
+          "jsx": true
+        }
+    },
+    "rules": {
+       "indent": [2, 2, { "SwitchCase": 1 }],
+       "semi": 1,
+       "no-mixed-spaces-and-tabs": 1
+    }
+}
