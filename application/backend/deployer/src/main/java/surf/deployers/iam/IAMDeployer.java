@@ -7,11 +7,11 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import surf.ExitCode;
 import surf.deployers.Deployer;
 import surf.deployers.DeployerConfiguration;
 import surf.deployment.Context;
 import surf.deployment.IAMRoles;
+import surf.exceptions.OperationFailedException;
 
 import javax.annotation.Nonnull;
 
@@ -34,88 +34,24 @@ public class IAMDeployer implements Deployer {
     }
 
     @Override
-    public Context deploy(@Nonnull Context context) {
+    public Context deploy(@Nonnull final Context context) {
         Preconditions.checkNotNull(context);
         final AmazonIdentityManagement iamClient = initializeIAMClient();
 
+        // TODO implement this in order to support role identity federation through sts and iam
+        // final Role surfApiUser = createSurfApiUserRole(iamClient);
+
         final Role helloWorldLambdaRole = createHelloWorldLambdaIAMRole(iamClient);
-        /* Add more IAM roles here when needed */
+        final Role apiGatewayPushToCloudWatchLogsRole = createApiGatewayPushToCloudWatchLogsRole(iamClient);
 
         LOG.info("Updating context with the created/existing lambda roles.");
         final IAMRoles IAMRoles = new IAMRoles.Builder()
                 .withHelloWorldLambdaRole(helloWorldLambdaRole)
+                .withApiGatewayPushToCloudWatchLogsRole(apiGatewayPushToCloudWatchLogsRole)
                 .build();
         context.setIAMRoles(IAMRoles);
 
         return context;
-    }
-
-    private Role createHelloWorldLambdaIAMRole(final AmazonIdentityManagement iamClient) {
-        final HelloWorldLambdaIAMRoleConfig helloWorldLambdaIAMRoleConfig = new HelloWorldLambdaIAMRoleConfig();
-        final Role helloWorldLambdaRole = createIAMRole(iamClient, helloWorldLambdaIAMRoleConfig);
-        putAccessPolicyOnRole(iamClient, helloWorldLambdaIAMRoleConfig);
-        return helloWorldLambdaRole;
-    }
-
-    private PutRolePolicyResult putAccessPolicyOnRole(
-            final AmazonIdentityManagement iamClient,final IAMRoleConfig helloWorldLambdaIAMRoleConfig) {
-        try {
-            LOG.info("Putting an access policy on the role with name '{}'", helloWorldLambdaIAMRoleConfig.getRoleName());
-            return iamClient.putRolePolicy(new PutRolePolicyRequest()
-                    .withPolicyName(helloWorldLambdaIAMRoleConfig.getAccessPolicyName())
-                    .withRoleName(helloWorldLambdaIAMRoleConfig.getRoleName())
-                    .withPolicyDocument(helloWorldLambdaIAMRoleConfig.getAccessPolicyDocument()));
-        } catch (LimitExceededException
-                | MalformedPolicyDocumentException
-                | NoSuchEntityException
-                | ServiceFailureException e) {
-            LOG.error("Exception while trying to put access policy on an IAM role! Exiting...", e);
-            System.exit(ExitCode.Error.getCode());
-        }
-
-        throw new IllegalStateException("This code path should not have been reached!");
-    }
-
-    private Role createIAMRole(final AmazonIdentityManagement iamClient, final IAMRoleConfig iamRoleConfig) {
-        try {
-            LOG.info("Trying to create IAM role with name '{}'...", iamRoleConfig.getRoleName());
-
-            final CreateRoleResult createRoleResult = iamClient.createRole(new CreateRoleRequest()
-                    .withRoleName(iamRoleConfig.getRoleName())
-                    .withAssumeRolePolicyDocument(iamRoleConfig.getAssumeRolePolicyDocument()));
-            return createRoleResult.getRole();
-
-        } catch (EntityAlreadyExistsException ignored) {
-            LOG.warn("IAM role with name '{}' already exists! Trying to use it's ARN instead.",
-                    iamRoleConfig.getRoleName());
-            return getIAMRole(iamClient, iamRoleConfig);
-        } catch (LimitExceededException
-                | ServiceFailureException
-                | InvalidInputException
-                | MalformedPolicyDocumentException e) {
-            LOG.error("Exception while trying to create IAM role! Exiting...", e);
-            System.exit(ExitCode.Error.getCode());
-        }
-
-        throw new IllegalStateException("This code path should not have been reached!");
-    }
-
-    private Role getIAMRole(final AmazonIdentityManagement iamClient, final IAMRoleConfig iamRoleConfig) {
-        try {
-            LOG.info("Trying to get IAM role with name '{}'...", iamRoleConfig.getRoleName());
-            GetRoleResult getRoleResult = iamClient.getRole(new GetRoleRequest()
-                    .withRoleName(iamRoleConfig.getRoleName()));
-            return getRoleResult.getRole();
-
-        } catch (NoSuchEntityException ignored) {
-            LOG.warn("IAM role with name '{}' could not be found!", iamRoleConfig.getRoleName());
-            System.exit(ExitCode.Error.getCode());
-        } catch (ServiceFailureException e) {
-            LOG.error("Exception while trying to get IAM role! Exiting...", e);
-            System.exit(ExitCode.Error.getCode());
-        }
-
-        throw new IllegalStateException("This code path should not have been reached!");
     }
 
     private AmazonIdentityManagement initializeIAMClient() {
@@ -124,5 +60,104 @@ public class IAMDeployer implements Deployer {
                 .withClientConfiguration(deployerConfiguration.getClientConfiguration())
                 .withRegion(deployerConfiguration.getRegion())
                 .build();
+    }
+
+    private Role createHelloWorldLambdaIAMRole(@Nonnull final AmazonIdentityManagement iamClient) {
+        final HelloWorldLambdaIAMRoleConfig roleConfig = new HelloWorldLambdaIAMRoleConfig();
+        final Role role = createIAMRole(iamClient, roleConfig);
+        putAccessPolicyOnRole(iamClient, roleConfig);
+
+        return role;
+    }
+
+    private Role createApiGatewayPushToCloudWatchLogsRole(@Nonnull final AmazonIdentityManagement iamClient) {
+        final ApiGatewayPushToCloudWatchLogsRoleConfig roleConfig = new ApiGatewayPushToCloudWatchLogsRoleConfig();
+        final Role role = createIAMRole(iamClient, roleConfig);
+        putAccessPolicyOnRole(iamClient, roleConfig);
+
+        return role;
+    }
+
+    private Role createIAMRole(
+            @Nonnull final AmazonIdentityManagement iamClient,
+            @Nonnull final IAMRoleConfig iamRoleConfig) {
+        final String roleName = iamRoleConfig.getRoleName();
+        final String assumeRolePolicyDocument = iamRoleConfig.getAssumeRolePolicyDocument();
+
+        try {
+            LOG.info("Trying to create IAM role with name='{}' and assumeRolePolicyDocument='{}'",
+                    roleName,
+                    assumeRolePolicyDocument);
+
+            final CreateRoleResult createRoleResult = iamClient.createRole(new CreateRoleRequest()
+                    .withRoleName(roleName)
+                    .withAssumeRolePolicyDocument(assumeRolePolicyDocument));
+
+            LOG.info("Successfully created IAM role with name='{}'!", roleName);
+
+            return createRoleResult.getRole();
+
+        } catch (EntityAlreadyExistsException ignored) {
+            LOG.warn("!!! IAM role with name '{}' already exists! Trying to use it's ARN instead !!!", roleName);
+            return getIAMRole(iamClient, iamRoleConfig);
+        } catch (LimitExceededException
+                | ServiceFailureException
+                | InvalidInputException
+                | MalformedPolicyDocumentException e) {
+            LOG.error("Exception while trying to create IAM role! Exiting...", e);
+            throw new OperationFailedException(e);
+        }
+    }
+
+    private Role getIAMRole(
+            @Nonnull final AmazonIdentityManagement iamClient,
+            @Nonnull final IAMRoleConfig iamRoleConfig) {
+        final String roleName = iamRoleConfig.getRoleName();
+
+        try {
+            LOG.info("Trying to get IAM role with name='{}'...", roleName);
+            final GetRoleResult getRoleResult = iamClient.getRole(new GetRoleRequest()
+                    .withRoleName(roleName));
+
+            LOG.info("Successfully found IAM role with name='{}'", roleName);
+            return getRoleResult.getRole();
+
+        } catch (NoSuchEntityException e) {
+            LOG.warn("IAM role with name '{}' could not be found!", roleName);
+            throw new OperationFailedException(e);
+        } catch (ServiceFailureException e) {
+            LOG.error("Exception while trying to get IAM role! Exiting...", e);
+            throw new OperationFailedException(e);
+        }
+    }
+
+    private void putAccessPolicyOnRole(
+            @Nonnull final AmazonIdentityManagement iamClient,
+            @Nonnull final IAMRoleConfig helloWorldLambdaIAMRoleConfig) {
+
+        final String accessPolicyName = helloWorldLambdaIAMRoleConfig.getAccessPolicyName();
+        final String accessPolicyDocument = helloWorldLambdaIAMRoleConfig.getAccessPolicyDocument();
+        final String roleName = helloWorldLambdaIAMRoleConfig.getRoleName();
+
+        try {
+            LOG.info("Putting an access policy with policyName='{}' and policyDocument='{}' on the role with name '{}'",
+                    accessPolicyName,
+                    accessPolicyDocument,
+                    roleName);
+
+            iamClient.putRolePolicy(new PutRolePolicyRequest()
+                    .withRoleName(roleName)
+                    .withPolicyName(accessPolicyName)
+                    .withPolicyDocument(accessPolicyDocument));
+
+            LOG.info("Successfully put access policy on the role with name='{}'", roleName);
+
+        } catch (LimitExceededException
+                | MalformedPolicyDocumentException
+                | NoSuchEntityException
+                | ServiceFailureException e) {
+            LOG.error("Exception while trying to put access policy on an IAM role! Exiting...", e);
+            throw new OperationFailedException(e);
+        }
     }
 }

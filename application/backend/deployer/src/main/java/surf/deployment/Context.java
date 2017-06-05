@@ -1,12 +1,16 @@
 package surf.deployment;
 
+import com.amazonaws.services.apigateway.model.Resource;
 import com.google.common.base.Preconditions;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 public class Context {
     private IAMRoles IAMRoles;
-    private LambdaArns lambdaArns;
+    private LambdaFunctionsData lambdaFunctionsData;
+    private List<Resource> apiResources;
+    private String apiKey;
 
     public void setIAMRoles(@Nonnull final IAMRoles IAMRoles) {
         Preconditions.checkNotNull(IAMRoles);
@@ -16,27 +20,53 @@ public class Context {
         this.IAMRoles = IAMRoles;
     }
 
-    public void setLambdaArns(@Nonnull final LambdaArns lambdaArns) {
-        Preconditions.checkNotNull(lambdaArns);
-        if (this.lambdaArns != null) {
+    public void setLambdaFunctionsData(@Nonnull final LambdaFunctionsData lambdaFunctionsData) {
+        Preconditions.checkNotNull(lambdaFunctionsData);
+        if (this.lambdaFunctionsData != null) {
             throw new UnsupportedOperationException("Lambda ARNs was already set in this context!");
         }
-        this.lambdaArns = lambdaArns;
+        this.lambdaFunctionsData = lambdaFunctionsData;
+    }
+
+    public void setApiResources(@Nonnull final List<Resource> apiResources) {
+        Preconditions.checkNotNull(apiResources);
+        if (this.apiResources != null) {
+            throw new UnsupportedOperationException("Api resources was already set in this context!");
+        }
+        this.apiResources = apiResources;
+    }
+
+    public void setApiKey(@Nonnull final String apiKey) {
+        Preconditions.checkNotNull(apiResources);
+        if (this.apiKey != null) {
+            throw new UnsupportedOperationException("Api key was already set in this context!");
+        }
+        this.apiKey = apiKey;
     }
 
     public IAMRoles getIAMRoles() {
         return IAMRoles;
     }
 
-    public LambdaArns getLambdaArns() {
-        return lambdaArns;
+    public LambdaFunctionsData getLambdaFunctionsData() {
+        return lambdaFunctionsData;
+    }
+
+    public List<Resource> getApiResources() {
+        return apiResources;
+    }
+
+    public String getApiKey() {
+        return apiKey;
     }
 
     @Override
     public String toString() {
         return "Context{" +
                 "IAMRoles=" + IAMRoles +
-                ", lambdaArns=" + lambdaArns +
+                ", lambdaFunctionsData=" + lambdaFunctionsData +
+                ", apiResources=" + apiResources +
+                ", apiKey='" + apiKey + '\'' +
                 '}';
     }
 }

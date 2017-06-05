@@ -1,0 +1,18 @@
+{
+  "awsAccountId": "011759591962",
+  "awsClientRequestTimeoutSeconds": "30",
+  "awsClientRegion": "eu-west-1",
+  "lambdaCodePath": "../lambda/target/surf-lambda-backend-1.0-SNAPSHOT.jar",
+  "lambdaRuntime": "java8",
+  "apiGatewayEndpoint": "apigateway.amazonaws.com",
+  "apiStageName": "v1",
+  "apiStageDescription": "v1 version of this API",
+  "apiStageMetricsEnabled": true,
+  "apiStageThrottlingRateLimit": "5",
+  "apiStageThrottlingBurstLimit": "20",
+  "apiLoggingLevel": "INFO",
+  "apiDataTraceEnabled": "true",
+  "apiGeneratedSdkType": "javascript",
+  "apiGeneratedSdkOutputPath": "../../frontend/generated/sdks/",
+  "apiGeneratedSdkFolderName": "api-gateway-js-sdk"
+}

@@ -1,4 +1,4 @@
-package surf;
+package surf.utility;
 
 public enum ExitCode {
     Success(0),

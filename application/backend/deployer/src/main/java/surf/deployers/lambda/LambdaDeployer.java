@@ -8,18 +8,23 @@ import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import surf.ExitCode;
 import surf.deployers.Deployer;
 import surf.deployers.DeployerConfiguration;
 import surf.deployment.Context;
-import surf.deployment.LambdaArns;
+import surf.deployment.LambdaData;
+import surf.deployment.LambdaFunctionsData;
+import surf.exceptions.OperationFailedException;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LambdaDeployer implements Deployer {
 
     private static final Logger LOG = LoggerFactory.getLogger(LambdaDeployer.class);
     private static final String DEPLOYER_NAME = "LambdaDeployer";
+    private static final String LAMBDA_API_GATEWAY_INVOKE_STATEMENT_ID = "apigateway-invoke-lambda-4457c439bb0b";
+    private static final String LAMBDA_INVOKE_FUNCTION_ACTION = "lambda:invokeFunction";
 
     private DeployerConfiguration deployerConfiguration;
 
@@ -39,14 +44,19 @@ public class LambdaDeployer implements Deployer {
         Preconditions.checkNotNull(context);
         final AWSLambda lambdaClient = initializeLambdaClient();
 
-        String helloWorldLambdaArn = createFunction(lambdaClient, new HelloWorldLambdaConfig(context));
-        /* Add more lambda functions here when needed */
+        final List<LambdaData> lambdaNeedingApiGatewayInvokePermissions = new ArrayList<>();
+
+        final LambdaData helloWorldFunctionData = createFunction(lambdaClient, new HelloWorldLambdaConfig(context));
+        lambdaNeedingApiGatewayInvokePermissions.add(helloWorldFunctionData);
+
+        cleanupApiGatewayInvokePermissions(lambdaClient, lambdaNeedingApiGatewayInvokePermissions);
+        setupApiGatewayInvokePermissions(lambdaClient, lambdaNeedingApiGatewayInvokePermissions);
 
         LOG.info("Updating context with the created/existing lambda arns.");
-        final LambdaArns lambdaArns = new LambdaArns.Builder()
-                .withHelloWorldLambdaArn(helloWorldLambdaArn)
+        final LambdaFunctionsData lambdaFunctionsData = new LambdaFunctionsData.Builder()
+                .withHelloWorldFunctionData(helloWorldFunctionData)
                 .build();
-        context.setLambdaArns(lambdaArns);
+        context.setLambdaFunctionsData(lambdaFunctionsData);
 
 
         return context;
@@ -59,7 +69,9 @@ public class LambdaDeployer implements Deployer {
                 .build();
     }
 
-    private String createFunction(AWSLambda lambdaClient, LambdaFunctionConfig functionConfig) {
+    private LambdaData createFunction(
+            @Nonnull final AWSLambda lambdaClient,
+            @Nonnull final LambdaFunctionConfig functionConfig) {
         final CreateFunctionRequest createFunctionRequest = new CreateFunctionRequest()
                 .withFunctionName(functionConfig.getFunctionName())
                 .withDescription(functionConfig.getDescription())
@@ -71,18 +83,24 @@ public class LambdaDeployer implements Deployer {
                 .withCode(deployerConfiguration.getLambdaFunctionCode());
 
         try {
-            LOG.info("Trying to create lambda function with name='{}', description='{}', handler='{}'," +
-                            "memoryMegabytes='{}', iamRoleName='{}', timeoutSeconds='{}', runtime='{}'...",
+            LOG.info("Trying to create lambda function with name='{}', description='{}', handler='{}', " +
+                            "memoryMegabytes='{}', iamRoleName='{}', iamRoleArn='{}' timeoutSeconds='{}', " +
+                            "runtime='{}'...",
                     functionConfig.getFunctionName(),
                     functionConfig.getDescription(),
                     functionConfig.getHandlerName(),
                     functionConfig.getMemoryMegabytes(),
                     functionConfig.getIAMRole().getRoleName(),
+                    functionConfig.getIAMRole().getArn(),
                     functionConfig.getTimeoutSeconds(),
                     deployerConfiguration.getLambdaRuntime());
 
-            CreateFunctionResult createFunctionResult = lambdaClient.createFunction(createFunctionRequest);
-            return createFunctionResult.getFunctionArn();
+            final CreateFunctionResult createFunctionResult = lambdaClient.createFunction(createFunctionRequest);
+
+            LOG.info("Successfully created lambda function with name='{}'", functionConfig.getFunctionName());
+            return new LambdaData(
+                    createFunctionResult.getFunctionName(),
+                    createFunctionResult.getFunctionArn());
         } catch (ResourceConflictException ignored) {
             LOG.warn("Lambda function with name '{}' already exists! Will update its metadata instead.",
                     functionConfig.getFunctionName());
@@ -93,23 +111,27 @@ public class LambdaDeployer implements Deployer {
                 | TooManyRequestsException
                 | CodeStorageExceededException e) {
             LOG.error("Exception while trying to create Lambda function! Exiting...", e);
-            System.exit(ExitCode.Error.getCode());
+            throw new OperationFailedException(e);
         }
-
-        throw new IllegalStateException("This code path should not have been reached!");
     }
 
-    private String updateFunction(final AWSLambda lambdaClient, final LambdaFunctionConfig functionConfig) {
+    private LambdaData updateFunction(
+            @Nonnull final AWSLambda lambdaClient,
+            @Nonnull final LambdaFunctionConfig functionConfig) {
         final GetFunctionResult getFunctionResult = getFunction(lambdaClient, functionConfig);
         LOG.info("Existing lambda function was found! Proceeding with updating function code and configuration.");
 
         updateFunctionCode(lambdaClient, functionConfig);
         updateFunctionConfiguration(lambdaClient, functionConfig);
 
-        return getFunctionResult.getConfiguration().getFunctionArn();
+        return new LambdaData(
+                getFunctionResult.getConfiguration().getFunctionName(),
+                getFunctionResult.getConfiguration().getFunctionArn());
     }
 
-    private GetFunctionResult getFunction(final AWSLambda lambdaClient, final LambdaFunctionConfig functionConfig) {
+    private GetFunctionResult getFunction(
+            @Nonnull final AWSLambda lambdaClient,
+            @Nonnull final LambdaFunctionConfig functionConfig) {
         try {
             LOG.info("Getting lambda function code and configuration for function name '{}'...",
                     functionConfig.getFunctionName());
@@ -120,14 +142,13 @@ public class LambdaDeployer implements Deployer {
                 | TooManyRequestsException
                 | InvalidParameterValueException e) {
             LOG.error("Exception while trying to get Lambda function! Exiting...", e);
-            System.exit(ExitCode.Error.getCode());
+            throw new OperationFailedException(e);
         }
-
-        throw new IllegalStateException("This code path should not have been reached!");
     }
 
     private UpdateFunctionCodeResult updateFunctionCode(
-            final AWSLambda lambdaClient, final LambdaFunctionConfig functionConfig) {
+            @Nonnull final AWSLambda lambdaClient,
+            @Nonnull final LambdaFunctionConfig functionConfig) {
         try {
             LOG.info("Updating lambda function code for function name '{}'", functionConfig.getFunctionName());
             return lambdaClient.updateFunctionCode(new UpdateFunctionCodeRequest()
@@ -139,30 +160,107 @@ public class LambdaDeployer implements Deployer {
                 | InvalidParameterValueException
                 | CodeStorageExceededException e) {
             LOG.error("Exception while trying to update Lambda function code! Exiting...", e);
-            System.exit(ExitCode.Error.getCode());
+            throw new OperationFailedException(e);
         }
-
-        throw new IllegalStateException("This code path should not have been reached!");
     }
 
-    private void updateFunctionConfiguration(final AWSLambda lambdaClient, final LambdaFunctionConfig functionConfig) {
+    private UpdateFunctionConfigurationResult updateFunctionConfiguration(
+            @Nonnull final AWSLambda lambdaClient,
+            @Nonnull final LambdaFunctionConfig config) {
         try {
-            LOG.info("Updating lambda function configuration for function name '{}'", functionConfig.getFunctionName());
-            lambdaClient.updateFunctionConfiguration(new UpdateFunctionConfigurationRequest()
+            LOG.info("Updating lambda function configuration for function name '{}'", config.getFunctionName());
+            return lambdaClient.updateFunctionConfiguration(new UpdateFunctionConfigurationRequest()
                     .withRuntime(deployerConfiguration.getLambdaRuntime())
-                    .withFunctionName(functionConfig.getFunctionName())
-                    .withDescription(functionConfig.getDescription())
-                    .withHandler(functionConfig.getHandlerName())
-                    .withMemorySize(functionConfig.getMemoryMegabytes())
-                    .withRole(functionConfig.getIAMRole().getArn())
-                    .withTimeout(functionConfig.getTimeoutSeconds()));
+                    .withFunctionName(config.getFunctionName())
+                    .withDescription(config.getDescription())
+                    .withHandler(config.getHandlerName())
+                    .withMemorySize(config.getMemoryMegabytes())
+                    .withRole(config.getIAMRole().getArn())
+                    .withTimeout(config.getTimeoutSeconds()));
         } catch (InvalidParameterValueException
                 | ServiceFailureException
                 | ResourceNotFoundException
                 | TooManyRequestsException
                 | CodeStorageExceededException e) {
-            LOG.error("Exception while trying to create Lambda function! Exiting...", e);
-            System.exit(ExitCode.Error.getCode());
+            LOG.error("Exception while trying to update Lambda function! Exiting...", e);
+            throw new OperationFailedException(e);
+        }
+    }
+
+    private void cleanupApiGatewayInvokePermissions(
+            @Nonnull final AWSLambda lambdaClient,
+            @Nonnull final List<LambdaData> lambdasData) {
+        LOG.info("Trying to cleanup Api Gateway invoke permissions for all lambda functions in order to recreate them");
+        for (final LambdaData lambdaData : lambdasData) {
+            try {
+                LOG.info("Cleaning up Api Gateway invoke permission with statementId='{}' for lambda with name='{}'",
+                        LAMBDA_API_GATEWAY_INVOKE_STATEMENT_ID,
+                        lambdaData.getFunctionName());
+
+                lambdaClient.removePermission(new RemovePermissionRequest()
+                        .withFunctionName(lambdaData.getFunctionName())
+                        .withStatementId(LAMBDA_API_GATEWAY_INVOKE_STATEMENT_ID));
+
+                LOG.info("Successfully cleaned up Api Gateway invoke permission for lambda with name='{}'",
+                        lambdaData.getFunctionName());
+            } catch (ResourceNotFoundException ignored) {
+            } catch (ServiceException
+                    | InvalidParameterValueException
+                    | TooManyRequestsException e) {
+                LOG.error("Exception while trying to cleanup lambda api-gateway invoke permissions!", e);
+                throw new OperationFailedException(e);
+            }
+        }
+
+    }
+
+    private void setupApiGatewayInvokePermissions(
+            @Nonnull final AWSLambda lambdaClient,
+            @Nonnull final List<LambdaData> lambdasData) {
+        LOG.info("Trying to setup api gateway invoke permissions for lambdaFunctions...");
+        for (final LambdaData lambdaData : lambdasData) {
+
+            final String sourceEndpoint = deployerConfiguration.getApiGatewayEndpoint();
+            final String sourceArn = String.format(
+                    "arn:aws:execute-api:%s:%s:*/*/*/*",
+                    deployerConfiguration.getRegion().getName(),
+                    deployerConfiguration.getAwsAccountId());
+
+            addInvokePermissionToLambdaFunction(lambdaClient, lambdaData, sourceEndpoint, sourceArn);
+        }
+    }
+
+    private void addInvokePermissionToLambdaFunction(
+            @Nonnull final AWSLambda lambdaClient,
+            @Nonnull final LambdaData lambdaData,
+            @Nonnull final String sourceEndpoint,
+            @Nonnull final String sourceArn) {
+        LOG.info("Adding invoke permission on lambdaName='{}' to sourceEndpoint='{}' with sourceArn='{}'...",
+                lambdaData.getFunctionName(),
+                sourceEndpoint,
+                sourceArn);
+        try {
+            lambdaClient.addPermission(new AddPermissionRequest()
+                    .withFunctionName(lambdaData.getFunctionName())
+                    .withStatementId(LAMBDA_API_GATEWAY_INVOKE_STATEMENT_ID)
+                    .withAction(LAMBDA_INVOKE_FUNCTION_ACTION)
+                    .withPrincipal(sourceEndpoint)
+                    .withSourceArn(sourceArn));
+
+            LOG.info("Successfully added invoke permission on lambdaName='{}'", lambdaData.getFunctionName());
+        } catch (ServiceException
+                | ResourceNotFoundException
+                | ResourceConflictException
+                | InvalidParameterValueException
+                | PolicyLengthExceededException
+                | TooManyRequestsException e) {
+            LOG.error("Could not add lambda invoke permission on " +
+                            "lambdaName='{}' to sourceEndpoint='{}', sourceArn='{}'",
+                    lambdaData.getFunctionName(),
+                    sourceEndpoint,
+                    sourceArn);
+            LOG.error("Exception was...", e);
+            throw new OperationFailedException(e);
         }
     }
 }
