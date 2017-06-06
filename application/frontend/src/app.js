@@ -6,8 +6,8 @@ import configureStore from 'redux/store';
 import Home from 'containers/home';
 import Utility from 'modules/utility';
 
-require('bootstrap/dist/css/bootstrap.css');
-
+Utility.requireBootstrapResources();
+Utility.requireApiGatewayResources();
 Utility.initFacebook();
 
 const store = configureStore();

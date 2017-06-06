@@ -1,6 +1,8 @@
 import { combineReducers } from 'redux';
-import { authenticateWithFacebook } from 'redux/actions/facebookAuth';
+import {
+  auth
+} from 'redux/reducers/auth';
 
 export default combineReducers({
-  authenticateWithFacebook
+  auth
 });

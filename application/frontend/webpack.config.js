@@ -6,26 +6,33 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const PATHS = {
   app: path.join(__dirname, 'src'),
   node_modules: path.join(__dirname, 'node_modules'),
-  build: path.join(__dirname, 'build')
+  generated: path.join(__dirname, 'generated'),
+  build: path.join(__dirname, 'build'),
+  api_gateway_sdk: path.join(__dirname, 'generated/sdks/api-gateway-js-sdk/apiGateway-js-sdk'),
+  static: path.join(__dirname, 'static')
 };
 
 const common = {
   resolve: {
     modules: [
       path.resolve(PATHS.app),
-      path.resolve(PATHS.node_modules)
+      path.resolve(PATHS.node_modules),
+      path.resolve(PATHS.generated)
     ]
   },
   entry: {
-    app: PATHS.app + "/app.js"
+    'app': path.join(PATHS.app, 'app.js')
   },
   output: {
-    filename: 'app.js',
+    filename: '[name].js',
     path: PATHS.build
   },
   module: {
     loaders: [
       {
+        test: /\.json$/,
+        loaders: ['json-loader']
+      }, {
         // Test expects a RegExp! Note the slashes!
         test: /\.css$/,
         loaders: ['style-loader', 'css-loader']
@@ -37,7 +44,7 @@ const common = {
         loaders: ['babel-loader?cacheDirectory'],
         // Parse only app files! Without this it will go through entire project.
         // In addition to being slow, that will most likely result in an error.
-        include: PATHS.app
+        include: [PATHS.app, PATHS.generated]
       }, {
         test: /\.(woff|woff2)$/,
         loader: "url-loader?limit=10000&mimetype=application/font-woff"
@@ -59,7 +66,10 @@ const environments = {
   development: merge(common, {
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
-      new HtmlWebpackPlugin({title: 'Surf - Crawling in the cloud', template: 'static/index.ejs'})
+      new HtmlWebpackPlugin({
+        title: 'Surf - Crawling in the cloud',
+        template: 'static/index.ejs'
+      })
     ],
     devServer: {
       contentBase: PATHS.build,
@@ -85,7 +95,10 @@ const environments = {
   production: merge(common, {
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
-      new HtmlWebpackPlugin({title: 'Surf - Crawling in the cloud', template: 'static/index.ejs'}),
+      new HtmlWebpackPlugin({
+        title: 'Surf - Crawling in the cloud',
+        template: 'static/index.ejs'
+      }),
       new webpack.optimize.UglifyJsPlugin({minimize: true})
     ]
   })

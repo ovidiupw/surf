@@ -5,7 +5,7 @@ import reducer from 'redux/reducers';
 
 const logger = createLogger({
   level: 'info',
-  collapsed: true
+  collapsed: false
 });
 
 const applyStore = applyMiddleware(thunk, logger)(createStore);

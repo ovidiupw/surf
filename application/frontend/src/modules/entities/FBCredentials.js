@@ -1,5 +1,3 @@
-import CredentialNames from 'constants/CredentialNames';
-
 class FBCredentials {
   constructor(userId, accessToken, userName) {
     this.userId = userId;
