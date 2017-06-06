@@ -81,7 +81,7 @@ public class ApiDeployer implements Deployer {
     private AmazonApiGateway initializeApiClient() {
         return AmazonApiGatewayClientBuilder.standard()
                 .withClientConfiguration(deployerConfiguration.getClientConfiguration())
-                .withRegion(deployerConfiguration.getRegion())
+                .withRegion(deployerConfiguration.getAwsClientRegion())
                 .build();
     }
 

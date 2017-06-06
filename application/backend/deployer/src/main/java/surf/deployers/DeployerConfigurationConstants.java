@@ -2,6 +2,7 @@ package surf.deployers;
 
 public class DeployerConfigurationConstants {
     private String awsAccountId;
+    private String awsAccessKey;
     private int awsClientRequestTimeoutSeconds;
     private String awsClientRegion;
     private String lambdaCodePath;
@@ -17,6 +18,15 @@ public class DeployerConfigurationConstants {
     private String apiGeneratedSdkFolderName;
     private String apiGeneratedSdkOutputPath;
     private String apiGeneratedSdkType;
+    private String clientConfigFilePath;
+
+    public String getClientConfigFilePath() {
+        return clientConfigFilePath;
+    }
+
+    public void setClientConfigFilePath(String clientConfigFilePath) {
+        this.clientConfigFilePath = clientConfigFilePath;
+    }
 
     public void setApiLoggingLevel(String apiLoggingLevel) {
         this.apiLoggingLevel = apiLoggingLevel;
@@ -128,6 +138,14 @@ public class DeployerConfigurationConstants {
 
     public String getApiGeneratedSdkOutputPath() {
         return apiGeneratedSdkOutputPath;
+    }
+
+    public String getAwsAccessKey() {
+        return awsAccessKey;
+    }
+
+    public void setAwsAccessKey(String awsAccessKey) {
+        this.awsAccessKey = awsAccessKey;
     }
 
     public void setApiGeneratedSdkFolderName(String apiGeneratedSdkFolderName) {

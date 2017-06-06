@@ -3,13 +3,25 @@ package surf.deployers;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.model.FunctionCode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import surf.utility.ExitCode;
+import surf.utility.FileReader;
 
 import javax.annotation.Nonnull;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.util.concurrent.TimeUnit;
 
 public class DeployerConfiguration {
+    private static final Logger LOG = LoggerFactory.getLogger(DeployerConfiguration.class);
+
     private ClientConfiguration clientConfiguration;
-    private Regions region;
+    private Regions awsClientRegion;
     private FunctionCode lambdaFunctionCode;
     private String lambdaRuntime;
     private String apiGatewayEndpoint;
@@ -25,6 +37,64 @@ public class DeployerConfiguration {
     private String apiGeneratedSdkFolderName;
     private String apiGeneratedSdkOutputPath;
     private String apiGeneratedSdkType;
+    private String clientConfigFilePath;
+    private String awsAccessKey;
+
+    public static DeployerConfiguration fromFile(@Nonnull final String configFilePath) {
+        try {
+            return initializeDeployerConfiguration(configFilePath);
+        } catch (IOException e) {
+            LOG.error("Error while initializing deployer configuration!", e);
+            System.exit(ExitCode.Error.getCode());
+        }
+        throw new IllegalStateException("This code path should not have been reached!");
+    }
+
+
+    private static DeployerConfiguration initializeDeployerConfiguration(
+            @Nonnull final String configFilePath) throws IOException {
+
+        final DeployerConfigurationConstants config = loadDeployerConfig(configFilePath);
+
+        final ClientConfiguration clientConfiguration = new ClientConfiguration()
+                .withClientExecutionTimeout((int) TimeUnit.SECONDS.toMillis(config.getAwsClientRequestTimeoutSeconds()));
+
+        final FunctionCode lambdaFunctionsCode = new FunctionCode()
+                .withZipFile(ByteBuffer.wrap(Files.readAllBytes(new File(config.getLambdaCodePath()).toPath())));
+
+        final String apiGatewayLambdaFunctionsPath = String.format(
+                "arn:aws:apigateway:%s:lambda:path/2015-03-31/functions/",
+                config.getAwsClientRegion());
+
+        return new DeployerConfiguration.Builder()
+                .withClientConfiguration(clientConfiguration)
+                .withLambdaFunctionCode(lambdaFunctionsCode)
+                .withLambdaRuntime(config.getLambdaRuntime())
+                .withAWSClientRegion(Regions.fromName(config.getAwsClientRegion()))
+                .withAwsAccountId(config.getAwsAccountId())
+                .withApiGatewayEndpoint(config.getApiGatewayEndpoint())
+                .withApiGatewayLambdaFunctionsPath(apiGatewayLambdaFunctionsPath)
+                .withApiStageName(config.getApiStageName())
+                .withApiStageDescription(config.getApiStageDescription())
+                .withApiStageMetricsEnabled(config.getApiStageMetricsEnabled())
+                .withApiStageThrottlingRateLimit(config.getApiStageThrottlingRateLimit())
+                .withApiStageThrottlingBurstLimit(config.getApiStageThrottlingBurstLimit())
+                .withApiLoggingLevel(config.getApiLoggingLevel())
+                .withApiDataTraceEnabled(config.getApiDataTraceEnabled())
+                .withApiGeneratedSdkFolderName(config.getApiGeneratedSdkFolderName())
+                .withApiGeneratedSdkOutputPath(config.getApiGeneratedSdkOutputPath())
+                .withApiGeneratedSdkType(config.getApiGeneratedSdkType())
+                .withClientConfigFilepath(config.getClientConfigFilePath())
+                .withAwsAccessKey(config.getAwsAccessKey())
+                .build();
+    }
+
+    private static DeployerConfigurationConstants loadDeployerConfig(
+            @Nonnull final String configFilePath) throws IOException {
+        final String configurationConstantsFileContent = FileReader.readFile(configFilePath);
+        final ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(configurationConstantsFileContent, DeployerConfigurationConstants.class);
+    }
 
     public ClientConfiguration getClientConfiguration() {
         return clientConfiguration;
@@ -34,12 +104,12 @@ public class DeployerConfiguration {
         this.clientConfiguration = clientConfiguration;
     }
 
-    public Regions getRegion() {
-        return region;
+    public Regions getAwsClientRegion() {
+        return awsClientRegion;
     }
 
-    private void setRegion(Regions region) {
-        this.region = region;
+    private void setAwsClientRegion(Regions awsClientRegion) {
+        this.awsClientRegion = awsClientRegion;
     }
 
     public FunctionCode getLambdaFunctionCode() {
@@ -162,6 +232,22 @@ public class DeployerConfiguration {
         this.apiGeneratedSdkType = apiGeneratedSdkType;
     }
 
+    public String getClientConfigFilePath() {
+        return clientConfigFilePath;
+    }
+
+    private void setClientConfigFilePath(String clientConfigFilePath) {
+        this.clientConfigFilePath = clientConfigFilePath;
+    }
+
+    public String getAwsAccessKey() {
+        return awsAccessKey;
+    }
+
+    private void setAwsAccessKey(String awsAccessKey) {
+        this.awsAccessKey = awsAccessKey;
+    }
+
     public static class Builder {
         private ClientConfiguration clientConfiguration;
         private Regions region;
@@ -180,6 +266,8 @@ public class DeployerConfiguration {
         private String apiGeneratedSdkFolderName;
         private String apiGeneratedSdkOutputPath;
         private String apiGeneratedSdkType;
+        private String clientConfigFilePath;
+        private String awsAccessKey;
 
         public DeployerConfiguration build() {
             Preconditions.checkNotNull(clientConfiguration);
@@ -199,11 +287,13 @@ public class DeployerConfiguration {
             Preconditions.checkNotNull(apiGeneratedSdkFolderName);
             Preconditions.checkNotNull(apiGeneratedSdkOutputPath);
             Preconditions.checkNotNull(apiGeneratedSdkType);
+            Preconditions.checkNotNull(clientConfigFilePath);
+            Preconditions.checkNotNull(awsAccessKey);
 
             final DeployerConfiguration deployerConfiguration = new DeployerConfiguration();
             deployerConfiguration.setClientConfiguration(clientConfiguration);
             deployerConfiguration.setLambdaFunctionCode(lambdaFunctionCode);
-            deployerConfiguration.setRegion(region);
+            deployerConfiguration.setAwsClientRegion(region);
             deployerConfiguration.setLambdaRuntime(lambdaRuntime);
             deployerConfiguration.setAwsAccountId(awsAccountId);
             deployerConfiguration.setApiGatewayEndpoint(apiGatewayEndpoint);
@@ -218,6 +308,8 @@ public class DeployerConfiguration {
             deployerConfiguration.setApiGeneratedSdkFolderName(apiGeneratedSdkFolderName);
             deployerConfiguration.setApiGeneratedSdkOutputPath(apiGeneratedSdkOutputPath);
             deployerConfiguration.setApiGeneratedSdkType(apiGeneratedSdkType);
+            deployerConfiguration.setClientConfigFilePath(clientConfigFilePath);
+            deployerConfiguration.setAwsAccessKey(awsAccessKey);
             return deployerConfiguration;
         }
 
@@ -227,7 +319,7 @@ public class DeployerConfiguration {
             return this;
         }
 
-        public DeployerConfiguration.Builder withRegion(@Nonnull final Regions region) {
+        public DeployerConfiguration.Builder withAWSClientRegion(@Nonnull final Regions region) {
             Preconditions.checkNotNull(region);
             this.region = region;
             return this;
@@ -320,6 +412,18 @@ public class DeployerConfiguration {
         public DeployerConfiguration.Builder withApiGeneratedSdkType(@Nonnull final String apiGeneratedSdkType) {
             Preconditions.checkNotNull(apiGeneratedSdkType);
             this.apiGeneratedSdkType = apiGeneratedSdkType;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withClientConfigFilepath(@Nonnull final String clientConfigFilePath) {
+            Preconditions.checkNotNull(clientConfigFilePath);
+            this.clientConfigFilePath = clientConfigFilePath;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withAwsAccessKey(@Nonnull final String awsAccessKey) {
+            Preconditions.checkNotNull(awsAccessKey);
+            this.awsAccessKey = awsAccessKey;
             return this;
         }
     }

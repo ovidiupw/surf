@@ -38,16 +38,18 @@ public class IAMDeployer implements Deployer {
         Preconditions.checkNotNull(context);
         final AmazonIdentityManagement iamClient = initializeIAMClient();
 
-        // TODO implement this in order to support role identity federation through sts and iam
-        // final Role surfApiUser = createSurfApiUserRole(iamClient);
-
-        final Role helloWorldLambdaRole = createHelloWorldLambdaIAMRole(iamClient);
-        final Role apiGatewayPushToCloudWatchLogsRole = createApiGatewayPushToCloudWatchLogsRole(iamClient);
+        final Role facebookWebIdentityBasicRole
+                = createRoleWithConfig(iamClient, new FacebookWebIdentityBasicRoleConfig());
+        final Role helloWorldLambdaRole
+                = createRoleWithConfig(iamClient, new HelloWorldLambdaIAMRoleConfig());
+        final Role apiGatewayPushToCloudWatchLogsRole
+                = createRoleWithConfig(iamClient, new ApiGatewayPushToCloudWatchLogsRoleConfig());
 
         LOG.info("Updating context with the created/existing lambda roles.");
         final IAMRoles IAMRoles = new IAMRoles.Builder()
                 .withHelloWorldLambdaRole(helloWorldLambdaRole)
                 .withApiGatewayPushToCloudWatchLogsRole(apiGatewayPushToCloudWatchLogsRole)
+                .withFacebookWebIdentityBasicRole(facebookWebIdentityBasicRole)
                 .build();
         context.setIAMRoles(IAMRoles);
 
@@ -55,26 +57,19 @@ public class IAMDeployer implements Deployer {
     }
 
     private AmazonIdentityManagement initializeIAMClient() {
-        LOG.info("Initializing IAM client with region set to '{}'...", deployerConfiguration.getRegion().getName());
+        LOG.info("Initializing IAM client with region set to '{}'...", deployerConfiguration.getAwsClientRegion().getName());
         return AmazonIdentityManagementClientBuilder.standard()
                 .withClientConfiguration(deployerConfiguration.getClientConfiguration())
-                .withRegion(deployerConfiguration.getRegion())
+                .withRegion(deployerConfiguration.getAwsClientRegion())
                 .build();
     }
 
-    private Role createHelloWorldLambdaIAMRole(@Nonnull final AmazonIdentityManagement iamClient) {
-        final HelloWorldLambdaIAMRoleConfig roleConfig = new HelloWorldLambdaIAMRoleConfig();
+    private Role createRoleWithConfig(
+            @Nonnull final AmazonIdentityManagement iamClient,
+            @Nonnull final IAMRoleConfig roleConfig) {
+
         final Role role = createIAMRole(iamClient, roleConfig);
         putAccessPolicyOnRole(iamClient, roleConfig);
-
-        return role;
-    }
-
-    private Role createApiGatewayPushToCloudWatchLogsRole(@Nonnull final AmazonIdentityManagement iamClient) {
-        final ApiGatewayPushToCloudWatchLogsRoleConfig roleConfig = new ApiGatewayPushToCloudWatchLogsRoleConfig();
-        final Role role = createIAMRole(iamClient, roleConfig);
-        putAccessPolicyOnRole(iamClient, roleConfig);
-
         return role;
     }
 

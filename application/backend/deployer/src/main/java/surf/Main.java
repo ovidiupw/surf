@@ -5,6 +5,7 @@ import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.Deployer;
+import surf.deployers.DeployerConfiguration;
 import surf.deployers.DeployerConfigurationModule;
 import surf.deployers.api.ApiDeployer;
 import surf.deployers.iam.IAMDeployer;
@@ -13,6 +14,8 @@ import surf.deployment.Deployment;
 import surf.exceptions.OperationFailedException;
 import surf.utility.ExitCode;
 
+import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class Main {
@@ -28,16 +31,23 @@ public class Main {
 
     private static void doMain() {
         try {
-            final Deployment deployment = buildDeployment();
+            DeployerConfiguration deployerConfiguration = DeployerConfiguration.fromFile(DEPLOYER_CONFIG_FILE_PATH);
+            final Deployment deployment = buildDeployment(deployerConfiguration);
             deployment.start();
-        } catch (OperationFailedException ignored) {
+
+            final DeploymentFinalizer deploymentFinalizer = new DeploymentFinalizer(deployerConfiguration, deployment);
+            deploymentFinalizer.dumpClientConfigurationToFile();
+
+        } catch (OperationFailedException
+                | IOException e) {
+            LOG.error("Exception while executing deployment!", e);
             System.exit(ExitCode.Error.getCode());
         }
     }
 
-    private static Deployment buildDeployment() {
+    private static Deployment buildDeployment(@Nonnull final DeployerConfiguration deployerConfiguration) {
         final Deployment deployment = new Deployment();
-        final Injector injector = Guice.createInjector(new DeployerConfigurationModule(DEPLOYER_CONFIG_FILE_PATH));
+        final Injector injector = Guice.createInjector(new DeployerConfigurationModule(deployerConfiguration));
 
         final Deployer iamDeployer = injector.getInstance(IAMDeployer.class);
         final Deployer lambdaDeployer = injector.getInstance(LambdaDeployer.class);

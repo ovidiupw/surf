@@ -65,7 +65,7 @@ public class LambdaDeployer implements Deployer {
     private AWSLambda initializeLambdaClient() {
         return AWSLambdaClientBuilder.standard()
                 .withClientConfiguration(deployerConfiguration.getClientConfiguration())
-                .withRegion(deployerConfiguration.getRegion())
+                .withRegion(deployerConfiguration.getAwsClientRegion())
                 .build();
     }
 
@@ -223,7 +223,7 @@ public class LambdaDeployer implements Deployer {
             final String sourceEndpoint = deployerConfiguration.getApiGatewayEndpoint();
             final String sourceArn = String.format(
                     "arn:aws:execute-api:%s:%s:*/*/*/*",
-                    deployerConfiguration.getRegion().getName(),
+                    deployerConfiguration.getAwsClientRegion().getName(),
                     deployerConfiguration.getAwsAccountId());
 
             addInvokePermissionToLambdaFunction(lambdaClient, lambdaData, sourceEndpoint, sourceArn);
