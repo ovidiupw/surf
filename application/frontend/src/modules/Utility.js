@@ -1,3 +1,7 @@
+import LocalStorageHelper from 'modules/LocalStorageHelper';
+import {initializeApiGatewayClient, addUserDataToState} from 'redux/actions/auth';
+import Routes from 'constants/Routes';
+
 let Utility = {
   initFacebook: function() {
     FB.init({appId: '1964336457119734', xfbml: true, version: 'v2.9'});
@@ -29,8 +33,39 @@ let Utility = {
     require('!!script-loader!sdks/api-gateway-js-sdk/apiGateway-js-sdk/apigClient.js');
   },
 
-  requireBootstrapResources: function() {
+  requireStyles: function() {
     require('bootstrap/dist/css/bootstrap.css');
+    require('bootstrap/dist/css/bootstrap-theme.css');
+    require('elemental/less/elemental.less');
+  },
+
+  requireGlobalErrorHandler: function() {
+    require('global_scripts/GlobalErrorsHandler.js');
+  },
+
+  initializeApigClientFromLocalStorage: function(dispatch, routerHistory) {
+    console.log("Entering componentDidMount()...");
+
+    console.log("ApigClient was null. Trying to recreate it using localStorage credentials...");
+    console.log("Trying to load AWS credentials from local storage...");
+    let awsCredentials = LocalStorageHelper.loadAWSCredentialsFromLocalStorage();
+    let fbCredentials = LocalStorageHelper.loadFBCredentialsFromLocalStorage();
+
+    if (awsCredentials.hasAllFieldsSet()
+      && awsCredentials.willNotExpireInTheNextFiveMinutes()
+      && fbCredentials.haveUserIdAndUserName()) {
+      console.log("Found AWS credentials in localStorage that don't expire in the next ~5 mintues.");
+      dispatch(initializeApiGatewayClient(awsCredentials));
+      dispatch(addUserDataToState(fbCredentials.userId, fbCredentials.userName));
+
+      console.log("Redirecting to " + Routes.DASHBOARD);
+      routerHistory.push(Routes.DASHBOARD);
+    }
+  },
+
+  clearLocalStorageAuthData: function() {
+    LocalStorageHelper.deleteAWSCredentialsFromLocalStorage();
+    LocalStorageHelper.deleteFBCredentialsFromLocalStorage();
   }
 };
 

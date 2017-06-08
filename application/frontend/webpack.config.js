@@ -37,6 +37,9 @@ const common = {
         test: /\.css$/,
         loaders: ['style-loader', 'css-loader']
       }, {
+        test: /\.less$/,
+        loaders: [ "style-loader", "css-loader","less-loader"]
+      }, {
         test: /\.jsx?$/,
         // Enable caching for improved performance during development
         // It uses default OS directory by default. If you need something
@@ -66,10 +69,7 @@ const environments = {
   development: merge(common, {
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
-      new HtmlWebpackPlugin({
-        title: 'Surf - Crawling in the cloud',
-        template: 'static/index.ejs'
-      })
+      new HtmlWebpackPlugin({title: 'Surf - Crawling in the cloud', template: 'static/index.ejs'})
     ],
     devServer: {
       contentBase: PATHS.build,
@@ -95,10 +95,7 @@ const environments = {
   production: merge(common, {
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
-      new HtmlWebpackPlugin({
-        title: 'Surf - Crawling in the cloud',
-        template: 'static/index.ejs'
-      }),
+      new HtmlWebpackPlugin({title: 'Surf - Crawling in the cloud', template: 'static/index.ejs'}),
       new webpack.optimize.UglifyJsPlugin({minimize: true})
     ]
   })
