@@ -39,4 +39,8 @@ public class ObjectConverter {
         stringBuilder.append("'");
         return stringBuilder.toString();
     }
+
+    public static String toNormalizedLambdaRoleName(@Nonnull final String roleName) {
+        return String.format("surf_lambda_%s", roleName);
+    }
 }

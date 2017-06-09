@@ -11,7 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.Deployer;
 import surf.deployers.DeployerConfiguration;
-import surf.deployers.api.hello_world.HelloWorldResourceCreator;
+import surf.deployers.api.resources.ResourceCreator;
+import surf.deployers.api.resources.WorkersResourceCreator;
+import surf.deployers.api.resources.WorkflowsByIdResourceCreator;
+import surf.deployers.api.resources.WorkflowsResourceCreator;
 import surf.deployment.Context;
 import surf.exceptions.OperationFailedException;
 import surf.utility.FileHelper;
@@ -60,18 +63,32 @@ public class ApiDeployer implements Deployer {
         final CreateApiKeyResult apiKey = createEnabledApiKey(apiClient, USER_KEY_NAME, USER_KEY_DESCRIPTION);
         final Resource rootResource = getRootResource(restApi, apiClient);
 
-        final ResourceCreator helloWorldResourceCreator = new HelloWorldResourceCreator(
+        final ResourceCreator workersResourceCreator = new WorkersResourceCreator(
                 restApi, apiClient, deployerConfiguration, context);
-        final Resource helloWorldResource = helloWorldResourceCreator.create(rootResource, "hello-world");
+        final Resource workersResource = workersResourceCreator.create(rootResource, "workers");
+
+        final ResourceCreator workflowsResourceCreator = new WorkflowsResourceCreator(
+                restApi, apiClient, deployerConfiguration, context);
+        final Resource workflowsResource = workflowsResourceCreator.create(rootResource, "workflows");
+
+        final ResourceCreator workflowsByIdResourceCreator = new WorkflowsByIdResourceCreator(
+                restApi, apiClient, deployerConfiguration, context);
+        final Resource workflowsByIdResource = workflowsByIdResourceCreator.create(workflowsResource, "{id}");
         // Add other resources here by abiding the general interface conventions
 
         createApiDeployment(apiClient, restApi);
         configureDeploymentStageSettings(apiClient, restApi);
 
+        createApiUsagePlan(apiClient, restApi, apiKey);
+
         final GetSdkResult getSdkResult = generateJavascriptSdk(apiClient, restApi);
         extractGeneratedSdkToFolder(getSdkResult);
 
-        context.setApiResources(Arrays.asList(helloWorldResource));
+        context.setApiResources(Arrays.asList(
+                workersResource,
+                workflowsResource,
+                workflowsByIdResource
+        ));
         // Add other resources to the context as you create them in the API
         context.setApiKey(apiKey.getValue());
 
@@ -274,6 +291,47 @@ public class ApiDeployer implements Deployer {
             LOG.error("Exception was...", e);
             throw new OperationFailedException(e);
         }
+    }
+
+    private CreateUsagePlanResult createApiUsagePlan(
+            @Nonnull final AmazonApiGateway apiClient,
+            @Nonnull final CreateRestApiResult restApi,
+            @Nonnull final CreateApiKeyResult apiKey) {
+
+        try {
+            LOG.info("Trying to create an usage plan for apiId={} and keyId={}...", restApi.getId(), apiKey.getId());
+            final CreateUsagePlanResult usagePlan = apiClient.createUsagePlan(new CreateUsagePlanRequest()
+                    .withApiStages(new ApiStage()
+                            .withApiId(restApi.getId())
+                            .withStage(deployerConfiguration.getApiStageName()))
+                    .withName("UsagePlan apiID=" + restApi.getId())
+                    .withDescription("Api usage plan for associated api key with id=" + apiKey.getId())
+                    .withThrottle(new ThrottleSettings()
+                            .withRateLimit(deployerConfiguration.getApiStageThrottlingRateLimit())
+                            .withBurstLimit(deployerConfiguration.getApiStageThrottlingBurstLimit())));
+            LOG.info("Successfully created API usage plan!");
+
+            LOG.info("Adding API key with apiKeyId={} to usage plan with usagePlanId={}",
+                    apiKey.getId(), usagePlan.getId());
+
+            apiClient.createUsagePlanKey(new CreateUsagePlanKeyRequest()
+                    .withUsagePlanId(usagePlan.getId())
+                    .withKeyId(apiKey.getId())
+                    .withKeyType("API_KEY"));
+
+            LOG.info("Successfully added API key to usage plan!");
+
+            return usagePlan;
+        } catch (BadRequestException
+                | UnauthorizedException
+                | TooManyRequestsException
+                | LimitExceededException
+                | ConflictException
+                | NotFoundException e) {
+            LOG.error("Exception while trying to create API usage plan!", e);
+            throw new OperationFailedException(e);
+        }
+
     }
 
     private GetSdkResult generateJavascriptSdk(

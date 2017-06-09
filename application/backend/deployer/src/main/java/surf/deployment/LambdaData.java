@@ -7,15 +7,21 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 
 public final class LambdaData {
-    private String functionName;
-    private String functionArn;
+    private final String functionName;
+    private final String functionArn;
+    private final String functionDescription;
 
-    public LambdaData(@Nonnull final String functionName, @Nonnull final String functionArn) {
+    public LambdaData(
+            @Nonnull final String functionName,
+            @Nonnull final String functionArn,
+            @Nonnull final String functionDescription) {
         Preconditions.checkArgument(Strings.isNotBlank(functionName));
         Preconditions.checkArgument(Strings.isNotBlank(functionArn));
+        Preconditions.checkArgument(Strings.isNotBlank(functionDescription));
 
         this.functionName = functionName;
         this.functionArn = functionArn;
+        this.functionDescription = functionDescription;
     }
 
     public String getFunctionName() {
@@ -26,11 +32,16 @@ public final class LambdaData {
         return functionArn;
     }
 
+    public String getFunctionDescription() {
+        return functionDescription;
+    }
+
     @Override
     public String toString() {
         return "LambdaData{" +
                 "functionName='" + functionName + '\'' +
                 ", functionArn='" + functionArn + '\'' +
+                ", functionDescription='" + functionDescription + '\'' +
                 '}';
     }
 
@@ -40,11 +51,12 @@ public final class LambdaData {
         if (o == null || getClass() != o.getClass()) return false;
         LambdaData that = (LambdaData) o;
         return Objects.equals(functionName, that.functionName) &&
-                Objects.equals(functionArn, that.functionArn);
+                Objects.equals(functionArn, that.functionArn) &&
+                Objects.equals(functionDescription, that.functionDescription);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(functionName, functionArn);
+        return Objects.hash(functionName, functionArn, functionDescription);
     }
 }

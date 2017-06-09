@@ -1,4 +1,4 @@
-package surf.deployers.api;
+package surf.deployers.api.methods;
 
 import com.amazonaws.services.apigateway.AmazonApiGateway;
 import com.amazonaws.services.apigateway.model.*;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class OptionsMethodCreator {
+public class OptionsMethodCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(OptionsMethodCreator.class);
 
@@ -24,7 +24,7 @@ class OptionsMethodCreator {
     private final CreateRestApiResult restApi;
     private final AmazonApiGateway apiClient;
 
-    OptionsMethodCreator(@Nonnull final CreateRestApiResult restApi, @Nonnull final AmazonApiGateway apiClient) {
+    public OptionsMethodCreator(@Nonnull final CreateRestApiResult restApi, @Nonnull final AmazonApiGateway apiClient) {
         Preconditions.checkNotNull(restApi);
         Preconditions.checkNotNull(apiClient);
 
@@ -32,7 +32,7 @@ class OptionsMethodCreator {
         this.apiClient = apiClient;
     }
 
-    GetMethodResult create(@Nonnull final Resource resource, @Nonnull final List<HttpMethod> corsAllowedMethods) {
+    public GetMethodResult create(@Nonnull final Resource resource, @Nonnull final List<HttpMethod> corsAllowedMethods) {
         try {
             putMethod(resource);
             putMethodIntegration(resource);

@@ -4,7 +4,7 @@ interface IAMRoleConfig {
 
     String getRoleName();
 
-    String getAssumeRolePolicyDocument();
+    String getTrustPolicyDocument();
 
     String getAccessPolicyName();
 

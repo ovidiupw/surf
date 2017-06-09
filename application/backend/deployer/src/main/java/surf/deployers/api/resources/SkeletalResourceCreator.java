@@ -1,10 +1,16 @@
-package surf.deployers.api;
+package surf.deployers.api.resources;
 
 import com.amazonaws.services.apigateway.AmazonApiGateway;
 import com.amazonaws.services.apigateway.model.*;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import surf.deployers.DeployerConfiguration;
+import surf.deployers.api.methods.GetMethodCreator;
+import surf.deployers.api.methods.OptionsMethodCreator;
+import surf.deployers.api.methods.PostMethodCreator;
+import surf.deployment.Context;
+import surf.deployment.LambdaData;
 import surf.exceptions.OperationFailedException;
 import surf.utility.HttpMethod;
 
@@ -50,6 +56,46 @@ public abstract class SkeletalResourceCreator implements ResourceCreator {
             LOG.error(String.format("Could not create api resource with path-part='%s'!", pathPart), e);
             throw new OperationFailedException(e);
         }
+    }
+
+    protected GetMethodResult createGetMethod(
+            @Nonnull final DeployerConfiguration deployerConfiguration,
+            @Nonnull final Resource resource,
+            @Nonnull final String integrationTemplateFilePath,
+            @Nonnull final String methodFriendlyName,
+            @Nonnull final LambdaData lambdaData) {
+        LOG.info("Trying to create GET method for the '{}' api resource...", resource.getPath());
+
+        final GetMethodCreator getMethodCreator = new GetMethodCreator(restApi, apiClient);
+        final GetMethodResult getMethodResult = getMethodCreator.create(
+                resource,
+                deployerConfiguration.getApiGatewayLambdaFunctionsPath(),
+                lambdaData,
+                integrationTemplateFilePath,
+                methodFriendlyName);
+
+        LOG.info("Successfully created GET method for the '{}' api resource!", resource.getPath());
+        return getMethodResult;
+    }
+
+    protected GetMethodResult createPostMethod(
+            @Nonnull final DeployerConfiguration deployerConfiguration,
+            @Nonnull final Resource resource,
+            @Nonnull final String integrationTemplateFilePath,
+            @Nonnull final String methodFriendlyName,
+            @Nonnull final LambdaData lambdaData) {
+        LOG.info("Trying to create POST method for the '{}' api resource...", resource.getPath());
+
+        final PostMethodCreator postMethodCreator = new PostMethodCreator(restApi, apiClient);
+        final GetMethodResult getMethodResult = postMethodCreator.create(
+                resource,
+                deployerConfiguration.getApiGatewayLambdaFunctionsPath(),
+                lambdaData,
+                integrationTemplateFilePath,
+                methodFriendlyName);
+
+        LOG.info("Successfully created POST method for the '{}' api resource!", resource.getPath());
+        return getMethodResult;
     }
 
     protected GetMethodResult createOptionsMethod(

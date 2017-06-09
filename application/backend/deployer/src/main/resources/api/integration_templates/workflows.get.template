@@ -1,0 +1,5 @@
+#set($inputRoot = $input.path('$'))
+{
+"userArn" : "$context.identity.userArn",
+"createdBefore": "$util.urlDecode($input.params('createdBefore'))"
+};

@@ -17,7 +17,7 @@ public class ApiGatewayPushToCloudWatchLogsRoleConfig implements IAMRoleConfig {
     }
 
     @Override
-    public String getAssumeRolePolicyDocument() {
+    public String getTrustPolicyDocument() {
         return FileReader.readFile(ASSUME_ROLE_POLICY_PATH);
     }
 

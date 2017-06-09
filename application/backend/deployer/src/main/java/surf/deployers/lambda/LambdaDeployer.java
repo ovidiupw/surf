@@ -46,15 +46,27 @@ public class LambdaDeployer implements Deployer {
 
         final List<LambdaData> lambdaNeedingApiGatewayInvokePermissions = new ArrayList<>();
 
-        final LambdaData helloWorldFunctionData = createFunction(lambdaClient, new HelloWorldLambdaConfig(context));
-        lambdaNeedingApiGatewayInvokePermissions.add(helloWorldFunctionData);
+        final LambdaData listCoreWorkersData = createFunction(lambdaClient, new ListCoreWorkersLambdaConfig(context));
+        lambdaNeedingApiGatewayInvokePermissions.add(listCoreWorkersData);
+
+        final LambdaData listWorkflowsData = createFunction(lambdaClient, new ListWorkflowsLambdaConfig(context));
+        lambdaNeedingApiGatewayInvokePermissions.add(listWorkflowsData);
+
+        final LambdaData startWorkflowData = createFunction(lambdaClient, new StartWorkflowLambdaConfig(context));
+        lambdaNeedingApiGatewayInvokePermissions.add(startWorkflowData);
+
+        final LambdaData getWorkflowData = createFunction(lambdaClient, new GetWorkflowLambdaConfig(context));
+        lambdaNeedingApiGatewayInvokePermissions.add(getWorkflowData);
 
         cleanupApiGatewayInvokePermissions(lambdaClient, lambdaNeedingApiGatewayInvokePermissions);
         setupApiGatewayInvokePermissions(lambdaClient, lambdaNeedingApiGatewayInvokePermissions);
 
         LOG.info("Updating context with the created/existing lambda arns.");
         final LambdaFunctionsData lambdaFunctionsData = new LambdaFunctionsData.Builder()
-                .withHelloWorldFunctionData(helloWorldFunctionData)
+                .withListCoreWorkersFunctionData(listCoreWorkersData)
+                .withListWorkflowsData(listWorkflowsData)
+                .withStartWorkflowData(startWorkflowData)
+                .withGetWorkflowData(getWorkflowData)
                 .build();
         context.setLambdaFunctionsData(lambdaFunctionsData);
 
@@ -100,7 +112,8 @@ public class LambdaDeployer implements Deployer {
             LOG.info("Successfully created lambda function with name='{}'", functionConfig.getFunctionName());
             return new LambdaData(
                     createFunctionResult.getFunctionName(),
-                    createFunctionResult.getFunctionArn());
+                    createFunctionResult.getFunctionArn(),
+                    createFunctionResult.getDescription());
         } catch (ResourceConflictException ignored) {
             LOG.warn("Lambda function with name '{}' already exists! Will update its metadata instead.",
                     functionConfig.getFunctionName());
@@ -126,7 +139,8 @@ public class LambdaDeployer implements Deployer {
 
         return new LambdaData(
                 getFunctionResult.getConfiguration().getFunctionName(),
-                getFunctionResult.getConfiguration().getFunctionArn());
+                getFunctionResult.getConfiguration().getFunctionArn(),
+                getFunctionResult.getConfiguration().getDescription());
     }
 
     private GetFunctionResult getFunction(

@@ -1,5 +1,0 @@
-#set($inputRoot = $input.path('$'))
-{
-"userId" : "$context.identity.userArn",
-"message": "$util.urlDecode($input.params('message'))"
-};

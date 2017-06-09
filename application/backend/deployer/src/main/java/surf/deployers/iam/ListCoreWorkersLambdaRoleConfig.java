@@ -2,14 +2,17 @@ package surf.deployers.iam;
 
 import surf.utility.FileReader;
 
-public class FacebookWebIdentityBasicRoleConfig implements IAMRoleConfig {
+import static surf.utility.ObjectConverter.toNormalizedLambdaRoleName;
 
-    private static final String ROLE_NAME = "surf_api_invoke_basic";
+class ListCoreWorkersLambdaRoleConfig implements IAMRoleConfig {
+
+    private static final String ROLE_NAME = toNormalizedLambdaRoleName("list_core_workers");
     private static final String TRUST_POLICY_PATH
-            = "src/main/resources/iam_policy_documents/api_gateway_facebook_trust_policy.json";
-    private static final String ACCESS_POLICY_NAME = "surf_api_invoke_basic";
+            = "src/main/resources/iam_policy_documents/lambda_trust_policy_assume_role.json";
+    private static final String ACCESS_POLICY_NAME = ROLE_NAME;
     private static final String ACCESS_POLICY_PATH
-            = "src/main/resources/iam_policy_documents/surf_api_invoke_basic_policy.json";
+            = "src/main/resources/iam_policy_documents/list_core_workers_lambda_access_policy.json";
+
     @Override
     public String getRoleName() {
         return ROLE_NAME;

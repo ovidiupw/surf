@@ -6,20 +6,19 @@ import surf.deployment.Context;
 
 import javax.annotation.Nonnull;
 
-class HelloWorldLambdaConfig implements LambdaFunctionConfig {
-
-    private static final String NAME = "helloWorld";
-    private static final String DESCRIPTION = "Hello world test function";
-    private static final String HANDLER_NAME = "handlers.HelloWorldHandler";
+public class StartWorkflowLambdaConfig implements LambdaFunctionConfig {
+    private static final String NAME = "startWorkflow";
+    private static final String DESCRIPTION = "Starts a new crawling workflow.";
+    private static final String HANDLER_NAME = "handlers.StartWorkflowHandler";
     private static final Integer MEMORY_MEGABYTES = 128;
     private static final Integer TIMEOUT_SECONDS = 5;
 
     private Context context;
 
-    public HelloWorldLambdaConfig(@Nonnull final Context context) {
+    public StartWorkflowLambdaConfig(@Nonnull final Context context) {
         Preconditions.checkNotNull(context);
         Preconditions.checkNotNull(context.getIAMRoles());
-        Preconditions.checkNotNull(context.getIAMRoles().getHelloWorldLambdaRole());
+        Preconditions.checkNotNull(context.getIAMRoles().getStartWorkflowLambdaRole());
         this.context = context;
     }
 
@@ -45,7 +44,7 @@ class HelloWorldLambdaConfig implements LambdaFunctionConfig {
 
     @Override
     public Role getIAMRole() {
-        return context.getIAMRoles().getHelloWorldLambdaRole();
+        return context.getIAMRoles().getStartWorkflowLambdaRole();
     }
 
     @Override

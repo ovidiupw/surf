@@ -40,16 +40,29 @@ public class IAMDeployer implements Deployer {
 
         final Role facebookWebIdentityBasicRole
                 = createRoleWithConfig(iamClient, new FacebookWebIdentityBasicRoleConfig());
-        final Role helloWorldLambdaRole
-                = createRoleWithConfig(iamClient, new HelloWorldLambdaIAMRoleConfig());
         final Role apiGatewayPushToCloudWatchLogsRole
                 = createRoleWithConfig(iamClient, new ApiGatewayPushToCloudWatchLogsRoleConfig());
+        final Role sfnInvokeLambdaRole
+                = createRoleWithConfig(iamClient, new SfnInvokeLambdaRoleConfig());
+
+        final Role listCoreWorkersLambdaRole
+                = createRoleWithConfig(iamClient, new ListCoreWorkersLambdaRoleConfig());
+        final Role listWorkflowsLambdaRole
+                = createRoleWithConfig(iamClient, new ListWorkflowsLambdaRoleConfig());
+        final Role startWorkflowLambdaRole
+                = createRoleWithConfig(iamClient, new StartWorkflowLambdaRole());
+        final Role getWorkflowLambdaRole
+                = createRoleWithConfig(iamClient, new GetWorkflowLambdaRole());
 
         LOG.info("Updating context with the created/existing lambda roles.");
         final IAMRoles IAMRoles = new IAMRoles.Builder()
-                .withHelloWorldLambdaRole(helloWorldLambdaRole)
                 .withApiGatewayPushToCloudWatchLogsRole(apiGatewayPushToCloudWatchLogsRole)
                 .withFacebookWebIdentityBasicRole(facebookWebIdentityBasicRole)
+                .withSfnInvokeLambdaRole(sfnInvokeLambdaRole)
+                .withListCoreWorkersLambdaRole(listCoreWorkersLambdaRole)
+                .withListWorkflowsLambdaRole(listWorkflowsLambdaRole)
+                .withStartWorkflowLambdaRole(startWorkflowLambdaRole)
+                .withGetWorkflowLambdaRole(getWorkflowLambdaRole)
                 .build();
         context.setIAMRoles(IAMRoles);
 
@@ -77,7 +90,7 @@ public class IAMDeployer implements Deployer {
             @Nonnull final AmazonIdentityManagement iamClient,
             @Nonnull final IAMRoleConfig iamRoleConfig) {
         final String roleName = iamRoleConfig.getRoleName();
-        final String assumeRolePolicyDocument = iamRoleConfig.getAssumeRolePolicyDocument();
+        final String assumeRolePolicyDocument = iamRoleConfig.getTrustPolicyDocument();
 
         try {
             LOG.info("Trying to create IAM role with name='{}' and assumeRolePolicyDocument='{}'",
