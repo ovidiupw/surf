@@ -29,16 +29,26 @@ public class DeployerConfiguration {
     private String apiGatewayLambdaFunctionsPath;
     private String apiStageName;
     private String apiStageDescription;
-    private Boolean apiStageMetricsEnabled;
-    private Double apiStageThrottlingRateLimit;
-    private Integer apiStageThrottlingBurstLimit;
+    private boolean apiStageMetricsEnabled;
+    private double apiStageThrottlingRateLimit;
+    private int apiStageThrottlingBurstLimit;
     private String apiLoggingLevel;
-    private Boolean apiDataTraceEnabled;
+    private boolean apiDataTraceEnabled;
     private String apiGeneratedSdkFolderName;
     private String apiGeneratedSdkOutputPath;
     private String apiGeneratedSdkType;
     private String clientConfigFilePath;
     private String awsAccessKey;
+    private long dynamoDBWorkflowsTableReadCapacityUnits;
+    private long dynamoDBWorkflowsTableWriteCapacityUnits;
+    private long dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits;
+    private long dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits;
+    private long dynamoDBWorkflowExecutionsTableReadCapacityUnits;
+    private long dynamoDBWorkflowExecutionsTableWriteCapacityUnits;
+    private long dynamoDBWorkflowExecutionTasksTableReadCapacityUnits;
+    private long dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits;
+    private long dynamoDBCrawlMetadataTableReadCapacityUnits;
+    private long dynamoDBCrawlMetadataTableWriteCapacityUnits;
 
     public static DeployerConfiguration fromFile(@Nonnull final String configFilePath) {
         try {
@@ -86,6 +96,16 @@ public class DeployerConfiguration {
                 .withApiGeneratedSdkType(config.getApiGeneratedSdkType())
                 .withClientConfigFilepath(config.getClientConfigFilePath())
                 .withAwsAccessKey(config.getAwsAccessKey())
+                .withDynamoDBWorkflowsTableReadCapacityUnits(config.getDynamoDBWorkflowsTableReadCapacityUnits())
+                .withDynamoDBWorkflowsTableWriteCapacityUnits(config.getDynamoDBWorkflowsTableWriteCapacityUnits())
+                .withDynamoDBWorkflowsTableOwnerGSIReadCapacityUnits(config.getDynamoDBWorkflowsTableOwnerGSIReadCapacityUnits())
+                .withDynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits(config.getDynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits())
+                .withDynamoDBWorkflowExecutionsTableReadCapacityUnits(config.getDynamoDBWorkflowExecutionsTableReadCapacityUnits())
+                .withDynamoDBWorkflowExecutionsTableWriteCapacityUnits(config.getDynamoDBWorkflowExecutionsTableWriteCapacityUnits())
+                .withDynamoDBWorkflowExecutionTasksTableReadCapacityUnits(config.getDynamoDBWorkflowExecutionTasksTableReadCapacityUnits())
+                .withDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits(config.getDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits())
+                .withDynamoDBCrawlMetadataTableReadCapacityUnits(config.getDynamoDBCrawlMetadataTableReadCapacityUnits())
+                .withDynamoDBCrawlMetadataTableWriteCapacityUnits(config.getDynamoDBCrawlMetadataTableWriteCapacityUnits())
                 .build();
     }
 
@@ -168,27 +188,27 @@ public class DeployerConfiguration {
         this.apiStageDescription = apiStageDescription;
     }
 
-    public Boolean getApiStageMetricsEnabled() {
+    public boolean getApiStageMetricsEnabled() {
         return apiStageMetricsEnabled;
     }
 
-    private void setApiStageMetricsEnabled(Boolean apiStageMetricsEnabled) {
+    private void setApiStageMetricsEnabled(boolean apiStageMetricsEnabled) {
         this.apiStageMetricsEnabled = apiStageMetricsEnabled;
     }
 
-    public Double getApiStageThrottlingRateLimit() {
+    public double getApiStageThrottlingRateLimit() {
         return apiStageThrottlingRateLimit;
     }
 
-    private void setApiStageThrottlingRateLimit(Double apiStageThrottlingRateLimit) {
+    private void setApiStageThrottlingRateLimit(double apiStageThrottlingRateLimit) {
         this.apiStageThrottlingRateLimit = apiStageThrottlingRateLimit;
     }
 
-    public Integer getApiStageThrottlingBurstLimit() {
+    public int getApiStageThrottlingBurstLimit() {
         return apiStageThrottlingBurstLimit;
     }
 
-    private void setApiStageThrottlingBurstLimit(Integer apiStageThrottlingBurstLimit) {
+    private void setApiStageThrottlingBurstLimit(int apiStageThrottlingBurstLimit) {
         this.apiStageThrottlingBurstLimit = apiStageThrottlingBurstLimit;
     }
 
@@ -200,11 +220,11 @@ public class DeployerConfiguration {
         this.apiLoggingLevel = apiLoggingLevel;
     }
 
-    public Boolean getApiDataTraceEnabled() {
+    public boolean getApiDataTraceEnabled() {
         return apiDataTraceEnabled;
     }
 
-    private void setApiDataTraceEnabled(Boolean apiDataTraceEnabled) {
+    private void setApiDataTraceEnabled(boolean apiDataTraceEnabled) {
         this.apiDataTraceEnabled = apiDataTraceEnabled;
     }
 
@@ -248,6 +268,86 @@ public class DeployerConfiguration {
         this.awsAccessKey = awsAccessKey;
     }
 
+    public long getDynamoDBWorkflowsTableReadCapacityUnits() {
+        return dynamoDBWorkflowsTableReadCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowsTableReadCapacityUnits(long dynamoDBWorkflowsTableReadCapacityUnits) {
+        this.dynamoDBWorkflowsTableReadCapacityUnits = dynamoDBWorkflowsTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowsTableWriteCapacityUnits() {
+        return dynamoDBWorkflowsTableWriteCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowsTableWriteCapacityUnits(long dynamoDBWorkflowsTableWriteCapacityUnits) {
+        this.dynamoDBWorkflowsTableWriteCapacityUnits = dynamoDBWorkflowsTableWriteCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowsTableOwnerGSIReadCapacityUnits() {
+        return dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits() {
+        return dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionsTableReadCapacityUnits() {
+        return dynamoDBWorkflowExecutionsTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionsTableWriteCapacityUnits() {
+        return dynamoDBWorkflowExecutionsTableWriteCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionTasksTableReadCapacityUnits() {
+        return dynamoDBWorkflowExecutionTasksTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits() {
+        return dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowsTableOwnerGSIReadCapacityUnits(long dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits) {
+        this.dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits = dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits(long dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits) {
+        this.dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits = dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowExecutionsTableReadCapacityUnits(long dynamoDBWorkflowExecutionsTableReadCapacityUnits) {
+        this.dynamoDBWorkflowExecutionsTableReadCapacityUnits = dynamoDBWorkflowExecutionsTableReadCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowExecutionsTableWriteCapacityUnits(long dynamoDBWorkflowExecutionsTableWriteCapacityUnits) {
+        this.dynamoDBWorkflowExecutionsTableWriteCapacityUnits = dynamoDBWorkflowExecutionsTableWriteCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowExecutionTasksTableReadCapacityUnits(long dynamoDBWorkflowExecutionTasksTableReadCapacityUnits) {
+        this.dynamoDBWorkflowExecutionTasksTableReadCapacityUnits = dynamoDBWorkflowExecutionTasksTableReadCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits(long dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits) {
+        this.dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits = dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits;
+    }
+
+    public long getDynamoDBCrawlMetadataTableReadCapacityUnits() {
+        return dynamoDBCrawlMetadataTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBCrawlMetadataTableWriteCapacityUnits() {
+        return dynamoDBCrawlMetadataTableWriteCapacityUnits;
+    }
+
+    private void setDynamoDBCrawlMetadataTableReadCapacityUnits(long dynamoDBCrawlMetadataTableReadCapacityUnits) {
+        this.dynamoDBCrawlMetadataTableReadCapacityUnits = dynamoDBCrawlMetadataTableReadCapacityUnits;
+    }
+
+    private void setDynamoDBCrawlMetadataTableWriteCapacityUnits(long dynamoDBCrawlMetadataTableWriteCapacityUnits) {
+        this.dynamoDBCrawlMetadataTableWriteCapacityUnits = dynamoDBCrawlMetadataTableWriteCapacityUnits;
+    }
+
     public static class Builder {
         private ClientConfiguration clientConfiguration;
         private Regions region;
@@ -258,16 +358,26 @@ public class DeployerConfiguration {
         private String apiGatewayLambdaFunctionsPath;
         private String apiStageName;
         private String apiStageDescription;
-        private Boolean apiStageMetricsEnabled;
-        private Double apiStageThrottlingRateLimit;
-        private Integer apiStageThrottlingBurstLimit;
+        private boolean apiStageMetricsEnabled;
+        private double apiStageThrottlingRateLimit;
+        private int apiStageThrottlingBurstLimit;
         private String apiLoggingLevel;
-        private Boolean apiDataTraceEnabled;
+        private boolean apiDataTraceEnabled;
         private String apiGeneratedSdkFolderName;
         private String apiGeneratedSdkOutputPath;
         private String apiGeneratedSdkType;
         private String clientConfigFilePath;
         private String awsAccessKey;
+        private long dynamoDBWorkflowsTableReadCapacityUnits;
+        private long dynamoDBWorkflowsTableWriteCapacityUnits;
+        private long dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits;
+        private long dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits;
+        private long dynamoDBWorkflowExecutionsTableReadCapacityUnits;
+        private long dynamoDBWorkflowExecutionsTableWriteCapacityUnits;
+        private long dynamoDBWorkflowExecutionTasksTableReadCapacityUnits;
+        private long dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits;
+        private long dynamoDBCrawlMetadataTableReadCapacityUnits;
+        private long dynamoDBCrawlMetadataTableWriteCapacityUnits;
 
         public DeployerConfiguration build() {
             Preconditions.checkNotNull(clientConfiguration);
@@ -289,6 +399,15 @@ public class DeployerConfiguration {
             Preconditions.checkNotNull(apiGeneratedSdkType);
             Preconditions.checkNotNull(clientConfigFilePath);
             Preconditions.checkNotNull(awsAccessKey);
+            Preconditions.checkArgument(dynamoDBWorkflowsTableReadCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBWorkflowExecutionsTableReadCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBWorkflowExecutionsTableWriteCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBWorkflowExecutionTasksTableReadCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBCrawlMetadataTableReadCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBCrawlMetadataTableWriteCapacityUnits >= 0);
 
             final DeployerConfiguration deployerConfiguration = new DeployerConfiguration();
             deployerConfiguration.setClientConfiguration(clientConfiguration);
@@ -310,6 +429,16 @@ public class DeployerConfiguration {
             deployerConfiguration.setApiGeneratedSdkType(apiGeneratedSdkType);
             deployerConfiguration.setClientConfigFilePath(clientConfigFilePath);
             deployerConfiguration.setAwsAccessKey(awsAccessKey);
+            deployerConfiguration.setDynamoDBWorkflowsTableReadCapacityUnits(dynamoDBWorkflowsTableReadCapacityUnits);
+            deployerConfiguration.setDynamoDBWorkflowsTableWriteCapacityUnits(dynamoDBWorkflowsTableWriteCapacityUnits);
+            deployerConfiguration.setDynamoDBWorkflowsTableOwnerGSIReadCapacityUnits(dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits);
+            deployerConfiguration.setDynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits(dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits);
+            deployerConfiguration.setDynamoDBWorkflowExecutionsTableReadCapacityUnits(dynamoDBWorkflowExecutionsTableReadCapacityUnits);
+            deployerConfiguration.setDynamoDBWorkflowExecutionsTableWriteCapacityUnits(dynamoDBWorkflowExecutionsTableWriteCapacityUnits);
+            deployerConfiguration.setDynamoDBWorkflowExecutionTasksTableReadCapacityUnits(dynamoDBWorkflowExecutionTasksTableReadCapacityUnits);
+            deployerConfiguration.setDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits(dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits);
+            deployerConfiguration.setDynamoDBCrawlMetadataTableReadCapacityUnits(dynamoDBCrawlMetadataTableReadCapacityUnits);
+            deployerConfiguration.setDynamoDBCrawlMetadataTableWriteCapacityUnits(dynamoDBCrawlMetadataTableWriteCapacityUnits);
             return deployerConfiguration;
         }
 
@@ -367,20 +496,19 @@ public class DeployerConfiguration {
             return this;
         }
 
-        public DeployerConfiguration.Builder withApiStageMetricsEnabled(@Nonnull final Boolean apiStageMetricsEnabled) {
-            Preconditions.checkNotNull(apiStageMetricsEnabled);
+        public DeployerConfiguration.Builder withApiStageMetricsEnabled(@Nonnull final boolean apiStageMetricsEnabled) {
             this.apiStageMetricsEnabled = apiStageMetricsEnabled;
             return this;
         }
 
-        public DeployerConfiguration.Builder withApiStageThrottlingRateLimit(@Nonnull final Double apiStageThrottlingRateLimit) {
-            Preconditions.checkNotNull(apiStageThrottlingRateLimit);
+        public DeployerConfiguration.Builder withApiStageThrottlingRateLimit(@Nonnull final double apiStageThrottlingRateLimit) {
+            Preconditions.checkArgument(apiStageThrottlingRateLimit > 0);
             this.apiStageThrottlingRateLimit = apiStageThrottlingRateLimit;
             return this;
         }
 
-        public DeployerConfiguration.Builder withApiStageThrottlingBurstLimit(@Nonnull final Integer apiStageThrottlingBurstLimit) {
-            Preconditions.checkNotNull(apiStageThrottlingBurstLimit);
+        public DeployerConfiguration.Builder withApiStageThrottlingBurstLimit(@Nonnull final int apiStageThrottlingBurstLimit) {
+            Preconditions.checkArgument(apiStageThrottlingBurstLimit > 0);
             this.apiStageThrottlingBurstLimit = apiStageThrottlingBurstLimit;
             return this;
         }
@@ -391,8 +519,7 @@ public class DeployerConfiguration {
             return this;
         }
 
-        public DeployerConfiguration.Builder withApiDataTraceEnabled(@Nonnull final Boolean apiDataTraceEnabled) {
-            Preconditions.checkNotNull(apiDataTraceEnabled);
+        public DeployerConfiguration.Builder withApiDataTraceEnabled(@Nonnull final boolean apiDataTraceEnabled) {
             this.apiDataTraceEnabled = apiDataTraceEnabled;
             return this;
         }
@@ -424,6 +551,66 @@ public class DeployerConfiguration {
         public DeployerConfiguration.Builder withAwsAccessKey(@Nonnull final String awsAccessKey) {
             Preconditions.checkNotNull(awsAccessKey);
             this.awsAccessKey = awsAccessKey;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableReadCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowsTableReadCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableWriteCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowsTableWriteCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableOwnerGSIReadCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableReadCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowExecutionsTableReadCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableWriteCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowExecutionsTableWriteCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableReadCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowExecutionTasksTableReadCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBCrawlMetadataTableReadCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBCrawlMetadataTableReadCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBCrawlMetadataTableWriteCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBCrawlMetadataTableWriteCapacityUnits = units;
             return this;
         }
     }

@@ -19,7 +19,7 @@ public enum ContentType {
         return name;
     }
 
-    public ContentType fromName(@Nonnull final String name) {
+    public static ContentType fromName(@Nonnull final String name) {
         Preconditions.checkArgument(Strings.isNotBlank(name));
 
         for (final ContentType contentType : ContentType.values()) {

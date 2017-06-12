@@ -16,5 +16,15 @@
   "apiGeneratedSdkType": "javascript",
   "apiGeneratedSdkOutputPath": "../../frontend/generated/sdks/",
   "apiGeneratedSdkFolderName": "api-gateway-js-sdk",
-  "clientConfigFilePath": "../../frontend/generated/config/aws-config.json"
+  "clientConfigFilePath": "../../frontend/generated/config/aws-config.json",
+  "dynamoDBWorkflowsTableReadCapacityUnits": "2",
+  "dynamoDBWorkflowsTableWriteCapacityUnits": "2",
+  "dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits": "2",
+  "dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits": "2",
+  "dynamoDBWorkflowExecutionsTableReadCapacityUnits": "2",
+  "dynamoDBWorkflowExecutionsTableWriteCapacityUnits": "2",
+  "dynamoDBWorkflowExecutionTasksTableReadCapacityUnits": "2",
+  "dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits": "2",
+  "dynamoDBCrawlMetadataTableReadCapacityUnits": "2",
+  "dynamoDBCrawlMetadataTableWriteCapacityUnits": "2"
 }

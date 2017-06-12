@@ -19,6 +19,16 @@ public class DeployerConfigurationConstants {
     private String apiGeneratedSdkOutputPath;
     private String apiGeneratedSdkType;
     private String clientConfigFilePath;
+    private long dynamoDBWorkflowsTableReadCapacityUnits;
+    private long dynamoDBWorkflowsTableWriteCapacityUnits;
+    private long dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits;
+    private long dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits;
+    private long dynamoDBWorkflowExecutionsTableReadCapacityUnits;
+    private long dynamoDBWorkflowExecutionsTableWriteCapacityUnits;
+    private long dynamoDBWorkflowExecutionTasksTableReadCapacityUnits;
+    private long dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits;
+    private long dynamoDBCrawlMetadataTableReadCapacityUnits;
+    private long dynamoDBCrawlMetadataTableWriteCapacityUnits;
 
     public String getClientConfigFilePath() {
         return clientConfigFilePath;
@@ -163,5 +173,85 @@ public class DeployerConfigurationConstants {
     public String getApiGeneratedSdkType() {
 
         return apiGeneratedSdkType;
+    }
+
+    public long getDynamoDBWorkflowsTableReadCapacityUnits() {
+        return dynamoDBWorkflowsTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowsTableWriteCapacityUnits() {
+        return dynamoDBWorkflowsTableWriteCapacityUnits;
+    }
+
+    public void setDynamoDBWorkflowsTableReadCapacityUnits(long dynamoDBWorkflowsTableReadCapacityUnits) {
+        this.dynamoDBWorkflowsTableReadCapacityUnits = dynamoDBWorkflowsTableReadCapacityUnits;
+    }
+
+    public void setDynamoDBWorkflowsTableWriteCapacityUnits(long dynamoDBWorkflowsTableWriteCapacityUnits) {
+        this.dynamoDBWorkflowsTableWriteCapacityUnits = dynamoDBWorkflowsTableWriteCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowsTableOwnerGSIReadCapacityUnits() {
+        return dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits() {
+        return dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionsTableReadCapacityUnits() {
+        return dynamoDBWorkflowExecutionsTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionsTableWriteCapacityUnits() {
+        return dynamoDBWorkflowExecutionsTableWriteCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionTasksTableReadCapacityUnits() {
+        return dynamoDBWorkflowExecutionTasksTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits() {
+        return dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits;
+    }
+
+    public void setDynamoDBWorkflowsTableOwnerGSIReadCapacityUnits(long dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits) {
+        this.dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits = dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits;
+    }
+
+    public void setDynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits(long dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits) {
+        this.dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits = dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits;
+    }
+
+    public void setDynamoDBWorkflowExecutionsTableReadCapacityUnits(long dynamoDBWorkflowExecutionsTableReadCapacityUnits) {
+        this.dynamoDBWorkflowExecutionsTableReadCapacityUnits = dynamoDBWorkflowExecutionsTableReadCapacityUnits;
+    }
+
+    public void setDynamoDBWorkflowExecutionsTableWriteCapacityUnits(long dynamoDBWorkflowExecutionsTableWriteCapacityUnits) {
+        this.dynamoDBWorkflowExecutionsTableWriteCapacityUnits = dynamoDBWorkflowExecutionsTableWriteCapacityUnits;
+    }
+
+    public void setDynamoDBWorkflowExecutionTasksTableReadCapacityUnits(long dynamoDBWorkflowExecutionTasksTableReadCapacityUnits) {
+        this.dynamoDBWorkflowExecutionTasksTableReadCapacityUnits = dynamoDBWorkflowExecutionTasksTableReadCapacityUnits;
+    }
+
+    public void setDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits(long dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits) {
+        this.dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits = dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits;
+    }
+
+    public long getDynamoDBCrawlMetadataTableReadCapacityUnits() {
+        return dynamoDBCrawlMetadataTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBCrawlMetadataTableWriteCapacityUnits() {
+        return dynamoDBCrawlMetadataTableWriteCapacityUnits;
+    }
+
+    public void setDynamoDBCrawlMetadataTableReadCapacityUnits(long dynamoDBCrawlMetadataTableReadCapacityUnits) {
+        this.dynamoDBCrawlMetadataTableReadCapacityUnits = dynamoDBCrawlMetadataTableReadCapacityUnits;
+    }
+
+    public void setDynamoDBCrawlMetadataTableWriteCapacityUnits(long dynamoDBCrawlMetadataTableWriteCapacityUnits) {
+        this.dynamoDBCrawlMetadataTableWriteCapacityUnits = dynamoDBCrawlMetadataTableWriteCapacityUnits;
     }
 }

@@ -22,7 +22,7 @@ public enum HttpMethod {
         return name;
     }
 
-    public HttpMethod fromName(@Nonnull final String name) {
+    public static HttpMethod fromName(@Nonnull final String name) {
         Preconditions.checkArgument(Strings.isNotBlank(name));
 
         for (final HttpMethod httpMethod : HttpMethod.values()) {

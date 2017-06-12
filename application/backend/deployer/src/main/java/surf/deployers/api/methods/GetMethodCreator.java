@@ -138,6 +138,17 @@ public class GetMethodCreator {
         LOG.info("Successfully created GET 400 method method response for resource with path='{}'",
                 resource.getPath());
 
+        results.add(apiClient.putMethodResponse(new PutMethodResponseRequest()
+                .withRestApiId(restApi.getId())
+                .withResourceId(resource.getId())
+                .withHttpMethod(HttpMethod.GET.getName())
+                .withStatusCode("500")
+                .withResponseModels(Collections.singletonMap(ContentType.JSON.getName(), "Empty"))
+                .withResponseParameters(ApiMethodsHelper.buildCrossOriginMethodResponseParameters())));
+
+        LOG.info("Successfully created GET 500 method method response for resource with path='{}'",
+                resource.getPath());
+
         return results;
     }
 
@@ -164,11 +175,23 @@ public class GetMethodCreator {
                 .withResourceId(resource.getId())
                 .withHttpMethod(HttpMethod.GET.getName())
                 .withStatusCode("400")
-                .withSelectionPattern("Error.400.*")
+                .withSelectionPattern("Error\\.400.*")
                 .withResponseParameters(ApiMethodsHelper.buildCrossOriginIntegrationResponseParameters())
                 .withResponseTemplates(dataPassThroughTemplate)));
 
         LOG.info("Successfully put GET 400 method integration response for resource with path='{}'",
+                resource.getPath());
+
+        results.add(apiClient.putIntegrationResponse(new PutIntegrationResponseRequest()
+                .withRestApiId(restApi.getId())
+                .withResourceId(resource.getId())
+                .withHttpMethod(HttpMethod.GET.getName())
+                .withStatusCode("500")
+                .withSelectionPattern("Error\\.500.*")
+                .withResponseParameters(ApiMethodsHelper.buildCrossOriginIntegrationResponseParameters())
+                .withResponseTemplates(dataPassThroughTemplate)));
+
+        LOG.info("Successfully put GET 500 method integration response for resource with path='{}'",
                 resource.getPath());
 
         return results;

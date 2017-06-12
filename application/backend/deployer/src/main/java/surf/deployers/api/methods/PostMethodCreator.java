@@ -137,6 +137,17 @@ public class PostMethodCreator {
         LOG.info("Successfully created POST 400 method method response for resource with path='{}'",
                 resource.getPath());
 
+        results.add(apiClient.putMethodResponse(new PutMethodResponseRequest()
+                .withRestApiId(restApi.getId())
+                .withResourceId(resource.getId())
+                .withHttpMethod(HttpMethod.POST.getName())
+                .withStatusCode("500")
+                .withResponseModels(Collections.singletonMap(ContentType.JSON.getName(), "Empty"))
+                .withResponseParameters(ApiMethodsHelper.buildCrossOriginMethodResponseParameters())));
+
+        LOG.info("Successfully created POST 500 method method response for resource with path='{}'",
+                resource.getPath());
+
         return results;
     }
 
@@ -163,11 +174,23 @@ public class PostMethodCreator {
                 .withResourceId(resource.getId())
                 .withHttpMethod(HttpMethod.POST.getName())
                 .withStatusCode("400")
-                .withSelectionPattern("Error.400.*")
+                .withSelectionPattern("Error\\.400.*")
                 .withResponseParameters(ApiMethodsHelper.buildCrossOriginIntegrationResponseParameters())
                 .withResponseTemplates(dataPassThroughTemplate)));
 
         LOG.info("Successfully put POST 400 method integration response for resource with path='{}'",
+                resource.getPath());
+
+        results.add(apiClient.putIntegrationResponse(new PutIntegrationResponseRequest()
+                .withRestApiId(restApi.getId())
+                .withResourceId(resource.getId())
+                .withHttpMethod(HttpMethod.POST.getName())
+                .withStatusCode("500")
+                .withSelectionPattern("Error\\.500.*")
+                .withResponseParameters(ApiMethodsHelper.buildCrossOriginIntegrationResponseParameters())
+                .withResponseTemplates(dataPassThroughTemplate)));
+
+        LOG.info("Successfully put POST 500 method integration response for resource with path='{}'",
                 resource.getPath());
 
         return results;

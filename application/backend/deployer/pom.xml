@@ -11,6 +11,15 @@
 
     <dependencies>
 
+        <!-- ######## Lambda module dependency ######## -->
+        <dependency>
+            <groupId>surf</groupId>
+            <artifactId>surf-lambda-backend</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../lambda/target/surf-lambda-backend-1.0-SNAPSHOT.jar</systemPath>
+        </dependency>
+
         <!-- ######## AWS ######## -->
 
         <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk -->
@@ -21,6 +30,21 @@
             <type>pom</type>
             <scope>import</scope>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-sns -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sns</artifactId>
+            <version>1.11.106</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-dynamodb -->
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-dynamodb</artifactId>
+            <version>1.11.106</version>
+        </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-lambda -->
         <dependency>

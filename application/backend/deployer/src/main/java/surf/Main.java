@@ -4,14 +4,14 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import surf.deployers.Deployer;
-import surf.deployers.DeployerConfiguration;
-import surf.deployers.DeployerConfigurationModule;
+import surf.deployers.*;
 import surf.deployers.api.ApiDeployer;
+import surf.deployers.dynamo.DynamoDeployer;
 import surf.deployers.iam.IAMDeployer;
 import surf.deployers.lambda.LambdaDeployer;
 import surf.deployment.Deployment;
 import surf.exceptions.OperationFailedException;
+import surf.deployers.sleep.SleepDeployer;
 import surf.utility.ExitCode;
 
 import javax.annotation.Nonnull;
@@ -52,6 +52,7 @@ public class Main {
         final Deployer iamDeployer = injector.getInstance(IAMDeployer.class);
         final Deployer lambdaDeployer = injector.getInstance(LambdaDeployer.class);
         final Deployer apiDeployer = injector.getInstance(ApiDeployer.class);
+        final Deployer dynamoDeployer = injector.getInstance(DynamoDeployer.class);
         // TODO the sleep deployer should really be set to something between 15 and 30 seconds
         final Deployer sleepDeployer = new SleepDeployer(1, TimeUnit.SECONDS);
 
@@ -60,6 +61,7 @@ public class Main {
                 .chainDeployer(iamDeployer)
                 .chainDeployer(sleepDeployer) // ensure IAM permissions consistency in AWS
                 .chainDeployer(lambdaDeployer)
+                .chainDeployer(dynamoDeployer)
                 .chainDeployer(apiDeployer);
 
         return deployment;

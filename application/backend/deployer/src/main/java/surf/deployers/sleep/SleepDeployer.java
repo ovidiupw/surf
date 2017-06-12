@@ -1,4 +1,4 @@
-package surf;
+package surf.deployers.sleep;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

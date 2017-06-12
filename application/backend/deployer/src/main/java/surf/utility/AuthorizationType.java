@@ -19,7 +19,7 @@ public enum AuthorizationType {
         return name;
     }
 
-    public AuthorizationType fromName(@Nonnull final String name) {
+    public static AuthorizationType fromName(@Nonnull final String name) {
         Preconditions.checkArgument(Strings.isNotBlank(name));
 
         for (final AuthorizationType authType : AuthorizationType.values()) {
