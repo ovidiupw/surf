@@ -38,6 +38,7 @@ public class DeployerConfiguration {
     private String apiGeneratedSdkOutputPath;
     private String apiGeneratedSdkType;
     private String clientConfigFilePath;
+    private String lambdaConfigFilePath;
     private String awsAccessKey;
     private long dynamoDBWorkflowsTableReadCapacityUnits;
     private long dynamoDBWorkflowsTableWriteCapacityUnits;
@@ -94,7 +95,8 @@ public class DeployerConfiguration {
                 .withApiGeneratedSdkFolderName(config.getApiGeneratedSdkFolderName())
                 .withApiGeneratedSdkOutputPath(config.getApiGeneratedSdkOutputPath())
                 .withApiGeneratedSdkType(config.getApiGeneratedSdkType())
-                .withClientConfigFilepath(config.getClientConfigFilePath())
+                .withClientConfigFilePath(config.getClientConfigFilePath())
+                .withLambdaConfigFilePath(config.getLambdaConfigFilePath())
                 .withAwsAccessKey(config.getAwsAccessKey())
                 .withDynamoDBWorkflowsTableReadCapacityUnits(config.getDynamoDBWorkflowsTableReadCapacityUnits())
                 .withDynamoDBWorkflowsTableWriteCapacityUnits(config.getDynamoDBWorkflowsTableWriteCapacityUnits())
@@ -348,6 +350,14 @@ public class DeployerConfiguration {
         this.dynamoDBCrawlMetadataTableWriteCapacityUnits = dynamoDBCrawlMetadataTableWriteCapacityUnits;
     }
 
+    public String getLambdaConfigFilePath() {
+        return lambdaConfigFilePath;
+    }
+
+    private void setLambdaConfigFilePath(String lambdaConfigFilePath) {
+        this.lambdaConfigFilePath = lambdaConfigFilePath;
+    }
+
     public static class Builder {
         private ClientConfiguration clientConfiguration;
         private Regions region;
@@ -367,6 +377,7 @@ public class DeployerConfiguration {
         private String apiGeneratedSdkOutputPath;
         private String apiGeneratedSdkType;
         private String clientConfigFilePath;
+        private String lambdaConfigFilePath;
         private String awsAccessKey;
         private long dynamoDBWorkflowsTableReadCapacityUnits;
         private long dynamoDBWorkflowsTableWriteCapacityUnits;
@@ -398,6 +409,7 @@ public class DeployerConfiguration {
             Preconditions.checkNotNull(apiGeneratedSdkOutputPath);
             Preconditions.checkNotNull(apiGeneratedSdkType);
             Preconditions.checkNotNull(clientConfigFilePath);
+            Preconditions.checkNotNull(lambdaConfigFilePath);
             Preconditions.checkNotNull(awsAccessKey);
             Preconditions.checkArgument(dynamoDBWorkflowsTableReadCapacityUnits >= 0);
             Preconditions.checkArgument(dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits >= 0);
@@ -428,6 +440,7 @@ public class DeployerConfiguration {
             deployerConfiguration.setApiGeneratedSdkOutputPath(apiGeneratedSdkOutputPath);
             deployerConfiguration.setApiGeneratedSdkType(apiGeneratedSdkType);
             deployerConfiguration.setClientConfigFilePath(clientConfigFilePath);
+            deployerConfiguration.setLambdaConfigFilePath(lambdaConfigFilePath);
             deployerConfiguration.setAwsAccessKey(awsAccessKey);
             deployerConfiguration.setDynamoDBWorkflowsTableReadCapacityUnits(dynamoDBWorkflowsTableReadCapacityUnits);
             deployerConfiguration.setDynamoDBWorkflowsTableWriteCapacityUnits(dynamoDBWorkflowsTableWriteCapacityUnits);
@@ -542,9 +555,15 @@ public class DeployerConfiguration {
             return this;
         }
 
-        public DeployerConfiguration.Builder withClientConfigFilepath(@Nonnull final String clientConfigFilePath) {
-            Preconditions.checkNotNull(clientConfigFilePath);
-            this.clientConfigFilePath = clientConfigFilePath;
+        public DeployerConfiguration.Builder withClientConfigFilePath(@Nonnull final String filePath) {
+            Preconditions.checkNotNull(filePath);
+            this.clientConfigFilePath = filePath;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withLambdaConfigFilePath(@Nonnull final String filePath) {
+            Preconditions.checkNotNull(filePath);
+            this.lambdaConfigFilePath = filePath;
             return this;
         }
 

@@ -1,4 +1,4 @@
-package surf.deployment;
+package surf.deployers.lambda;
 
 import com.google.common.base.Preconditions;
 
@@ -10,6 +10,9 @@ public class LambdaFunctionsData {
     private LambdaData listWorkflowsData;
     private LambdaData startWorkflowData;
     private LambdaData getWorkflowData;
+    private LambdaData initializeCrawlSessionData;
+    private LambdaData crawlWebPageData;
+    private LambdaData finalizeCrawlSessionData;
 
     public LambdaData getListCoreWorkersData() {
         return listCoreWorkersData;
@@ -27,24 +30,45 @@ public class LambdaFunctionsData {
         return getWorkflowData;
     }
 
+    public LambdaData getInitializeCrawlSessionData() {
+        return initializeCrawlSessionData;
+    }
+
+    public LambdaData getCrawlWebPageData() {
+        return crawlWebPageData;
+    }
+
+    public LambdaData getFinalizeCrawlSessionData() {
+        return finalizeCrawlSessionData;
+    }
+
     public static class Builder {
 
         private LambdaData listCoreWorkersData;
         private LambdaData listWorkflowsData;
         private LambdaData startWorkflowData;
         private LambdaData getWorkflowData;
+        private LambdaData initializeCrawlSessionData;
+        private LambdaData crawlWebPageData;
+        private LambdaData finalizeCrawlSessionData;
 
         public LambdaFunctionsData build() {
             Preconditions.checkNotNull(listCoreWorkersData);
             Preconditions.checkNotNull(listWorkflowsData);
             Preconditions.checkNotNull(startWorkflowData);
             Preconditions.checkNotNull(getWorkflowData);
+            Preconditions.checkNotNull(initializeCrawlSessionData);
+            Preconditions.checkNotNull(crawlWebPageData);
+            Preconditions.checkNotNull(finalizeCrawlSessionData);
 
             final LambdaFunctionsData lambdaFunctionsData = new LambdaFunctionsData();
             lambdaFunctionsData.setListCoreWorkersData(listCoreWorkersData);
             lambdaFunctionsData.setListWorkflowsData(listWorkflowsData);
             lambdaFunctionsData.setStartWorkflowData(startWorkflowData);
             lambdaFunctionsData.setGetWorkflowData(getWorkflowData);
+            lambdaFunctionsData.setInitializeCrawlSessionData(initializeCrawlSessionData);
+            lambdaFunctionsData.setCrawlWebPageData(crawlWebPageData);
+            lambdaFunctionsData.setFinalizeCrawlSessionData(finalizeCrawlSessionData);
             return lambdaFunctionsData;
         }
 
@@ -71,6 +95,24 @@ public class LambdaFunctionsData {
             this.getWorkflowData = lambdaData;
             return this;
         }
+
+        public Builder withInitializeCrawlSessionData(@Nonnull final LambdaData lambdaData) {
+            Preconditions.checkNotNull(lambdaData);
+            this.initializeCrawlSessionData = lambdaData;
+            return this;
+        }
+
+        public Builder withCrawlWebPageData(@Nonnull final LambdaData lambdaData) {
+            Preconditions.checkNotNull(lambdaData);
+            this.crawlWebPageData = lambdaData;
+            return this;
+        }
+
+        public Builder withFinalizeCrawlSessionData(@Nonnull final LambdaData lambdaData) {
+            Preconditions.checkNotNull(lambdaData);
+            this.finalizeCrawlSessionData = lambdaData;
+            return this;
+        }
     }
 
     private void setListCoreWorkersData(final LambdaData listCoreWorkersData) {
@@ -89,6 +131,18 @@ public class LambdaFunctionsData {
         this.getWorkflowData = getWorkflowData;
     }
 
+    private void setInitializeCrawlSessionData(LambdaData initializeCrawlSessionData) {
+        this.initializeCrawlSessionData = initializeCrawlSessionData;
+    }
+
+    private void setCrawlWebPageData(LambdaData crawlWebPageData) {
+        this.crawlWebPageData = crawlWebPageData;
+    }
+
+    private void setFinalizeCrawlSessionData(LambdaData finalizeCrawlSessionData) {
+        this.finalizeCrawlSessionData = finalizeCrawlSessionData;
+    }
+
     @Override
     public String toString() {
         return "LambdaFunctionsData{" +
@@ -96,6 +150,9 @@ public class LambdaFunctionsData {
                 ", listWorkflowsData=" + listWorkflowsData +
                 ", startWorkflowData=" + startWorkflowData +
                 ", getWorkflowData=" + getWorkflowData +
+                ", initializeCrawlSessionData=" + initializeCrawlSessionData +
+                ", crawlWebPageData=" + crawlWebPageData +
+                ", finalizeCrawlSessionData=" + finalizeCrawlSessionData +
                 '}';
     }
 }

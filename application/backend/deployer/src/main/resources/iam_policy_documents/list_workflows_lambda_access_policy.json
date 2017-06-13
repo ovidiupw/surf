@@ -2,9 +2,13 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "1",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Query"
+      ],
       "Effect": "Allow",
-      "Action": "lambda:*",
-      "Resource": "*"
+      "Resource": "arn:aws:dynamodb:*:*:*"
     }
   ]
 }

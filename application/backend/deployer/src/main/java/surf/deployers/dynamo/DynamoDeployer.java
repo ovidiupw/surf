@@ -176,10 +176,6 @@ public class DynamoDeployer implements Deployer {
         }
     }
 
-   /* private void createCrawlProgressTable(@Nonnull final AmazonDynamoDB dynamoClient) {
-
-    }*/
-
     private AmazonDynamoDB initializeDynamoClient() {
         return AmazonDynamoDBClientBuilder.standard()
                 .withClientConfiguration(deployerConfiguration.getClientConfiguration())

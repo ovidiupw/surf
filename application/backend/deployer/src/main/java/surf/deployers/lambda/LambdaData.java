@@ -1,4 +1,4 @@
-package surf.deployment;
+package surf.deployers.lambda;
 
 import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.util.Strings;

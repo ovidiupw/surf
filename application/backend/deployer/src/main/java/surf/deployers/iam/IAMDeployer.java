@@ -54,6 +54,13 @@ public class IAMDeployer implements Deployer {
         final Role getWorkflowLambdaRole
                 = createRoleWithConfig(iamClient, new GetWorkflowLambdaRole());
 
+        final Role initializeCrawlSessionLambdaRole
+                = createRoleWithConfig(iamClient, new InitializeCrawlSessionLambdaRole());
+        final Role crawlWebPageLambdaRole
+                = createRoleWithConfig(iamClient, new CrawlWebPageLambdaRole());
+        final Role finalizeCrawlSessionLambdaRole
+                = createRoleWithConfig(iamClient, new FinalizeCrawlSessionLambdaRole());
+
         LOG.info("Updating context with the created/existing lambda roles.");
         final IAMRoles IAMRoles = new IAMRoles.Builder()
                 .withApiGatewayPushToCloudWatchLogsRole(apiGatewayPushToCloudWatchLogsRole)
@@ -63,6 +70,9 @@ public class IAMDeployer implements Deployer {
                 .withListWorkflowsLambdaRole(listWorkflowsLambdaRole)
                 .withStartWorkflowLambdaRole(startWorkflowLambdaRole)
                 .withGetWorkflowLambdaRole(getWorkflowLambdaRole)
+                .withInitializeCrawlSessionLambdaRole(initializeCrawlSessionLambdaRole)
+                .withCrawlWebPageLambdaRole(crawlWebPageLambdaRole)
+                .withFinalizeCrawlSessionLambdaRole(finalizeCrawlSessionLambdaRole)
                 .build();
         context.setIAMRoles(IAMRoles);
 

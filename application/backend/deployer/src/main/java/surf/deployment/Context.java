@@ -3,6 +3,7 @@ package surf.deployment;
 import com.amazonaws.services.apigateway.model.Resource;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.google.common.base.Preconditions;
+import surf.deployers.lambda.LambdaFunctionsData;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -16,6 +17,7 @@ public class Context {
     private TableDescription workflowExecutionsDynamoDBTable;
     private TableDescription workflowExecutionTasksDynamoDBTable;
     private TableDescription crawlMetadataDynamoDBTable;
+    private String initializeCrawlSessionSNSTopicArn;
 
     public void setIAMRoles(@Nonnull final IAMRoles IAMRoles) {
         Preconditions.checkNotNull(IAMRoles);
@@ -86,6 +88,15 @@ public class Context {
         this.crawlMetadataDynamoDBTable = tableDescription;
     }
 
+    public void setInitializeCrawlSessionSNSTopicArn(@Nonnull final String arn) {
+        Preconditions.checkNotNull(arn);
+        if (this.initializeCrawlSessionSNSTopicArn != null) {
+            throw new UnsupportedOperationException(
+                    "SNS InitializeCrawlSession Topic ARN was already set in this context!");
+        }
+        this.initializeCrawlSessionSNSTopicArn = arn;
+    }
+
     public IAMRoles getIAMRoles() {
         return IAMRoles;
     }
@@ -118,6 +129,10 @@ public class Context {
         return crawlMetadataDynamoDBTable;
     }
 
+    public String getInitializeCrawlSessionSNSTopicArn() {
+        return initializeCrawlSessionSNSTopicArn;
+    }
+
     @Override
     public String toString() {
         return "Context{" +
@@ -125,10 +140,11 @@ public class Context {
                 ", lambdaFunctionsData=" + lambdaFunctionsData +
                 ", apiResources=" + apiResources +
                 ", apiKey='" + apiKey + '\'' +
-                ", workflowsDynamoDBTable=" + workflowsDynamoDBTable.getTableName() +
-                ", workflowExecutionsDynamoDBTable=" + workflowExecutionsDynamoDBTable.getTableName() +
-                ", workflowExecutionTasksDynamoDBTable=" + workflowExecutionTasksDynamoDBTable.getTableName() +
-                ", crawlMetadataDynamoDBTable=" + crawlMetadataDynamoDBTable.getTableName() +
+                ", workflowsDynamoDBTable=" + workflowsDynamoDBTable +
+                ", workflowExecutionsDynamoDBTable=" + workflowExecutionsDynamoDBTable +
+                ", workflowExecutionTasksDynamoDBTable=" + workflowExecutionTasksDynamoDBTable +
+                ", crawlMetadataDynamoDBTable=" + crawlMetadataDynamoDBTable +
+                ", initializeCrawlSessionSNSTopicArn=" + initializeCrawlSessionSNSTopicArn +
                 '}';
     }
 }

@@ -5,7 +5,7 @@ import com.amazonaws.services.apigateway.model.*;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import surf.deployment.LambdaData;
+import surf.deployers.lambda.LambdaData;
 import surf.exceptions.OperationFailedException;
 import surf.utility.*;
 

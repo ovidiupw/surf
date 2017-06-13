@@ -4,11 +4,10 @@
     {
       "Sid": "1",
       "Action": [
-        "dynamodb:GetItem",
-        "dynamodb:Query"
+        "sns:Publish"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:dynamodb:*:*:*"
+      "Resource": "arn:aws:sns:*:*:*"
     }
   ]
 }

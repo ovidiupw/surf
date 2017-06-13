@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import surf.deployers.Deployer;
 import surf.deployers.DeployerConfiguration;
 import surf.deployment.Context;
-import surf.deployment.LambdaData;
-import surf.deployment.LambdaFunctionsData;
 import surf.exceptions.OperationFailedException;
 
 import javax.annotation.Nonnull;
@@ -46,6 +44,8 @@ public class LambdaDeployer implements Deployer {
 
         final List<LambdaData> lambdaNeedingApiGatewayInvokePermissions = new ArrayList<>();
 
+        /* API Gateway Lambda functions */
+
         final LambdaData listCoreWorkersData = createFunction(lambdaClient, new ListCoreWorkersLambdaConfig(context));
         lambdaNeedingApiGatewayInvokePermissions.add(listCoreWorkersData);
 
@@ -61,12 +61,24 @@ public class LambdaDeployer implements Deployer {
         cleanupApiGatewayInvokePermissions(lambdaClient, lambdaNeedingApiGatewayInvokePermissions);
         setupApiGatewayInvokePermissions(lambdaClient, lambdaNeedingApiGatewayInvokePermissions);
 
+        /* Non API Gateway Lambda functions */
+
+        final LambdaData initializeCrawlSessionData
+                = createFunction(lambdaClient, new InitializeCrawlSessionLambdaConfig(context));
+        final LambdaData crawlWebPageData
+                = createFunction(lambdaClient, new CrawlWebPageLambdaConfig(context));
+        final LambdaData finalizeCrawlSessionData
+                = createFunction(lambdaClient, new FinalizeCrawlSessionLambdaConfig(context));
+
         LOG.info("Updating context with the created/existing lambda arns.");
         final LambdaFunctionsData lambdaFunctionsData = new LambdaFunctionsData.Builder()
                 .withListCoreWorkersFunctionData(listCoreWorkersData)
                 .withListWorkflowsData(listWorkflowsData)
                 .withStartWorkflowData(startWorkflowData)
                 .withGetWorkflowData(getWorkflowData)
+                .withInitializeCrawlSessionData(initializeCrawlSessionData)
+                .withCrawlWebPageData(crawlWebPageData)
+                .withFinalizeCrawlSessionData(finalizeCrawlSessionData)
                 .build();
         context.setLambdaFunctionsData(lambdaFunctionsData);
 

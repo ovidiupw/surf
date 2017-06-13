@@ -14,6 +14,9 @@ public class IAMRoles {
     private Role listWorkflowsLambdaRole;
     private Role startWorkflowLambdaRole;
     private Role getWorkflowLambdaRole;
+    private Role initializeCrawlSessionLambdaRole;
+    private Role crawlWebPageLambdaRole;
+    private Role finalizeCrawlSessionLambdaRole;
 
     public Role getListCoreWorkersLambdaRole() {
         return listCoreWorkersLambdaRole;
@@ -43,6 +46,18 @@ public class IAMRoles {
         return getWorkflowLambdaRole;
     }
 
+    public Role getInitializeCrawlSessionLambdaRole() {
+        return initializeCrawlSessionLambdaRole;
+    }
+
+    public Role getCrawlWebPageLambdaRole() {
+        return crawlWebPageLambdaRole;
+    }
+
+    public Role getFinalizeCrawlSessionLambdaRole() {
+        return finalizeCrawlSessionLambdaRole;
+    }
+
     public static class Builder {
 
         private Role apiGatewayPushToCloudWatchLogsRole;
@@ -52,6 +67,9 @@ public class IAMRoles {
         private Role listWorkflowsLambdaRole;
         private Role startWorkflowLambdaRole;
         private Role getWorkflowLambdaRole;
+        private Role initializeCrawlSessionLambdaRole;
+        private Role crawlWebPageLambdaRole;
+        private Role finalizeCrawlSessionLambdaRole;
 
         public IAMRoles build() {
             Preconditions.checkNotNull(apiGatewayPushToCloudWatchLogsRole);
@@ -61,6 +79,9 @@ public class IAMRoles {
             Preconditions.checkNotNull(listWorkflowsLambdaRole);
             Preconditions.checkNotNull(startWorkflowLambdaRole);
             Preconditions.checkNotNull(getWorkflowLambdaRole);
+            Preconditions.checkNotNull(initializeCrawlSessionLambdaRole);
+            Preconditions.checkNotNull(crawlWebPageLambdaRole);
+            Preconditions.checkNotNull(finalizeCrawlSessionLambdaRole);
 
             final IAMRoles IAMRoles = new IAMRoles();
             IAMRoles.setApiGatewayPushToCloudWatchLogsRole(apiGatewayPushToCloudWatchLogsRole);
@@ -70,6 +91,9 @@ public class IAMRoles {
             IAMRoles.setListWorkflowsLambdaRole(listWorkflowsLambdaRole);
             IAMRoles.setStartWorkflowLambdaRole(startWorkflowLambdaRole);
             IAMRoles.setGetWorkflowLambdaRole(getWorkflowLambdaRole);
+            IAMRoles.setInitializeCrawlSessionLambdaRole(initializeCrawlSessionLambdaRole);
+            IAMRoles.setCrawlWebPageLambdaRole(crawlWebPageLambdaRole);
+            IAMRoles.setFinalizeCrawlSessionLambdaRole(finalizeCrawlSessionLambdaRole);
             return IAMRoles;
         }
 
@@ -114,6 +138,22 @@ public class IAMRoles {
             this.getWorkflowLambdaRole = role;
             return this;
         }
+
+        public Builder withInitializeCrawlSessionLambdaRole(@Nonnull final Role role) {
+            Preconditions.checkNotNull(role);
+            this.initializeCrawlSessionLambdaRole = role;
+            return this;
+        }
+
+        public Builder withCrawlWebPageLambdaRole(@Nonnull final Role role) {
+            Preconditions.checkNotNull(role);
+            this.crawlWebPageLambdaRole = role;
+            return this;        }
+
+        public Builder withFinalizeCrawlSessionLambdaRole(@Nonnull final Role role) {
+            Preconditions.checkNotNull(role);
+            this.finalizeCrawlSessionLambdaRole = role;
+            return this;        }
     }
 
     private void setApiGatewayPushToCloudWatchLogsRole(@Nonnull final Role role) {
@@ -144,6 +184,17 @@ public class IAMRoles {
         this.getWorkflowLambdaRole = role;
     }
 
+    private void setInitializeCrawlSessionLambdaRole(Role initializeCrawlSessionLambdaRole) {
+        this.initializeCrawlSessionLambdaRole = initializeCrawlSessionLambdaRole;
+    }
+
+    private void setCrawlWebPageLambdaRole(Role crawlWebPageLambdaRole) {
+        this.crawlWebPageLambdaRole = crawlWebPageLambdaRole;
+    }
+
+    private void setFinalizeCrawlSessionLambdaRole(Role finalizeCrawlSessionLambdaRole) {
+        this.finalizeCrawlSessionLambdaRole = finalizeCrawlSessionLambdaRole;
+    }
 
     @Override
     public String toString() {
@@ -155,6 +206,9 @@ public class IAMRoles {
                 ", listWorkflowsLambdaRole=" + listWorkflowsLambdaRole +
                 ", startWorkflowLambdaRole=" + startWorkflowLambdaRole +
                 ", getWorkflowLambdaRole=" + getWorkflowLambdaRole +
+                ", initializeCrawlSessionLambdaRole=" + initializeCrawlSessionLambdaRole +
+                ", crawlWebPageLambdaRole=" + crawlWebPageLambdaRole +
+                ", finalizeCrawlSessionLambdaRole=" + finalizeCrawlSessionLambdaRole +
                 '}';
     }
 }

@@ -17,6 +17,7 @@
   "apiGeneratedSdkOutputPath": "../../frontend/generated/sdks/",
   "apiGeneratedSdkFolderName": "api-gateway-js-sdk",
   "clientConfigFilePath": "../../frontend/generated/config/aws-config.json",
+  "lambdaConfigFilePath": "../lambda/generated/config/lambda-config.json",
   "dynamoDBWorkflowsTableReadCapacityUnits": "2",
   "dynamoDBWorkflowsTableWriteCapacityUnits": "2",
   "dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits": "2",

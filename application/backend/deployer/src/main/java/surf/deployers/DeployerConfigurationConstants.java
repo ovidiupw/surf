@@ -29,6 +29,7 @@ public class DeployerConfigurationConstants {
     private long dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits;
     private long dynamoDBCrawlMetadataTableReadCapacityUnits;
     private long dynamoDBCrawlMetadataTableWriteCapacityUnits;
+    private String lambdaConfigFilePath;
 
     public String getClientConfigFilePath() {
         return clientConfigFilePath;
@@ -253,5 +254,13 @@ public class DeployerConfigurationConstants {
 
     public void setDynamoDBCrawlMetadataTableWriteCapacityUnits(long dynamoDBCrawlMetadataTableWriteCapacityUnits) {
         this.dynamoDBCrawlMetadataTableWriteCapacityUnits = dynamoDBCrawlMetadataTableWriteCapacityUnits;
+    }
+
+    public void setLambdaConfigFilePath(String lambdaConfigFilePath) {
+        this.lambdaConfigFilePath = lambdaConfigFilePath;
+    }
+
+    public String getLambdaConfigFilePath() {
+        return lambdaConfigFilePath;
     }
 }

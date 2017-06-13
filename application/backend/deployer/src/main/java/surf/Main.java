@@ -9,7 +9,9 @@ import surf.deployers.api.ApiDeployer;
 import surf.deployers.dynamo.DynamoDeployer;
 import surf.deployers.iam.IAMDeployer;
 import surf.deployers.lambda.LambdaDeployer;
+import surf.deployers.sns.SNSDeployer;
 import surf.deployment.Deployment;
+import surf.deployment.DeploymentFinalizer;
 import surf.exceptions.OperationFailedException;
 import surf.deployers.sleep.SleepDeployer;
 import surf.utility.ExitCode;
@@ -37,6 +39,7 @@ public class Main {
 
             final DeploymentFinalizer deploymentFinalizer = new DeploymentFinalizer(deployerConfiguration, deployment);
             deploymentFinalizer.dumpClientConfigurationToFile();
+            deploymentFinalizer.dumpLambdaConfigurationToFile();
 
         } catch (OperationFailedException
                 | IOException e) {
@@ -53,6 +56,7 @@ public class Main {
         final Deployer lambdaDeployer = injector.getInstance(LambdaDeployer.class);
         final Deployer apiDeployer = injector.getInstance(ApiDeployer.class);
         final Deployer dynamoDeployer = injector.getInstance(DynamoDeployer.class);
+        final Deployer snsDeployer = injector.getInstance(SNSDeployer.class);
         // TODO the sleep deployer should really be set to something between 15 and 30 seconds
         final Deployer sleepDeployer = new SleepDeployer(1, TimeUnit.SECONDS);
 
@@ -61,6 +65,8 @@ public class Main {
                 .chainDeployer(iamDeployer)
                 .chainDeployer(sleepDeployer) // ensure IAM permissions consistency in AWS
                 .chainDeployer(lambdaDeployer)
+                .chainDeployer(sleepDeployer) // ensure Lambda create consistency in AWS
+                .chainDeployer(snsDeployer)
                 .chainDeployer(dynamoDeployer)
                 .chainDeployer(apiDeployer);
 

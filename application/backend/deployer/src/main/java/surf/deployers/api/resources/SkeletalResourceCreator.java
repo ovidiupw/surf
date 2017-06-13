@@ -9,8 +9,7 @@ import surf.deployers.DeployerConfiguration;
 import surf.deployers.api.methods.GetMethodCreator;
 import surf.deployers.api.methods.OptionsMethodCreator;
 import surf.deployers.api.methods.PostMethodCreator;
-import surf.deployment.Context;
-import surf.deployment.LambdaData;
+import surf.deployers.lambda.LambdaData;
 import surf.exceptions.OperationFailedException;
 import surf.utility.HttpMethod;
 
