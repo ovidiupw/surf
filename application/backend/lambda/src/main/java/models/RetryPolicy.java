@@ -1,5 +1,7 @@
 package models;
 
+import com.google.common.base.Preconditions;
+
 import java.util.Objects;
 import java.util.Set;
 
@@ -9,7 +11,7 @@ import java.util.Set;
  * Some use-cases may require using only one {@link ExponentialBackoffRetrier}, which
  * should lead to disregarding this class in favor of using a {@link ExponentialBackoffRetrier}.
  */
-public class RetryPolicy {
+public class RetryPolicy implements Validateable {
 
     /**
      * The set of {@link ExponentialBackoffRetrier exponentialBackoffRetriers} configured for this retry policy.
@@ -43,5 +45,16 @@ public class RetryPolicy {
         return "RetryPolicy{" +
                 "exponentialBackoffRetriers=" + exponentialBackoffRetriers +
                 '}';
+    }
+
+    @Override
+    public void validate() throws RuntimeException {
+        Preconditions.checkNotNull(
+                exponentialBackoffRetriers,
+                "The RetryPolicy 'exponentialBackoffRetriers' must not be null but can be empty!"
+        );
+        for (final ExponentialBackoffRetrier exponentialBackoffRetrier : exponentialBackoffRetriers) {
+            exponentialBackoffRetrier.validate();
+        }
     }
 }

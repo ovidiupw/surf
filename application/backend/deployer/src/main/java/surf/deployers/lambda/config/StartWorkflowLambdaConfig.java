@@ -10,8 +10,8 @@ public class StartWorkflowLambdaConfig implements LambdaFunctionConfig {
     private static final String NAME = "startWorkflow";
     private static final String DESCRIPTION = "Starts a new crawling workflow.";
     private static final String HANDLER_NAME = "handlers.StartWorkflowHandler";
-    private static final Integer MEMORY_MEGABYTES = 128;
-    private static final Integer TIMEOUT_SECONDS = 5;
+    private static final Integer MEMORY_MEGABYTES = 512;
+    private static final Integer TIMEOUT_SECONDS = 15;
 
     private Context context;
 

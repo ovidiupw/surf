@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.model.*;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
+import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.Deployer;
@@ -15,7 +16,9 @@ import surf.deployment.Context;
 import surf.exceptions.OperationFailedException;
 
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LambdaDeployer implements Deployer {
@@ -41,6 +44,7 @@ public class LambdaDeployer implements Deployer {
     @Override
     public Context deploy(@Nonnull final Context context) {
         Preconditions.checkNotNull(context);
+
         final AWSLambda lambdaClient = initializeLambdaClient();
 
         final List<LambdaData> lambdaNeedingApiGatewayInvokePermissions = new ArrayList<>();

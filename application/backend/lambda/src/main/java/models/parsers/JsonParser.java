@@ -2,6 +2,7 @@ package models.parsers;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
@@ -21,27 +22,30 @@ public class JsonParser {
         this.context = context;
     }
 
-    public <T> T parse(@Nonnull final String json, @Nonnull final Class<T> clazz) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(json));
+    public <T> T parse(@Nonnull final String json, @Nonnull final Class<T> clazz, final String errorMessage) {
+        Preconditions.checkArgument(
+                !Strings.isNullOrEmpty(json),
+                errorMessage);
 
         final ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
         try {
             return objectMapper.readValue(json, clazz);
         } catch (JsonParseException
                 | JsonMappingException e) {
-            final String errorMessage = Logger.LOG(
+            final String log = Logger.log(
                     context.getLogger(),
                     "Error while trying to parse json to class '%s': '%s'",
                     e.getMessage(),
                     clazz.getName());
-            throw new BadRequestException(errorMessage);
+            throw new BadRequestException(log);
         } catch (IOException e) {
-            final String errorMessage = Logger.LOG(
+            final String log = Logger.log(
                     context.getLogger(),
                     "Error while trying to parse json to class '%s': '%s'",
                     e.getMessage(),
                     clazz.getName());
-            throw new InternalServerException(errorMessage);
+            throw new BadRequestException(log);
         }
     }
 }

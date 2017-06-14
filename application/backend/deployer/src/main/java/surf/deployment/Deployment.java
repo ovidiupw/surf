@@ -1,6 +1,7 @@
 package surf.deployment;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.Deployer;
@@ -11,9 +12,15 @@ import java.util.List;
 
 public class Deployment {
     private static final Logger LOG = LoggerFactory.getLogger(Deployment.class);
+    private final String name;
 
     private List<Deployer> deployers = new LinkedList<>();
     private Context context = new Context();
+
+    public Deployment(@Nonnull final String name) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
+        this.name = name;
+    }
 
     public Deployment chainDeployer(@Nonnull final Deployer deployer) {
         Preconditions.checkNotNull(deployer);
@@ -22,7 +29,7 @@ public class Deployment {
     }
 
     public void start() {
-        LOG.info("Starting deployment...");
+        LOG.info("Starting deployment with name={}...", name);
         LOG.info("Initialized deployment context to '{}'", context);
 
         for (final Deployer deployer : deployers) {
@@ -34,7 +41,7 @@ public class Deployment {
 
             LOG.info("Finished executing deployer '{}'", deployer.getName());
         }
-        LOG.info("Finished deployment!");
+        LOG.info("Finished deployment with name={}!", name);
     }
 
     public Context getContext() {

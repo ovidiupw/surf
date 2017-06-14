@@ -5,13 +5,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
  * Represents a way of extracting a sub-text from a super-text that
  * is richer in content (i.e. longer).
  */
-public class ExtractionPolicy {
+public class ExtractionPolicy implements Validateable {
 
     /**
      * The {@link Type} of the extraction policy.
@@ -21,7 +22,29 @@ public class ExtractionPolicy {
     /**
      * The associated value for the specified extraction policy {@link Type}.
      */
-    private Integer value;
+    private int value;
+
+    @Override
+    public void validate() throws RuntimeException {
+        Preconditions.checkNotNull(
+                type,
+                "The type of the extraction policy must not be one of " + Arrays.asList(Type.values())
+        );
+        switch (type) {
+            case TextAfter:
+                Preconditions.checkArgument(
+                        value > 0,
+                        "When TextAfter policy type is used, the policy's 'value' must be > 0"
+                );
+                break;
+            case TextBefore:
+                Preconditions.checkArgument(
+                        value > 0,
+                        "When TextBefore policy type is used, the policy's 'value' must be > 0"
+                );
+                break;
+        }
+    }
 
     public enum Type {
         /**
@@ -48,8 +71,6 @@ public class ExtractionPolicy {
         }
 
         public static Type fromName(@Nonnull final String name) {
-            Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
-
             for (final Type extractionPolicyType : Type.values()) {
                 if (extractionPolicyType.getName().equals(name)) {
                     return extractionPolicyType;
@@ -65,6 +86,22 @@ public class ExtractionPolicy {
                     "name='" + name + '\'' +
                     '}';
         }
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
     }
 
     @Override

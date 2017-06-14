@@ -2,11 +2,11 @@ package surf.deployment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
+import models.config.LambdaConfigurationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.DeployerConfiguration;
 import surf.utility.ClientConfigurationConstants;
-import surf.utility.LambdaConfigurationConstants;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
 
 public class DeploymentFinalizer {
     private static final Logger LOG = LoggerFactory.getLogger(DeploymentFinalizer.class);
@@ -36,6 +37,10 @@ public class DeploymentFinalizer {
 
         final LambdaConfigurationConstants clientConstants = new LambdaConfigurationConstants.Builder()
                 .withInitializeCrawlSessionSNSTopicArn(deployment.getContext().getInitializeCrawlSessionSNSTopicArn())
+                .withAwsClientRegion(deployerConfiguration.getAwsClientRegion().getName())
+                .withAwsClientExecutionTimeoutSeconds(
+                        (int) TimeUnit.MILLISECONDS.toSeconds(
+                                deployerConfiguration.getClientConfiguration().getClientExecutionTimeout()))
                 .build();
 
         dumpObjectToFile(clientConstants, lambdaConfigFilePath);

@@ -11,7 +11,7 @@ public class CrawlWebPageLambdaConfig implements LambdaFunctionConfig {
     private static final String NAME = "crawlWebPage";
     private static final String DESCRIPTION = "Crawls the given webpage, updates the global progress and outputs data to S3.";
     private static final String HANDLER_NAME = "handlers.CrawlWebPageHandler";
-    private static final Integer MEMORY_MEGABYTES = 128;
+    private static final Integer MEMORY_MEGABYTES = 512;
     private static final Integer TIMEOUT_SECONDS = 300;
 
     private Context context;

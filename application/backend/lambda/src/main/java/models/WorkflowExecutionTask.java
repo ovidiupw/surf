@@ -82,18 +82,18 @@ public class WorkflowExecutionTask {
      */
     private Long version;
 
-    static final String DDB_WORKFLOW_EXECUTION_ID = "WorkflowExecutionId";
-    static final String DDB_ID = "Id";
-    static final String DDB_CREATION_DATE_MILLIS = "CreationDateMillis";
-    static final String DDB_OWNER_ID = "OwnerId";
-    static final String DDB_STATUS = "Status";
-    static final String DDB_CRAWL_URL = "CrawlURL";
-    static final String DDB_CRAWL_DEPTH = "CrawlDepth";
-    static final String DDB_STATUS_AND_DEPTH = "StatusAndDepth";
-    static final String DDB_VERSION = "Version";
-    static final String DDB_START_DATE = "StartDate";
-    static final String DDB_END_DATE = "EndDate";
-    static final String DDB_FAILURES = "Failures";
+    public static final String DDB_WORKFLOW_EXECUTION_ID = "WorkflowExecutionId";
+    public static final String DDB_ID = "Id";
+    public static final String DDB_CREATION_DATE_MILLIS = "CreationDateMillis";
+    public static final String DDB_OWNER_ID = "OwnerId";
+    public static final String DDB_STATUS = "Status";
+    public static final String DDB_CRAWL_URL = "CrawlURL";
+    public static final String DDB_CRAWL_DEPTH = "CrawlDepth";
+    public static final String DDB_STATUS_AND_DEPTH = "StatusAndDepth";
+    public static final String DDB_VERSION = "Version";
+    public static final String DDB_START_DATE = "StartDate";
+    public static final String DDB_END_DATE = "EndDate";
+    public static final String DDB_FAILURES = "Failures";
 
     public static final String DDB_STATUS_AND_DEPTH_LSI = "CrawlStatusAndDepthLSI";
 
@@ -108,7 +108,7 @@ public class WorkflowExecutionTask {
 
     @DynamoDBRangeKey(attributeName = DDB_ID)
     public String getId() {
-        return String.join("-", id, String.valueOf(creationDateMillis));
+        return id;
     }
 
     public void setId(String id) {
@@ -146,6 +146,7 @@ public class WorkflowExecutionTask {
     @DynamoDBIndexRangeKey(
             localSecondaryIndexName = DDB_STATUS_AND_DEPTH_LSI,
             attributeName = DDB_STATUS_AND_DEPTH)
+    //TODO watch for this; 99% broken
     public String getStatusAndDepth() {
         return String.join("-", status.getName(), String.valueOf(crawlDepth));
     }
@@ -206,6 +207,8 @@ public class WorkflowExecutionTask {
         this.failures = failures;
     }
 
+
+    @DynamoDBIgnore
     public static String getTableName() {
         return TABLE_NAME;
     }

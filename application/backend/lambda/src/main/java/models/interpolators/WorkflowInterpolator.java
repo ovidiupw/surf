@@ -1,9 +1,12 @@
 package models.interpolators;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import models.Workflow;
 import models.exceptions.BadRequestException;
 import models.exceptions.InternalServerException;
+import utils.ArnHelper;
 import utils.Logger;
 import utils.RandomGenerator;
 
@@ -12,22 +15,33 @@ import javax.annotation.Nonnull;
 public class WorkflowInterpolator implements Interpolator<Workflow> {
 
     private final Context context;
+    private final String userArn;
 
     public WorkflowInterpolator(@Nonnull final Context context, @Nonnull final String userArn) {
         this.context = context;
+        this.userArn = userArn;
     }
 
     @Override
     public Workflow interpolate(@Nonnull final Workflow workflow) throws BadRequestException, InternalServerException {
-        Logger.LOG(context.getLogger(), "Interpolating workflow '%s'...", workflow);
+        Logger.log(context.getLogger(), "Interpolating workflow '%s'...", workflow);
+
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(userArn), "The userArn cannot be null or empty!");
 
         final Workflow interpolatedWorkflow = new Workflow();
         interpolatedWorkflow.setCreationDateMillis(System.currentTimeMillis());
-        interpolatedWorkflow.setId(
-                RandomGenerator.randomUUIDWithSeparatedSuffix(
-                        "-", String.valueOf(interpolatedWorkflow.getCreationDateMillis())));
-        //interpolatedWorkflow.setOwnerId();
+        interpolatedWorkflow.setId(RandomGenerator.randomUUID());
 
+        final String fullOwnerId = String.join(
+                "@",
+                ArnHelper.getOwnerIdFromUserArn(userArn),
+                ArnHelper.getAuthProviderFromUserArn(userArn));
+
+        interpolatedWorkflow.setOwnerId(fullOwnerId);
+        interpolatedWorkflow.setName(workflow.getName());
+        interpolatedWorkflow.setMetadata(workflow.getMetadata()); // TODO deep copy
+
+        Logger.log(context.getLogger(), "Successfully interpolated workflow. Result is: '%s'.", workflow);
         return interpolatedWorkflow;
     }
 }

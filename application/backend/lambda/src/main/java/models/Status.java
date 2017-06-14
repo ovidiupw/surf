@@ -24,8 +24,6 @@ public enum Status {
     }
 
     public static Status fromName(@Nonnull final String name) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
-
         for (final Status status : Status.values()) {
             if (status.getName().equals(name)) {
                 return status;

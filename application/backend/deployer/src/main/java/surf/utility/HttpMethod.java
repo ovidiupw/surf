@@ -23,8 +23,6 @@ public enum HttpMethod {
     }
 
     public static HttpMethod fromName(@Nonnull final String name) {
-        Preconditions.checkArgument(Strings.isNotBlank(name));
-
         for (final HttpMethod httpMethod : HttpMethod.values()) {
             if (httpMethod.getName().equals(name)) {
                 return httpMethod;

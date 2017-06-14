@@ -10,14 +10,14 @@ public class Logger {
         throw new UnsupportedOperationException("This class is not instantiable!");
     }
 
-    public static String LOG(
+    public static String log(
             @Nonnull final LambdaLogger logger,
             @Nonnull final String message) {
         logger.log(message);
         return message;
     }
 
-    public static String LOG(
+    public static String log(
             @Nonnull final LambdaLogger logger,
             @Nonnull final String message,
             @Nonnull final Object ...args) {

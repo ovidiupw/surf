@@ -11,8 +11,8 @@ public class InitializeCrawlSessionLambdaConfig implements LambdaFunctionConfig 
     private static final String NAME = "initializeCrawlSession";
     private static final String DESCRIPTION = "Initializes a new crawling session based on the supplied arguments.";
     private static final String HANDLER_NAME = "handlers.InitializeCrawlSessionHandler";
-    private static final Integer MEMORY_MEGABYTES = 128;
-    private static final Integer TIMEOUT_SECONDS = 10;
+    private static final Integer MEMORY_MEGABYTES = 512;
+    private static final Integer TIMEOUT_SECONDS = 15;
 
     private Context context;
 

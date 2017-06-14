@@ -81,6 +81,7 @@ public class DynamoDeployer implements Deployer {
                             deployerConfiguration.getDynamoDBWorkflowsTableOwnerGSIReadCapacityUnits(),
                             deployerConfiguration.getDynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits()
                     ));
+                    gsi.setProjection(new Projection().withProjectionType(ProjectionType.ALL));
                     break;
                 }
                 default: {

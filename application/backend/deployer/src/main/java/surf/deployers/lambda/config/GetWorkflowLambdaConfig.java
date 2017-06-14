@@ -7,11 +7,11 @@ import surf.deployment.Context;
 import javax.annotation.Nonnull;
 
 public class GetWorkflowLambdaConfig implements LambdaFunctionConfig {
-    private static final String NAME = "getRawWorkflow";
+    private static final String NAME = "getWorkflow";
     private static final String DESCRIPTION = "Gets the metadata associated with the specified workflow.";
     private static final String HANDLER_NAME = "handlers.GetWorkflowHandler";
-    private static final Integer MEMORY_MEGABYTES = 128;
-    private static final Integer TIMEOUT_SECONDS = 5;
+    private static final Integer MEMORY_MEGABYTES = 512;
+    private static final Integer TIMEOUT_SECONDS = 15;
 
     private Context context;
 

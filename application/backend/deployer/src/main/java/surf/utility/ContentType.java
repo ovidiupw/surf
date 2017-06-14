@@ -20,8 +20,6 @@ public enum ContentType {
     }
 
     public static ContentType fromName(@Nonnull final String name) {
-        Preconditions.checkArgument(Strings.isNotBlank(name));
-
         for (final ContentType contentType : ContentType.values()) {
             if (contentType.getName().equals(name)) {
                 return contentType;

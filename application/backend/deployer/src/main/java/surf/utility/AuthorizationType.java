@@ -21,8 +21,6 @@ public enum AuthorizationType {
     }
 
     public static AuthorizationType fromName(@Nonnull final String name) {
-        Preconditions.checkArgument(Strings.isNotBlank(name));
-
         for (final AuthorizationType authType : AuthorizationType.values()) {
             if (authType.getName().equals(name)) {
                 return authType;

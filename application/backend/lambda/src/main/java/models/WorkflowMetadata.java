@@ -1,12 +1,15 @@
 package models;
 
+import com.google.common.base.Preconditions;
+import utils.CrawlDataValidator;
+
 import java.util.Objects;
 
 /**
  * Encapsulates all the details necessary for a {@link WorkflowExecution
  * workflow's execution} to be started.
  */
-public class WorkflowMetadata {
+public class WorkflowMetadata implements Validateable {
 
     /**
      * The URL from which the crawling process is to be started.
@@ -83,7 +86,6 @@ public class WorkflowMetadata {
      */
     private RetryPolicy finalizerRetryPolicy;
 
-    
 
     public String getRootAddress() {
         return rootAddress;
@@ -221,5 +223,74 @@ public class WorkflowMetadata {
                 ", orchestratorRetryPolicy=" + orchestratorRetryPolicy +
                 ", finalizerRetryPolicy=" + finalizerRetryPolicy +
                 '}';
+    }
+
+    @Override
+    public void validate() throws RuntimeException {
+        Preconditions.checkNotNull(
+                getRootAddress(),
+                "The workflow metadata 'rootAddress' must not be null!"
+        );
+        Preconditions.checkArgument(
+                CrawlDataValidator.isValidUrl(getRootAddress()),
+                "The workflow metadata 'rootAddress' must be a valid '" + CrawlDataValidator.getUrlSchemes() + "' url!");
+        Preconditions.checkNotNull(
+                getUrlMatcher(),
+                "The workflow metadata 'urlMatcher' must not be null!"
+        );
+        Preconditions.checkArgument(
+                CrawlDataValidator.isValidRegexp(getUrlMatcher()),
+                "The workflow metadata 'urlMatcher' must be a valid regexp!"
+        );
+        Preconditions.checkArgument(
+                getMaxRecursionDepth() >= 0,
+                "The workflow metadata 'maxRecursionDepth' must be >= 0!"
+        );
+        Preconditions.checkArgument(
+                getMaxPagesPerDepthLevel() >= 1,
+                "The workflow metadata 'maxPagesPerDepthLevel' must be >= 1 in order to be able to crawl the 'rootAddress'!"
+        );
+        Preconditions.checkArgument(
+                CrawlDataValidator.isValidMaxWebPageSize(getMaxWebPageSizeBytes()),
+                "The workflow metadata 'maxWebPageSizeBytes' must be between 1 and 25MB.toBytes() = 26214400 bytes!"
+        );
+        Preconditions.checkArgument(
+                getMaxConcurrentCrawlers() >= 1,
+                "The workflow metadata 'maxConcurrentCrawlers' must be >= 1!"
+        );
+        Preconditions.checkArgument(
+                getCrawlerTimeoutSeconds() >= 1 && getCrawlerTimeoutSeconds() < 300,
+                "The workflow metadata 'crawlerTimeoutSeconds' must be between 1 and 299 seconds!"
+        );
+
+        Preconditions.checkNotNull(
+                getSelectionPolicy(),
+                "The workflow metadata 'selectionPolicy' must not be null!"
+        );
+        getSelectionPolicy().validate();
+
+        Preconditions.checkNotNull(
+                getCrawlerRetryPolicy(),
+                "The workflow metadata 'crawlerRetryPolicy' must not be null!"
+        );
+        getCrawlerRetryPolicy().validate();
+
+        Preconditions.checkNotNull(
+                getFinalizerRetryPolicy(),
+                "The workflow metadata 'finalizerRetryPolicy' must not be null!"
+        );
+        getFinalizerRetryPolicy().validate();
+
+        Preconditions.checkNotNull(
+                getOrchestratorRetryPolicy(),
+                "The workflow metadata 'orchestratorRetryPolicy' must not be null!"
+        );
+        getOrchestratorRetryPolicy().validate();
+
+        Preconditions.checkNotNull(
+                getWorkerRetryPolicy(),
+                "The workflow metadata 'workerRetryPolicy' must not be null!"
+        );
+        getWorkerRetryPolicy().validate();
     }
 }

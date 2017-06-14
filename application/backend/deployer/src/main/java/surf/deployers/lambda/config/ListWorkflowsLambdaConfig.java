@@ -11,8 +11,8 @@ public class ListWorkflowsLambdaConfig implements LambdaFunctionConfig {
     private static final String NAME = "listWorkflows";
     private static final String DESCRIPTION = "Returns a list of all workflows that were created by the requesting user.";
     private static final String HANDLER_NAME = "handlers.ListWorkflowsHandler";
-    private static final Integer MEMORY_MEGABYTES = 128;
-    private static final Integer TIMEOUT_SECONDS = 5;
+    private static final Integer MEMORY_MEGABYTES = 512;
+    private static final Integer TIMEOUT_SECONDS = 15;
 
     private Context context;
 

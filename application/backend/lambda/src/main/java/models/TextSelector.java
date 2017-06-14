@@ -1,12 +1,15 @@
 package models;
 
+import com.google.common.base.Preconditions;
+import utils.CrawlDataValidator;
+
 import java.util.Objects;
 import java.util.Set;
 
 /**
  * Encapsulates logic about selecting text from a crawled web page.
  */
-public class TextSelector {
+public class TextSelector implements Validateable {
 
     /**
      * A regexp that identifies blocks that are to be selected for indexing during
@@ -56,5 +59,22 @@ public class TextSelector {
                 "textMatcher='" + textMatcher + '\'' +
                 ", extractionPolicies=" + extractionPolicies +
                 '}';
+    }
+
+    @Override
+    public void validate() throws RuntimeException {
+        Preconditions.checkNotNull(
+                textMatcher,
+                "The text selector 'textMatcher' must not be null!"
+        );
+        Preconditions.checkArgument(
+                CrawlDataValidator.isValidRegexp(textMatcher),
+                "The text selector 'textMatcher' must be a valid regexp!");
+
+        if (extractionPolicies != null) {
+            for (final ExtractionPolicy extractionPolicy : extractionPolicies) {
+                extractionPolicy.validate();
+            }
+        }
     }
 }

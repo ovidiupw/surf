@@ -3,10 +3,13 @@ package surf.deployers;
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.lambda.model.FunctionCode;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
+import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import surf.exceptions.OperationFailedException;
 import surf.utility.ExitCode;
 import surf.utility.FileReader;
 
@@ -15,10 +18,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 public class DeployerConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(DeployerConfiguration.class);
+
+    private static final String MAVEN_GOAL = "package";
+    private static final String MAVEN_LAMBDA_POM_PATH = "../lambda/pom.xml";
+    public static final String MAVEN_HOME = "/usr/local/";
 
     private ClientConfiguration clientConfiguration;
     private Regions awsClientRegion;
@@ -70,6 +78,7 @@ public class DeployerConfiguration {
         final ClientConfiguration clientConfiguration = new ClientConfiguration()
                 .withClientExecutionTimeout((int) TimeUnit.SECONDS.toMillis(config.getAwsClientRequestTimeoutSeconds()));
 
+        buildLambdaCodeJar();
         final FunctionCode lambdaFunctionsCode = new FunctionCode()
                 .withZipFile(ByteBuffer.wrap(Files.readAllBytes(new File(config.getLambdaCodePath()).toPath())));
 
@@ -115,8 +124,28 @@ public class DeployerConfiguration {
             @Nonnull final String configFilePath) throws IOException {
         final String configurationConstantsFileContent = FileReader.readFile(configFilePath);
         final ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
         return objectMapper.readValue(configurationConstantsFileContent, DeployerConfigurationConstants.class);
     }
+
+    private static void buildLambdaCodeJar() {
+        LOG.info("Trying to execute maven goal with name={} for pom with path={}", MAVEN_GOAL, MAVEN_LAMBDA_POM_PATH);
+
+        final InvocationRequest request = new DefaultInvocationRequest();
+        request.setPomFile(new File(MAVEN_LAMBDA_POM_PATH));
+        request.setGoals(Collections.singletonList(MAVEN_GOAL));
+
+        final Invoker invoker = new DefaultInvoker();
+        invoker.setMavenHome(new File(MAVEN_HOME));
+        try {
+            invoker.execute(request);
+        } catch (MavenInvocationException e) {
+            LOG.error("There was an error while trying to execute maven goal!", e);
+            throw new OperationFailedException(e);
+        }
+    }
+
+
 
     public ClientConfiguration getClientConfiguration() {
         return clientConfiguration;

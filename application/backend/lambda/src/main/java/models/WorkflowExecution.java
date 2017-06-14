@@ -45,11 +45,11 @@ public class WorkflowExecution {
      */
     private long startDateMillis;
 
-    static final String DDB_WORKFLOW_ID = "WorkflowId";
-    static final String DDB_ID = "Id";
-    static final String DDB_OWNER_ID = "OwnerId";
-    static final String DDB_START_DATE_MILLIS = "StartDateMillis";
-    static final String DDB_STATUS = "Status";
+    public static final String DDB_WORKFLOW_ID = "WorkflowId";
+    public static final String DDB_ID = "Id";
+    public static final String DDB_OWNER_ID = "OwnerId";
+    public static final String DDB_START_DATE_MILLIS = "StartDateMillis";
+    public static final String DDB_STATUS = "Status";
 
     @DynamoDBHashKey(attributeName = DDB_WORKFLOW_ID)
     public String getWorkflowId() {
@@ -62,7 +62,7 @@ public class WorkflowExecution {
 
     @DynamoDBAttribute(attributeName = DDB_ID)
     public String getId() {
-        return String.join("-", id, String.valueOf(creationDateMillis));
+        return id;
     }
 
     public void setId(String id) {
@@ -106,6 +106,7 @@ public class WorkflowExecution {
         this.startDateMillis = startDateMillis;
     }
 
+    @DynamoDBIgnore
     public static String getTableName() {
         return TABLE_NAME;
     }

@@ -1,5 +1,7 @@
 #set($inputRoot = $input.path('$'))
 {
 "userArn" : "$context.identity.userArn",
-"createdBefore": "$util.urlDecode($input.params('createdBefore'))"
+"createdBefore": "$util.urlDecode($input.params('createdBefore'))",
+"resultsPerPage": "$util.urlDecode($input.params('resultsPerPage'))",
+"startingWorkflowId": "$util.urlDecode($input.params('startingWorkflowId'))"
 };

@@ -36,12 +36,20 @@ public class Main {
     private static void doMain() {
         try {
             DeployerConfiguration deployerConfiguration = DeployerConfiguration.fromFile(DEPLOYER_CONFIG_FILE_PATH);
-            final Deployment deployment = buildDeployment(deployerConfiguration);
-            deployment.start();
+            final Deployment completeDeployment = buildCompleteDeployment(deployerConfiguration);
+            completeDeployment.start();
 
-            final DeploymentFinalizer deploymentFinalizer = new DeploymentFinalizer(deployerConfiguration, deployment);
+            final DeploymentFinalizer deploymentFinalizer = new DeploymentFinalizer(
+                    deployerConfiguration,
+                    completeDeployment
+            );
             deploymentFinalizer.dumpClientConfigurationToFile();
             deploymentFinalizer.dumpLambdaConfigurationToFile();
+
+            /* We need to redeploy lambda in order for the api generated resources to be accessible via
+            the generated files from the lambda functions. */
+            final Deployment lambdaOnlyDeployment = buildLambdaOnlyDeployment(deployerConfiguration);
+            lambdaOnlyDeployment.start();
 
         } catch (OperationFailedException
                 | IOException e) {
@@ -50,8 +58,8 @@ public class Main {
         }
     }
 
-    private static Deployment buildDeployment(@Nonnull final DeployerConfiguration deployerConfiguration) {
-        final Deployment deployment = new Deployment();
+    private static Deployment buildCompleteDeployment(@Nonnull final DeployerConfiguration deployerConfiguration) {
+        final Deployment deployment = new Deployment("Deployment Stage #1: Complete deployment");
         final Injector injector = Guice.createInjector(new DeployerConfigurationModule(deployerConfiguration));
 
         final Deployer iamDeployer = injector.getInstance(IAMDeployer.class);
@@ -71,6 +79,21 @@ public class Main {
                 .chainDeployer(snsDeployer)
                 .chainDeployer(dynamoDeployer)
                 .chainDeployer(apiDeployer);
+
+        return deployment;
+    }
+
+    private static Deployment buildLambdaOnlyDeployment(@Nonnull final DeployerConfiguration deployerConfiguration) {
+        final Deployment deployment = new Deployment("Deployment Stage #2: Lambda-only deployment");
+        final Injector injector = Guice.createInjector(new DeployerConfigurationModule(deployerConfiguration));
+
+        final Deployer iamDeployer = injector.getInstance(IAMDeployer.class);
+        final Deployer lambdaDeployer = injector.getInstance(LambdaDeployer.class);
+
+        /* The order of chaining the deployers matters. */
+        deployment
+                .chainDeployer(iamDeployer)
+                .chainDeployer(lambdaDeployer);
 
         return deployment;
     }

@@ -1,11 +1,22 @@
 package models;
 
-import java.util.Map;
-import java.util.Objects;
+import com.google.common.base.Preconditions;
 
-public class CSSSelector {
+import java.util.Objects;
+import java.util.Set;
+
+public class CSSSelector implements Validateable {
+
+    /**
+     * A valid css selector.
+     */
     private String cssSelector;
-    private Map<ExtractionPolicy, Integer> extractionPolicies;
+
+    /**
+     * A set of {@link ExtractionPolicy policies} to apply to the text extraction
+     * obtained by running the {@link #cssSelector} over the crawled web page.
+     */
+    private Set<ExtractionPolicy> extractionPolicies;
 
     public String getCssSelector() {
         return cssSelector;
@@ -15,11 +26,11 @@ public class CSSSelector {
         this.cssSelector = cssSelector;
     }
 
-    public Map<ExtractionPolicy, Integer> getExtractionPolicies() {
+    public Set<ExtractionPolicy> getExtractionPolicies() {
         return extractionPolicies;
     }
 
-    public void setExtractionPolicies(Map<ExtractionPolicy, Integer> extractionPolicies) {
+    public void setExtractionPolicies(Set<ExtractionPolicy> extractionPolicies) {
         this.extractionPolicies = extractionPolicies;
     }
 
@@ -43,5 +54,24 @@ public class CSSSelector {
                 "cssSelector='" + cssSelector + '\'' +
                 ", extractionPolicies=" + extractionPolicies +
                 '}';
+    }
+
+    @Override
+    public void validate() throws RuntimeException {
+        Preconditions.checkNotNull(
+                cssSelector,
+                "The css selector 'cssSelector' must not be null!"
+        );
+        Preconditions.checkArgument(
+                !cssSelector.isEmpty(),
+                "The css selector 'cssSelector' must not be the empty string!"
+        );
+
+        if (extractionPolicies != null) {
+            for (final ExtractionPolicy extractionPolicy : extractionPolicies) {
+                extractionPolicy.validate();
+            }
+        }
+
     }
 }

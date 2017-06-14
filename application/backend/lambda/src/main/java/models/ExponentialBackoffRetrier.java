@@ -1,12 +1,14 @@
 package models;
 
+import com.google.common.base.Preconditions;
+
 import java.util.Objects;
 import java.util.Set;
 
 /**
  * Encapsulates information about the retry logic of some failed task.
  */
-public class ExponentialBackoffRetrier {
+public class ExponentialBackoffRetrier implements Validateable {
     /**
      * The names of the errors which should be retried by using this retrier.
      */
@@ -85,5 +87,24 @@ public class ExponentialBackoffRetrier {
                 ", backoffRate=" + backoffRate +
                 ", maxAttempts=" + maxAttempts +
                 '}';
+    }
+
+    public void validate() {
+        Preconditions.checkNotNull(
+                errors,
+                "ExponentialBackoffRetrier 'errors' must not be null"
+        );
+        Preconditions.checkArgument(
+                intervalSeconds >= 0,
+                "ExponentialBackoffRetrier 'intervalSeconds' must not be null"
+        );
+        Preconditions.checkArgument(
+                backoffRate >= 1,
+                "ExponentialBackoffRetrier 'backoffRate' must not be null"
+        );
+        Preconditions.checkArgument(
+                maxAttempts >= 0,
+                "ExponentialBackoffRetrier 'maxAttempts' must not be null"
+        );
     }
 }

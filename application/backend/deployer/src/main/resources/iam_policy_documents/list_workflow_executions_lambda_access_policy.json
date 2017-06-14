@@ -5,7 +5,6 @@
       "Sid": "1",
       "Action": [
         "dynamodb:GetItem",
-        "dynamodb:PutItem",
         "dynamodb:Query"
       ],
       "Effect": "Allow",

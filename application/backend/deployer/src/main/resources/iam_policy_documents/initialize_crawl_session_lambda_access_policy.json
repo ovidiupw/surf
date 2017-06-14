@@ -6,6 +6,7 @@
       "Action": [
         "dynamodb:GetItem",
         "dynamodb:Query",
+        "dynamodb:UpdateItem",
         "dynamodb:PutItem"
       ],
       "Effect": "Allow",

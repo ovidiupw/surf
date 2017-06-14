@@ -1,6 +1,7 @@
 package models;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import com.google.common.base.Preconditions;
 import models.converters.WorkflowMetadataConverter;
 
 import java.util.Objects;
@@ -13,7 +14,7 @@ import java.util.Objects;
  * workflow's execution}
  */
 @DynamoDBTable(tableName = Workflow.TABLE_NAME)
-public class Workflow {
+public class Workflow implements Validateable {
     static final String TABLE_NAME = "Workflows";
 
     /**
@@ -34,9 +35,9 @@ public class Workflow {
     private String ownerId;
 
     /**
-     * The authorization provider which the user used to authenticate.
+     * A friendly name associated to the workflow.
      */
-    private String ownerAuthProvider;
+    private String name;
 
     /**
      * Workflow metadata for the current workflow. Represent as a
@@ -44,24 +45,23 @@ public class Workflow {
      */
     private WorkflowMetadata metadata;
 
-    static final String DDB_ID = "Id";
-    static final String DDB_CREATION_DATE_MILLIS = "CreationDateMillis";
-    static final String DDB_OWNER_ID = "OwnerId";
-    static final String DDB_OWNER_AUTH_PROVIDER = "OwnerAuthProvider";
-    static final String DDB_METADATA = "Metadata";
+    public static final String DDB_ID = "Id";
+    public static final String DDB_CREATION_DATE_MILLIS = "CreationDateMillis";
+    public static final String DDB_NAME = "Name";
+    public static final String DDB_OWNER_ID = "OwnerId";
+    public static final String DDB_METADATA = "Metadata";
 
     public static final String DDB_OWNER_GSI = "OwnerGSI";
 
     @DynamoDBHashKey(attributeName = DDB_ID)
     public String getId() {
-        return String.join("-", id, String.valueOf(creationDateMillis));
+        return id;
     }
 
     public void setId(String id) {
         this.id = id;
     }
 
-    @DynamoDBRangeKey(attributeName = DDB_CREATION_DATE_MILLIS)
     @DynamoDBIndexRangeKey(
             globalSecondaryIndexName = DDB_OWNER_GSI,
             attributeName = DDB_CREATION_DATE_MILLIS)
@@ -77,20 +77,11 @@ public class Workflow {
             globalSecondaryIndexName = DDB_OWNER_GSI,
             attributeName = DDB_OWNER_ID)
     public String getOwnerId() {
-        return String.join("-", ownerId, ownerAuthProvider);
+        return ownerId;
     }
 
     public void setOwnerId(String ownerId) {
         this.ownerId = ownerId;
-    }
-
-    @DynamoDBAttribute(attributeName = DDB_OWNER_AUTH_PROVIDER)
-    public String getOwnerAuthProvider() {
-        return ownerAuthProvider;
-    }
-
-    public void setOwnerAuthProvider(String ownerAuthProvider) {
-        this.ownerAuthProvider = ownerAuthProvider;
     }
 
     @DynamoDBAttribute(attributeName = DDB_METADATA)
@@ -103,9 +94,19 @@ public class Workflow {
         this.metadata = metadata;
     }
 
+    @DynamoDBAttribute(attributeName = DDB_NAME)
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     /**
      * @return The DynamoDB table name associated with this class.
      */
+    @DynamoDBIgnore
     public static String getTableName() {
         return TABLE_NAME;
     }
@@ -118,13 +119,13 @@ public class Workflow {
         return creationDateMillis == workflow.creationDateMillis &&
                 Objects.equals(id, workflow.id) &&
                 Objects.equals(ownerId, workflow.ownerId) &&
-                Objects.equals(ownerAuthProvider, workflow.ownerAuthProvider) &&
+                Objects.equals(name, workflow.name) &&
                 Objects.equals(metadata, workflow.metadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, creationDateMillis, ownerId, ownerAuthProvider, metadata);
+        return Objects.hash(id, creationDateMillis, ownerId, name, metadata);
     }
 
     @Override
@@ -133,8 +134,30 @@ public class Workflow {
                 "id='" + id + '\'' +
                 ", creationDateMillis=" + creationDateMillis +
                 ", ownerId='" + ownerId + '\'' +
-                ", ownerAuthProvider='" + ownerAuthProvider + '\'' +
+                ", name='" + name + '\'' +
                 ", metadata=" + metadata +
                 '}';
+    }
+
+    @Override
+    public void validate() throws RuntimeException {
+        Preconditions.checkNotNull(
+                getId(),
+                "The workflow 'id' must not be null!"
+        );
+        Preconditions.checkArgument(
+                getCreationDateMillis() >= 0,
+                "The workflow 'creationDateMillis' must be >= 0!"
+        );
+        Preconditions.checkNotNull(
+                getOwnerId(),
+                "The workflow 'ownerId' must not be null!"
+        );
+        Preconditions.checkNotNull(
+                getMetadata(),
+                "The workflow 'metadata' must not be null!"
+        );
+
+        getMetadata().validate();
     }
 }

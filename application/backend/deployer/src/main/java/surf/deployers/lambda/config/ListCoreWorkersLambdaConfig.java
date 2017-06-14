@@ -11,8 +11,8 @@ public class ListCoreWorkersLambdaConfig implements LambdaFunctionConfig {
     private static final String NAME = "listCoreWorkers";
     private static final String DESCRIPTION = "Returns a list of all core workers registered with the crawler.";
     private static final String HANDLER_NAME = "handlers.ListCoreWorkersHandler";
-    private static final Integer MEMORY_MEGABYTES = 128;
-    private static final Integer TIMEOUT_SECONDS = 5;
+    private static final Integer MEMORY_MEGABYTES = 512;
+    private static final Integer TIMEOUT_SECONDS = 25;
 
     private Context context;
 
