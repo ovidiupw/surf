@@ -1,4 +1,4 @@
-package surf.deployers.lambda;
+package surf.deployers.lambda.config;
 
 import com.amazonaws.services.identitymanagement.model.Role;
 import com.google.common.base.Preconditions;
@@ -6,20 +6,21 @@ import surf.deployment.Context;
 
 import javax.annotation.Nonnull;
 
-public class ListWorkflowsLambdaConfig implements LambdaFunctionConfig {
+public class FinalizeCrawlSessionLambdaConfig implements LambdaFunctionConfig {
 
-    private static final String NAME = "listWorkflows";
-    private static final String DESCRIPTION = "Returns a list of all workflows that were created by the requesting user.";
-    private static final String HANDLER_NAME = "handlers.ListWorkflowsHandler";
+    private static final String NAME = "finalizeCrawlSession";
+    private static final String DESCRIPTION = "Performs finalizing tasks on the crawl session. " +
+            "May recursively call initializeCrawlSession through SNS";
+    private static final String HANDLER_NAME = "handlers.FinalizeCrawlSessionHandler";
     private static final Integer MEMORY_MEGABYTES = 128;
-    private static final Integer TIMEOUT_SECONDS = 5;
+    private static final Integer TIMEOUT_SECONDS = 10;
 
     private Context context;
 
-    public ListWorkflowsLambdaConfig(@Nonnull final Context context) {
+    public FinalizeCrawlSessionLambdaConfig(@Nonnull final Context context) {
         Preconditions.checkNotNull(context);
         Preconditions.checkNotNull(context.getIAMRoles());
-        Preconditions.checkNotNull(context.getIAMRoles().getListWorkflowsLambdaRole());
+        Preconditions.checkNotNull(context.getIAMRoles().getFinalizeCrawlSessionLambdaRole());
         this.context = context;
     }
 
@@ -45,7 +46,7 @@ public class ListWorkflowsLambdaConfig implements LambdaFunctionConfig {
 
     @Override
     public Role getIAMRole() {
-        return context.getIAMRoles().getListWorkflowsLambdaRole();
+        return context.getIAMRoles().getFinalizeCrawlSessionLambdaRole();
     }
 
     @Override

@@ -20,6 +20,14 @@
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:states:*:*:*:*"
+    },
+    {
+      "Sid": "3",
+      "Action": [
+        "logs:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }

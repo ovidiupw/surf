@@ -62,7 +62,8 @@ public abstract class SkeletalResourceCreator implements ResourceCreator {
             @Nonnull final Resource resource,
             @Nonnull final String integrationTemplateFilePath,
             @Nonnull final String methodFriendlyName,
-            @Nonnull final LambdaData lambdaData) {
+            @Nonnull final LambdaData lambdaData,
+            @Nonnull final String customAuthorizerArn) {
         LOG.info("Trying to create GET method for the '{}' api resource...", resource.getPath());
 
         final GetMethodCreator getMethodCreator = new GetMethodCreator(restApi, apiClient);
@@ -71,7 +72,8 @@ public abstract class SkeletalResourceCreator implements ResourceCreator {
                 deployerConfiguration.getApiGatewayLambdaFunctionsPath(),
                 lambdaData,
                 integrationTemplateFilePath,
-                methodFriendlyName);
+                methodFriendlyName,
+                customAuthorizerArn);
 
         LOG.info("Successfully created GET method for the '{}' api resource!", resource.getPath());
         return getMethodResult;
@@ -82,7 +84,8 @@ public abstract class SkeletalResourceCreator implements ResourceCreator {
             @Nonnull final Resource resource,
             @Nonnull final String integrationTemplateFilePath,
             @Nonnull final String methodFriendlyName,
-            @Nonnull final LambdaData lambdaData) {
+            @Nonnull final LambdaData lambdaData,
+            @Nonnull final String customAuthorizerArn) {
         LOG.info("Trying to create POST method for the '{}' api resource...", resource.getPath());
 
         final PostMethodCreator postMethodCreator = new PostMethodCreator(restApi, apiClient);
@@ -91,7 +94,8 @@ public abstract class SkeletalResourceCreator implements ResourceCreator {
                 deployerConfiguration.getApiGatewayLambdaFunctionsPath(),
                 lambdaData,
                 integrationTemplateFilePath,
-                methodFriendlyName);
+                methodFriendlyName,
+                customAuthorizerArn);
 
         LOG.info("Successfully created POST method for the '{}' api resource!", resource.getPath());
         return getMethodResult;

@@ -1,5 +1,6 @@
 package surf.deployment;
 
+import com.amazonaws.services.apigateway.model.CreateAuthorizerResult;
 import com.amazonaws.services.apigateway.model.Resource;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.google.common.base.Preconditions;
@@ -18,6 +19,7 @@ public class Context {
     private TableDescription workflowExecutionTasksDynamoDBTable;
     private TableDescription crawlMetadataDynamoDBTable;
     private String initializeCrawlSessionSNSTopicArn;
+    private CreateAuthorizerResult apiAuthorizer;
 
     public void setIAMRoles(@Nonnull final IAMRoles IAMRoles) {
         Preconditions.checkNotNull(IAMRoles);
@@ -97,6 +99,15 @@ public class Context {
         this.initializeCrawlSessionSNSTopicArn = arn;
     }
 
+    public void setApiAuthorizer(@Nonnull final CreateAuthorizerResult apiAuthorizer) {
+        Preconditions.checkNotNull(apiAuthorizer);
+        if (this.apiAuthorizer != null) {
+            throw new UnsupportedOperationException(
+                    "API Authorizer was already set in this context!");
+        }
+        this.apiAuthorizer = apiAuthorizer;
+    }
+
     public IAMRoles getIAMRoles() {
         return IAMRoles;
     }
@@ -133,6 +144,10 @@ public class Context {
         return initializeCrawlSessionSNSTopicArn;
     }
 
+    public CreateAuthorizerResult getApiAuthorizer() {
+        return apiAuthorizer;
+    }
+
     @Override
     public String toString() {
         return "Context{" +
@@ -144,7 +159,8 @@ public class Context {
                 ", workflowExecutionsDynamoDBTable=" + workflowExecutionsDynamoDBTable +
                 ", workflowExecutionTasksDynamoDBTable=" + workflowExecutionTasksDynamoDBTable +
                 ", crawlMetadataDynamoDBTable=" + crawlMetadataDynamoDBTable +
-                ", initializeCrawlSessionSNSTopicArn=" + initializeCrawlSessionSNSTopicArn +
+                ", initializeCrawlSessionSNSTopicArn='" + initializeCrawlSessionSNSTopicArn + '\'' +
+                ", apiAuthorizer=" + apiAuthorizer +
                 '}';
     }
 }

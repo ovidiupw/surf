@@ -14,14 +14,6 @@
     {
       "Sid": "2",
       "Action": [
-        "sns:Publish"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:sns:*:*:*"
-    },
-    {
-      "Sid": "3",
-      "Action": [
         "logs:*"
       ],
       "Effect": "Allow",

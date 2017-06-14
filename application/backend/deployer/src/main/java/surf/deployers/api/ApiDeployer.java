@@ -11,10 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.Deployer;
 import surf.deployers.DeployerConfiguration;
-import surf.deployers.api.resources.ResourceCreator;
-import surf.deployers.api.resources.WorkersResourceCreator;
-import surf.deployers.api.resources.WorkflowsByIdResourceCreator;
-import surf.deployers.api.resources.WorkflowsResourceCreator;
+import surf.deployers.api.resources.*;
 import surf.deployment.Context;
 import surf.exceptions.OperationFailedException;
 import surf.utility.FileHelper;
@@ -36,6 +33,9 @@ public class ApiDeployer implements Deployer {
     private static final String API_VERSION = "v1";
     private static final String USER_KEY_DESCRIPTION = "Api key for Surf Api for standard users";
     private static final String USER_KEY_NAME = "StandardUserApiKey";
+    public static final String LAMBDA_AUTHORIZER_IDENTITY_SOURCE = "method.request.header.AuthDetails";
+    public static final String LAMBDA_AUTHORIZER_NAME = "LambdaAuthorizer";
+    public static final int LAMBDA_AUTHORIZER_AUTH_TIME_TO_LIVE_SECONDS = 3600;
 
     private final DeployerConfiguration deployerConfiguration;
 
@@ -60,6 +60,10 @@ public class ApiDeployer implements Deployer {
 
         updateAccountWithCloudWatchLogsRoleArn(apiClient, cloudWatchLogsRoleArn);
         final CreateRestApiResult restApi = createRestApi(apiClient);
+
+        final CreateAuthorizerResult apiAuthorizer = createApiAuthorizer(apiClient, restApi, context);
+        context.setApiAuthorizer(apiAuthorizer);
+
         final CreateApiKeyResult apiKey = createEnabledApiKey(apiClient, USER_KEY_NAME, USER_KEY_DESCRIPTION);
         final Resource rootResource = getRootResource(restApi, apiClient);
 
@@ -70,6 +74,10 @@ public class ApiDeployer implements Deployer {
         final ResourceCreator workflowsResourceCreator = new WorkflowsResourceCreator(
                 restApi, apiClient, deployerConfiguration, context);
         final Resource workflowsResource = workflowsResourceCreator.create(rootResource, "workflows");
+
+        final ResourceCreator workflowExecutionsResourceCreator = new WorkflowExecutionsResourceCreator(
+                restApi, apiClient, deployerConfiguration, context);
+        final Resource workflowExecutionsResource = workflowExecutionsResourceCreator.create(workflowsResource, "executions");
 
         final ResourceCreator workflowsByIdResourceCreator = new WorkflowsByIdResourceCreator(
                 restApi, apiClient, deployerConfiguration, context);
@@ -87,12 +95,51 @@ public class ApiDeployer implements Deployer {
         context.setApiResources(Arrays.asList(
                 workersResource,
                 workflowsResource,
-                workflowsByIdResource
+                workflowsByIdResource,
+                workflowExecutionsResource
         ));
         // Add other resources to the context as you create them in the API
         context.setApiKey(apiKey.getValue());
 
         return context;
+    }
+
+    private CreateAuthorizerResult createApiAuthorizer(
+            @Nonnull final AmazonApiGateway apiClient,
+            @Nonnull final CreateRestApiResult restApi,
+            @Nonnull final Context context) {
+
+        try {
+            LOG.info("Trying to create custom API authorizer for apiId={} with name={}, ttlInSeconds={}, " +
+                    "identitySource={}...",
+                    restApi.getId(),
+                    LAMBDA_AUTHORIZER_NAME,
+                    LAMBDA_AUTHORIZER_AUTH_TIME_TO_LIVE_SECONDS,
+                    LAMBDA_AUTHORIZER_IDENTITY_SOURCE);
+
+            final CreateAuthorizerResult authorizer = apiClient.createAuthorizer(new CreateAuthorizerRequest()
+                    .withRestApiId(restApi.getId())
+                    .withName(LAMBDA_AUTHORIZER_NAME)
+                    .withType(AuthorizerType.TOKEN)
+                    .withAuthorizerResultTtlInSeconds(LAMBDA_AUTHORIZER_AUTH_TIME_TO_LIVE_SECONDS)
+                    .withAuthorizerUri(
+                            String.format(
+                                    "%s%s/invocations",
+                                    deployerConfiguration.getApiGatewayLambdaFunctionsPath(),
+                                    context.getLambdaFunctionsData().getApiAuthorizerData().getFunctionArn()))
+                    .withAuthorizerCredentials(context.getIAMRoles().getApiGatewayInvokeLambdaRole().getArn())
+                    .withIdentitySource(LAMBDA_AUTHORIZER_IDENTITY_SOURCE));
+
+            LOG.info("Successfully created API authorizer!");
+            return authorizer;
+        } catch (BadRequestException
+                | UnauthorizedException
+                | NotFoundException
+                | LimitExceededException
+                | TooManyRequestsException e) {
+            LOG.error("Error while creating API authorizer!", e);
+            throw new OperationFailedException(e);
+        }
     }
 
     private AmazonApiGateway initializeApiClient() {

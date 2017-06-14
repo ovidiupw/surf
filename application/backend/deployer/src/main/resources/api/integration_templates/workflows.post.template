@@ -1,5 +1,5 @@
 #set($inputRoot = $input.path('$'))
 {
 "userArn" : "$context.identity.userArn",
-"workflowConfigJson": "$inputRoot.workflowConfigJson"
+"rawWorkflow": "$inputRoot.rawWorkflow"
 };

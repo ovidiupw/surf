@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 
 public enum AuthorizationType {
     AWS_IAM("AWS_IAM"),
+    CUSTOM("CUSTOM"),
     NONE("NONE");
 
     private final String name;

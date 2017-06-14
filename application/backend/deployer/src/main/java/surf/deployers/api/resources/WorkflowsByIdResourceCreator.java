@@ -52,7 +52,8 @@ public class WorkflowsByIdResourceCreator extends SkeletalResourceCreator {
                 resource,
                 GET_INTEGRATION_TEMPLATE_FILE_PATH,
                 GET_METHOD_FRIENDLY_NAME,
-                context.getLambdaFunctionsData().getGetWorkflowData());
+                context.getLambdaFunctionsData().getGetWorkflowData(),
+                context.getApiAuthorizer().getId());
 
         return resource;
     }

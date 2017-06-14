@@ -1,10 +1,12 @@
-package surf.deployers.iam;
+package surf.deployers.iam.config;
 
 import surf.utility.FileReader;
 
+import static surf.utility.ObjectConverter.toNormalizedLambdaRoleName;
+
 public class ApiGatewayPushToCloudWatchLogsRoleConfig implements IAMRoleConfig {
 
-    private static final String ROLE_NAME = "api_gateway_push_to_cloudwatch_logs";
+    private static final String ROLE_NAME = toNormalizedLambdaRoleName("api_gateway_push_to_cloudwatch_logs");
     private static final String ACCESS_POLICY_NAME = "AmazonAPIGatewayPushToCloudWatchLogs";
     private static final String ACCESS_POLICY_PATH
             = "src/main/resources/iam_policy_documents/api_gateway_push_to_cloudwatch_logs_policy.json";

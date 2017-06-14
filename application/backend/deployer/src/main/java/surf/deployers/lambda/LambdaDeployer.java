@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.Deployer;
 import surf.deployers.DeployerConfiguration;
+import surf.deployers.lambda.config.*;
 import surf.deployment.Context;
 import surf.exceptions.OperationFailedException;
 
@@ -52,11 +53,17 @@ public class LambdaDeployer implements Deployer {
         final LambdaData listWorkflowsData = createFunction(lambdaClient, new ListWorkflowsLambdaConfig(context));
         lambdaNeedingApiGatewayInvokePermissions.add(listWorkflowsData);
 
+        final LambdaData createWorkflowData = createFunction(lambdaClient, new CreateWorkflowLambdaConfig(context));
+        lambdaNeedingApiGatewayInvokePermissions.add(createWorkflowData);
+
         final LambdaData startWorkflowData = createFunction(lambdaClient, new StartWorkflowLambdaConfig(context));
         lambdaNeedingApiGatewayInvokePermissions.add(startWorkflowData);
 
         final LambdaData getWorkflowData = createFunction(lambdaClient, new GetWorkflowLambdaConfig(context));
         lambdaNeedingApiGatewayInvokePermissions.add(getWorkflowData);
+
+        final LambdaData listWorkflowExecutionsData = createFunction(lambdaClient, new ListWorkflowExecutionsLambdaConfig(context));
+        lambdaNeedingApiGatewayInvokePermissions.add(listWorkflowExecutionsData);
 
         cleanupApiGatewayInvokePermissions(lambdaClient, lambdaNeedingApiGatewayInvokePermissions);
         setupApiGatewayInvokePermissions(lambdaClient, lambdaNeedingApiGatewayInvokePermissions);
@@ -69,19 +76,23 @@ public class LambdaDeployer implements Deployer {
                 = createFunction(lambdaClient, new CrawlWebPageLambdaConfig(context));
         final LambdaData finalizeCrawlSessionData
                 = createFunction(lambdaClient, new FinalizeCrawlSessionLambdaConfig(context));
+        final LambdaData apiAuthorizerData
+                = createFunction(lambdaClient, new ApiAuthorizerLambdaConfig(context));
 
         LOG.info("Updating context with the created/existing lambda arns.");
         final LambdaFunctionsData lambdaFunctionsData = new LambdaFunctionsData.Builder()
                 .withListCoreWorkersFunctionData(listCoreWorkersData)
                 .withListWorkflowsData(listWorkflowsData)
+                .withCreateWorkflowData(createWorkflowData)
                 .withStartWorkflowData(startWorkflowData)
                 .withGetWorkflowData(getWorkflowData)
                 .withInitializeCrawlSessionData(initializeCrawlSessionData)
                 .withCrawlWebPageData(crawlWebPageData)
                 .withFinalizeCrawlSessionData(finalizeCrawlSessionData)
+                .withListWorkflowExecutionsData(listWorkflowExecutionsData)
+                .withApiAuthorizerData(apiAuthorizerData)
                 .build();
         context.setLambdaFunctionsData(lambdaFunctionsData);
-
 
         return context;
     }

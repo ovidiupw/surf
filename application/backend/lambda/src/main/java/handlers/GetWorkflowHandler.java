@@ -16,6 +16,7 @@ public class GetWorkflowHandler implements RequestHandler<GetWorkflowHandler.Inp
 
     public static class Input {
         private String userArn;
+        private String workflowId;
 
         public String getUserArn() {
             return userArn;
@@ -25,10 +26,19 @@ public class GetWorkflowHandler implements RequestHandler<GetWorkflowHandler.Inp
             this.userArn = userArn;
         }
 
+        public String getWorkflowId() {
+            return workflowId;
+        }
+
+        public void setWorkflowId(String workflowId) {
+            this.workflowId = workflowId;
+        }
+
         @Override
         public String toString() {
-            return "GetWorkflow Input{" +
+            return "Input{" +
                     "userArn='" + userArn + '\'' +
+                    ", workflowId='" + workflowId + '\'' +
                     '}';
         }
     }

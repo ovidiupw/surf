@@ -1,6 +1,6 @@
-package surf.deployers.iam;
+package surf.deployers.iam.config;
 
-interface IAMRoleConfig {
+public interface IAMRoleConfig {
 
     String getRoleName();
 

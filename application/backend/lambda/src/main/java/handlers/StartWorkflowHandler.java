@@ -3,6 +3,8 @@ package handlers;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import models.Workflow;
+import models.WorkflowMetadata;
 
 public class StartWorkflowHandler implements RequestHandler<StartWorkflowHandler.Input, StartWorkflowHandler.Output> {
 
@@ -16,6 +18,7 @@ public class StartWorkflowHandler implements RequestHandler<StartWorkflowHandler
 
     public static class Input {
         private String userArn;
+        private String workflowId;
 
         public String getUserArn() {
             return userArn;
@@ -25,10 +28,19 @@ public class StartWorkflowHandler implements RequestHandler<StartWorkflowHandler
             this.userArn = userArn;
         }
 
+        public String getWorkflowId() {
+            return workflowId;
+        }
+
+        public void setWorkflowId(String workflowId) {
+            this.workflowId = workflowId;
+        }
+
         @Override
         public String toString() {
-            return "StartWorkflow Input{" +
+            return "Input{" +
                     "userArn='" + userArn + '\'' +
+                    ", workflowId='" + workflowId + '\'' +
                     '}';
         }
     }

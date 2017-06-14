@@ -1,4 +1,4 @@
-package surf.deployers.lambda;
+package surf.deployers.lambda.config;
 
 import com.amazonaws.services.identitymanagement.model.Role;
 import com.google.common.base.Preconditions;
@@ -6,19 +6,20 @@ import surf.deployment.Context;
 
 import javax.annotation.Nonnull;
 
-public class StartWorkflowLambdaConfig implements LambdaFunctionConfig {
-    private static final String NAME = "startWorkflow";
-    private static final String DESCRIPTION = "Starts a new crawling workflow.";
-    private static final String HANDLER_NAME = "handlers.StartWorkflowHandler";
+public class ListWorkflowsLambdaConfig implements LambdaFunctionConfig {
+
+    private static final String NAME = "listWorkflows";
+    private static final String DESCRIPTION = "Returns a list of all workflows that were created by the requesting user.";
+    private static final String HANDLER_NAME = "handlers.ListWorkflowsHandler";
     private static final Integer MEMORY_MEGABYTES = 128;
     private static final Integer TIMEOUT_SECONDS = 5;
 
     private Context context;
 
-    public StartWorkflowLambdaConfig(@Nonnull final Context context) {
+    public ListWorkflowsLambdaConfig(@Nonnull final Context context) {
         Preconditions.checkNotNull(context);
         Preconditions.checkNotNull(context.getIAMRoles());
-        Preconditions.checkNotNull(context.getIAMRoles().getStartWorkflowLambdaRole());
+        Preconditions.checkNotNull(context.getIAMRoles().getListWorkflowsLambdaRole());
         this.context = context;
     }
 
@@ -44,7 +45,7 @@ public class StartWorkflowLambdaConfig implements LambdaFunctionConfig {
 
     @Override
     public Role getIAMRole() {
-        return context.getIAMRoles().getStartWorkflowLambdaRole();
+        return context.getIAMRoles().getListWorkflowsLambdaRole();
     }
 
     @Override

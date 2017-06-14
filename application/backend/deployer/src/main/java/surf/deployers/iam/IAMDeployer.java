@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.Deployer;
 import surf.deployers.DeployerConfiguration;
+import surf.deployers.iam.config.*;
+import surf.deployers.iam.roles.*;
 import surf.deployment.Context;
 import surf.deployment.IAMRoles;
 import surf.exceptions.OperationFailedException;
@@ -44,13 +46,21 @@ public class IAMDeployer implements Deployer {
                 = createRoleWithConfig(iamClient, new ApiGatewayPushToCloudWatchLogsRoleConfig());
         final Role sfnInvokeLambdaRole
                 = createRoleWithConfig(iamClient, new SfnInvokeLambdaRoleConfig());
+        final Role apiAuthorizerLambdaRole
+                = createRoleWithConfig(iamClient, new ApiAuthorizerLambdaRole());
+        final Role apiGatewayInvokeLambdaRole
+                = createRoleWithConfig(iamClient, new ApiGatewayInvokeLambdaRole());
 
         final Role listCoreWorkersLambdaRole
                 = createRoleWithConfig(iamClient, new ListCoreWorkersLambdaRoleConfig());
         final Role listWorkflowsLambdaRole
                 = createRoleWithConfig(iamClient, new ListWorkflowsLambdaRoleConfig());
+        final Role createWorkflowLambdaRole
+                = createRoleWithConfig(iamClient, new CreateWorkflowLambdaRole());
         final Role startWorkflowLambdaRole
                 = createRoleWithConfig(iamClient, new StartWorkflowLambdaRole());
+        final Role listWorkflowExecutionsLambdaRole
+                = createRoleWithConfig(iamClient, new ListWorkflowExecutionsLambdaRole());
         final Role getWorkflowLambdaRole
                 = createRoleWithConfig(iamClient, new GetWorkflowLambdaRole());
 
@@ -68,11 +78,15 @@ public class IAMDeployer implements Deployer {
                 .withSfnInvokeLambdaRole(sfnInvokeLambdaRole)
                 .withListCoreWorkersLambdaRole(listCoreWorkersLambdaRole)
                 .withListWorkflowsLambdaRole(listWorkflowsLambdaRole)
+                .withCreateWorkflowLambdaRole(createWorkflowLambdaRole)
                 .withStartWorkflowLambdaRole(startWorkflowLambdaRole)
                 .withGetWorkflowLambdaRole(getWorkflowLambdaRole)
                 .withInitializeCrawlSessionLambdaRole(initializeCrawlSessionLambdaRole)
                 .withCrawlWebPageLambdaRole(crawlWebPageLambdaRole)
                 .withFinalizeCrawlSessionLambdaRole(finalizeCrawlSessionLambdaRole)
+                .withListWorkflowExecutionsLambdaRole(listWorkflowExecutionsLambdaRole)
+                .withApiAuthorizerLambdaRole(apiAuthorizerLambdaRole)
+                .withApiGatewayInvokeLambdaRole(apiGatewayInvokeLambdaRole)
                 .build();
         context.setIAMRoles(IAMRoles);
 

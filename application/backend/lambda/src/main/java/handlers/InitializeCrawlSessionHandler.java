@@ -31,7 +31,7 @@ public class InitializeCrawlSessionHandler
 
         @Override
         public String toString() {
-            return "InitializeCrawlSessionHandler Input{" +
+            return "InitializeCrawlSession Input{" +
                     "userArn='" + userArn + '\'' +
                     '}';
         }

@@ -9,6 +9,14 @@
       ],
       "Effect": "Allow",
       "Resource": "arn:aws:dynamodb:*:*:*"
+    },
+    {
+      "Sid": "2",
+      "Action": [
+        "logs:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }

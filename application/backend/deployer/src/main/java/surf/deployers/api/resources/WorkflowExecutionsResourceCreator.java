@@ -15,24 +15,24 @@ import surf.utility.ObjectConverter;
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 
-public class WorkflowsResourceCreator extends SkeletalResourceCreator {
+public class WorkflowExecutionsResourceCreator extends SkeletalResourceCreator {
 
-    private static final Logger LOG = LoggerFactory.getLogger(WorkflowsResourceCreator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WorkflowExecutionsResourceCreator.class);
 
     private static final String GET_INTEGRATION_TEMPLATE_FILE_PATH
-            = "src/main/resources/api/integration_templates/workflows.get.template";
+            = "src/main/resources/api/integration_templates/workflow_executions.get.template";
     private static final String GET_METHOD_FRIENDLY_NAME
-            = "ListWorkflows";
+            = "ListWorkflowExecutions";
 
     private static final String POST_INTEGRATION_TEMPLATE_FILE_PATH
-            = "src/main/resources/api/integration_templates/workflows.post.template";
+            = "src/main/resources/api/integration_templates/workflow_executions.post.template";
     private static final String POST_METHOD_FRIENDLY_NAME
-            = "CreateWorkflow";
+            = "StartWorkflowExecution";
 
     private final DeployerConfiguration deployerConfiguration;
     private final Context context;
 
-    public WorkflowsResourceCreator(
+    public WorkflowExecutionsResourceCreator(
             @Nonnull final CreateRestApiResult restApi,
             @Nonnull final AmazonApiGateway apiClient,
             @Nonnull final DeployerConfiguration deployerConfiguration,
@@ -52,19 +52,19 @@ public class WorkflowsResourceCreator extends SkeletalResourceCreator {
                 this.createApiResource(parentResource, pathPart));
 
         // Use the skeletal implementation of createOptionsMethod in order to add CORS support to this resource
-        this.createOptionsMethod(resource, Arrays.asList(HttpMethod.GET, HttpMethod.POST));
+        this.createOptionsMethod(resource, Arrays.asList(HttpMethod.POST));
         this.createGetMethod(
                 deployerConfiguration,
                 resource,
                 GET_INTEGRATION_TEMPLATE_FILE_PATH,
                 GET_METHOD_FRIENDLY_NAME,
-                context.getLambdaFunctionsData().getListWorkflowsData(),
+                context.getLambdaFunctionsData().getListWorkflowExecutionsData(),
                 context.getApiAuthorizer().getId());
         this.createPostMethod(deployerConfiguration,
                 resource,
                 POST_INTEGRATION_TEMPLATE_FILE_PATH,
                 POST_METHOD_FRIENDLY_NAME,
-                context.getLambdaFunctionsData().getCreateWorkflowData(),
+                context.getLambdaFunctionsData().getStartWorkflowData(),
                 context.getApiAuthorizer().getId());
 
         return resource;

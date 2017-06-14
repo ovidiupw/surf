@@ -1,4 +1,4 @@
-package surf.deployers.lambda;
+package surf.deployers.lambda.config;
 
 import com.amazonaws.services.identitymanagement.model.Role;
 import com.google.common.base.Preconditions;
@@ -6,20 +6,19 @@ import surf.deployment.Context;
 
 import javax.annotation.Nonnull;
 
-public class CrawlWebPageLambdaConfig implements LambdaFunctionConfig {
-
-    private static final String NAME = "crawlWebPage";
-    private static final String DESCRIPTION = "Crawls the given webpage, updates the global progress and outputs data to S3.";
-    private static final String HANDLER_NAME = "handlers.CrawlWebPageHandler";
+public class StartWorkflowLambdaConfig implements LambdaFunctionConfig {
+    private static final String NAME = "startWorkflow";
+    private static final String DESCRIPTION = "Starts a new crawling workflow.";
+    private static final String HANDLER_NAME = "handlers.StartWorkflowHandler";
     private static final Integer MEMORY_MEGABYTES = 128;
-    private static final Integer TIMEOUT_SECONDS = 300;
+    private static final Integer TIMEOUT_SECONDS = 5;
 
     private Context context;
 
-    public CrawlWebPageLambdaConfig(@Nonnull final Context context) {
+    public StartWorkflowLambdaConfig(@Nonnull final Context context) {
         Preconditions.checkNotNull(context);
         Preconditions.checkNotNull(context.getIAMRoles());
-        Preconditions.checkNotNull(context.getIAMRoles().getCrawlWebPageLambdaRole());
+        Preconditions.checkNotNull(context.getIAMRoles().getStartWorkflowLambdaRole());
         this.context = context;
     }
 
@@ -45,7 +44,7 @@ public class CrawlWebPageLambdaConfig implements LambdaFunctionConfig {
 
     @Override
     public Role getIAMRole() {
-        return context.getIAMRoles().getCrawlWebPageLambdaRole();
+        return context.getIAMRoles().getStartWorkflowLambdaRole();
     }
 
     @Override

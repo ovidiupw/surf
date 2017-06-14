@@ -4,14 +4,6 @@
     {
       "Sid": "1",
       "Action": [
-        "sns:Publish"
-      ],
-      "Effect": "Allow",
-      "Resource": "arn:aws:sns:*:*:*"
-    },
-    {
-      "Sid": "2",
-      "Action": [
         "logs:*"
       ],
       "Effect": "Allow",

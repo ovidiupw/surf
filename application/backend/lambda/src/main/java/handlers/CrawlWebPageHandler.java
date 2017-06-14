@@ -27,7 +27,7 @@ public class CrawlWebPageHandler implements RequestHandler<CrawlWebPageHandler.I
 
         @Override
         public String toString() {
-            return "CrawlWebPageHandler Input{" +
+            return "CrawlWebPage Input{" +
                     "userArn='" + userArn + '\'' +
                     '}';
         }

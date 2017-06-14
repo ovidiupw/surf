@@ -1,8 +1,8 @@
-package surf.deployers.lambda;
+package surf.deployers.lambda.config;
 
 import com.amazonaws.services.identitymanagement.model.Role;
 
-interface LambdaFunctionConfig {
+public interface LambdaFunctionConfig {
     String getFunctionName();
 
     String getDescription();

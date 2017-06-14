@@ -1,4 +1,4 @@
-package surf.deployers.iam;
+package surf.deployers.iam.config;
 
 import surf.utility.FileReader;
 
@@ -9,7 +9,7 @@ public class SfnInvokeLambdaRoleConfig implements IAMRoleConfig {
             = "src/main/resources/iam_policy_documents/sfn_invoke_lambda_trust_policy.json";
     private static final String ACCESS_POLICY_NAME = "sfn_invoke_lambda";
     private static final String ACCESS_POLICY_PATH
-            = "src/main/resources/iam_policy_documents/sfn_invoke_lambda_access_policy.json";
+            = "src/main/resources/iam_policy_documents/invoke_lambda_access_policy.json";
 
     @Override
     public String getRoleName() {

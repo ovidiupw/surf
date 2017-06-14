@@ -32,15 +32,16 @@ public class PostMethodCreator {
             @Nonnull final String lambdaFunctionsPath,
             @Nonnull final LambdaData functionData,
             @Nonnull final String integrationTemplateFilePath,
-            @Nonnull final String methodFriendlyName) {
+            @Nonnull final String methodFriendlyName,
+            @Nonnull final String customAuthorizerArn) {
         Preconditions.checkNotNull(resource);
         Preconditions.checkNotNull(lambdaFunctionsPath);
         Preconditions.checkNotNull(functionData);
         Preconditions.checkNotNull(integrationTemplateFilePath);
-        Preconditions.checkNotNull(methodFriendlyName);
+        Preconditions.checkNotNull(customAuthorizerArn);
 
         try {
-            putMethod(resource, methodFriendlyName);
+            putMethod(resource, methodFriendlyName, customAuthorizerArn);
             putMethodIntegration(resource, lambdaFunctionsPath, functionData, integrationTemplateFilePath);
             putMethodResponses(resource);
             putMethodIntegrationResponses(resource);
@@ -63,8 +64,10 @@ public class PostMethodCreator {
 
     private PutMethodResult putMethod(
             @Nonnull final Resource resource,
-            @Nonnull final String methodFriendlyName) {
+            @Nonnull final String methodFriendlyName,
+            @Nonnull final String customAuthorizerArn) {
         LOG.info("Trying to create POST method for the '{}' api resource...", resource.getPath());
+        LOG.info("Will use authorizerId={}", customAuthorizerArn);
 
         final PutMethodResult putMethodResult = apiClient.putMethod(new PutMethodRequest()
                 .withRestApiId(restApi.getId())
@@ -73,6 +76,7 @@ public class PostMethodCreator {
                 .withOperationName(methodFriendlyName)
                 .withApiKeyRequired(true)
                 .withAuthorizationType(AuthorizationType.AWS_IAM.getName())
+                // .withAuthorizerId(customAuthorizerArn) // only for AuthorizationType.CUSTOM
                 .withRequestParameters(getRequestParameters()));
 
         LOG.info("Successfully created POST method for resource with path='{}', authType='{}'",

@@ -50,7 +50,8 @@ public class WorkersResourceCreator extends SkeletalResourceCreator {
                 resource,
                 GET_INTEGRATION_TEMPLATE_FILE_PATH,
                 GET_METHOD_FRIENDLY_NAME,
-                context.getLambdaFunctionsData().getListCoreWorkersData());
+                context.getLambdaFunctionsData().getListCoreWorkersData(),
+                context.getApiAuthorizer().getId());
 
         return resource;
     }
