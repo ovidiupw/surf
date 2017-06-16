@@ -1,4 +1,4 @@
-package models.parsers;
+package parsers;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import models.exceptions.BadRequestException;
-import models.exceptions.InternalServerException;
 import utils.Logger;
 
 import javax.annotation.Nonnull;

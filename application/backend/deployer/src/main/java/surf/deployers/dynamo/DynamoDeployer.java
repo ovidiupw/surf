@@ -39,8 +39,8 @@ public class DynamoDeployer implements Deployer {
         return DEPLOYER_NAME;
     }
 
-    @Override
-    public Context deploy(@Nonnull final Context context) throws OperationFailedException {
+        @Override
+        public Context deploy(@Nonnull final Context context) throws OperationFailedException {
         Preconditions.checkNotNull(context);
         final AmazonDynamoDB dynamoClient = initializeDynamoClient();
 
@@ -105,6 +105,23 @@ public class DynamoDeployer implements Deployer {
                 deployerConfiguration.getDynamoDBWorkflowExecutionsTableReadCapacityUnits(),
                 deployerConfiguration.getDynamoDBWorkflowExecutionsTableWriteCapacityUnits()
         ));
+
+        final List<GlobalSecondaryIndex> globalSecondaryIndexes = createTableRequest.getGlobalSecondaryIndexes();
+        for (final GlobalSecondaryIndex gsi : globalSecondaryIndexes) {
+            switch (gsi.getIndexName()) {
+                case WorkflowExecution.DDB_WORKFLOW_ID_GSI: {
+                    gsi.setProvisionedThroughput(new ProvisionedThroughput(
+                            deployerConfiguration.getDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits(),
+                            deployerConfiguration.getDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits()
+                    ));
+                    gsi.setProjection(new Projection().withProjectionType(ProjectionType.ALL));
+                    break;
+                }
+                default: {
+                    throw new OperationFailedException(new UnsupportedOperationException("DDB GSI name not covered!"));
+                }
+            }
+        }
 
         return createOrDescribeTable(dynamoClient, createTableRequest);
     }

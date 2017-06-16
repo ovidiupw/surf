@@ -1,4 +1,4 @@
-package models.interpolators;
+package interpolators;
 
 import models.exceptions.BadRequestException;
 import models.exceptions.InternalServerException;

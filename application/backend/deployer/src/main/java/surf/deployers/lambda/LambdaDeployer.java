@@ -6,7 +6,6 @@ import com.amazonaws.services.lambda.AWSLambdaClientBuilder;
 import com.amazonaws.services.lambda.model.*;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
-import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.Deployer;
@@ -16,9 +15,7 @@ import surf.deployment.Context;
 import surf.exceptions.OperationFailedException;
 
 import javax.annotation.Nonnull;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class LambdaDeployer implements Deployer {
@@ -51,22 +48,22 @@ public class LambdaDeployer implements Deployer {
 
         /* API Gateway Lambda functions */
 
-        final LambdaData listCoreWorkersData = createFunction(lambdaClient, new ListCoreWorkersLambdaConfig(context));
+        final LambdaData listCoreWorkersData = createFunction(lambdaClient, new ListCoreWorkersLambdaConfig(context), context);
         lambdaNeedingApiGatewayInvokePermissions.add(listCoreWorkersData);
 
-        final LambdaData listWorkflowsData = createFunction(lambdaClient, new ListWorkflowsLambdaConfig(context));
+        final LambdaData listWorkflowsData = createFunction(lambdaClient, new ListWorkflowsLambdaConfig(context), context);
         lambdaNeedingApiGatewayInvokePermissions.add(listWorkflowsData);
 
-        final LambdaData createWorkflowData = createFunction(lambdaClient, new CreateWorkflowLambdaConfig(context));
+        final LambdaData createWorkflowData = createFunction(lambdaClient, new CreateWorkflowLambdaConfig(context), context);
         lambdaNeedingApiGatewayInvokePermissions.add(createWorkflowData);
 
-        final LambdaData startWorkflowData = createFunction(lambdaClient, new StartWorkflowLambdaConfig(context));
+        final LambdaData startWorkflowData = createFunction(lambdaClient, new StartWorkflowLambdaConfig(context), context);
         lambdaNeedingApiGatewayInvokePermissions.add(startWorkflowData);
 
-        final LambdaData getWorkflowData = createFunction(lambdaClient, new GetWorkflowLambdaConfig(context));
+        final LambdaData getWorkflowData = createFunction(lambdaClient, new GetWorkflowLambdaConfig(context), context);
         lambdaNeedingApiGatewayInvokePermissions.add(getWorkflowData);
 
-        final LambdaData listWorkflowExecutionsData = createFunction(lambdaClient, new ListWorkflowExecutionsLambdaConfig(context));
+        final LambdaData listWorkflowExecutionsData = createFunction(lambdaClient, new ListWorkflowExecutionsLambdaConfig(context), context);
         lambdaNeedingApiGatewayInvokePermissions.add(listWorkflowExecutionsData);
 
         cleanupApiGatewayInvokePermissions(lambdaClient, lambdaNeedingApiGatewayInvokePermissions);
@@ -75,13 +72,13 @@ public class LambdaDeployer implements Deployer {
         /* Non API Gateway Lambda functions */
 
         final LambdaData initializeCrawlSessionData
-                = createFunction(lambdaClient, new InitializeCrawlSessionLambdaConfig(context));
+                = createFunction(lambdaClient, new InitializeCrawlSessionLambdaConfig(context), context);
         final LambdaData crawlWebPageData
-                = createFunction(lambdaClient, new CrawlWebPageLambdaConfig(context));
+                = createFunction(lambdaClient, new CrawlWebPageLambdaConfig(context), context);
         final LambdaData finalizeCrawlSessionData
-                = createFunction(lambdaClient, new FinalizeCrawlSessionLambdaConfig(context));
+                = createFunction(lambdaClient, new FinalizeCrawlSessionLambdaConfig(context), context);
         final LambdaData apiAuthorizerData
-                = createFunction(lambdaClient, new ApiAuthorizerLambdaConfig(context));
+                = createFunction(lambdaClient, new ApiAuthorizerLambdaConfig(context), context);
 
         LOG.info("Updating context with the created/existing lambda arns.");
         final LambdaFunctionsData lambdaFunctionsData = new LambdaFunctionsData.Builder()
@@ -110,7 +107,15 @@ public class LambdaDeployer implements Deployer {
 
     private LambdaData createFunction(
             @Nonnull final AWSLambda lambdaClient,
-            @Nonnull final LambdaFunctionConfig functionConfig) {
+            @Nonnull final LambdaFunctionConfig functionConfig,
+            @Nonnull final Context context) {
+
+        final FunctionCode functionCode = new FunctionCode()
+                .withS3Bucket(context.getS3AppConfigBucketName())
+                .withS3Key(context.getS3LambdaCodeKey());
+
+        LOG.info("Set function code to s3Bucket='{}' and s3Key='{}'");
+
         final CreateFunctionRequest createFunctionRequest = new CreateFunctionRequest()
                 .withFunctionName(functionConfig.getFunctionName())
                 .withDescription(functionConfig.getDescription())
@@ -119,7 +124,7 @@ public class LambdaDeployer implements Deployer {
                 .withRole(functionConfig.getIAMRole().getArn())
                 .withTimeout(functionConfig.getTimeoutSeconds())
                 .withRuntime(deployerConfiguration.getLambdaRuntime())
-                .withCode(deployerConfiguration.getLambdaFunctionCode());
+                .withCode(functionCode);
 
         try {
             LOG.info("Trying to create lambda function with name='{}', description='{}', handler='{}', " +
@@ -144,7 +149,7 @@ public class LambdaDeployer implements Deployer {
         } catch (ResourceConflictException ignored) {
             LOG.warn("Lambda function with name '{}' already exists! Will update its metadata instead.",
                     functionConfig.getFunctionName());
-            return updateFunction(lambdaClient, functionConfig);
+            return updateFunction(lambdaClient, functionConfig, context);
         } catch (InvalidParameterValueException
                 | ServiceFailureException
                 | ResourceNotFoundException
@@ -157,11 +162,12 @@ public class LambdaDeployer implements Deployer {
 
     private LambdaData updateFunction(
             @Nonnull final AWSLambda lambdaClient,
-            @Nonnull final LambdaFunctionConfig functionConfig) {
+            @Nonnull final LambdaFunctionConfig functionConfig,
+            @Nonnull final Context context) {
         final GetFunctionResult getFunctionResult = getFunction(lambdaClient, functionConfig);
         LOG.info("Existing lambda function was found! Proceeding with updating function code and configuration.");
 
-        updateFunctionCode(lambdaClient, functionConfig);
+        updateFunctionCode(lambdaClient, functionConfig, context);
         updateFunctionConfiguration(lambdaClient, functionConfig);
 
         return new LambdaData(
@@ -189,12 +195,15 @@ public class LambdaDeployer implements Deployer {
 
     private UpdateFunctionCodeResult updateFunctionCode(
             @Nonnull final AWSLambda lambdaClient,
-            @Nonnull final LambdaFunctionConfig functionConfig) {
+            @Nonnull final LambdaFunctionConfig functionConfig,
+            @Nonnull final Context context) {
+
         try {
             LOG.info("Updating lambda function code for function name '{}'", functionConfig.getFunctionName());
             return lambdaClient.updateFunctionCode(new UpdateFunctionCodeRequest()
                     .withFunctionName(functionConfig.getFunctionName())
-                    .withZipFile(deployerConfiguration.getLambdaFunctionCode().getZipFile()));
+                    .withS3Bucket(context.getS3AppConfigBucketName())
+                    .withS3Key(context.getS3LambdaCodeKey()));
         } catch (ServiceFailureException
                 | ResourceNotFoundException
                 | TooManyRequestsException

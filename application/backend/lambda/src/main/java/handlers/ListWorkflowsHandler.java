@@ -1,14 +1,7 @@
 package handlers;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
-import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedQueryList;
 import com.amazonaws.services.dynamodbv2.datamodeling.QueryResultPage;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
-import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
-import com.amazonaws.services.dynamodbv2.model.Condition;
-import com.amazonaws.services.dynamodbv2.model.QueryRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.base.Preconditions;
@@ -16,12 +9,10 @@ import com.google.common.base.Strings;
 import models.Validateable;
 import models.Workflow;
 import models.config.LambdaConfigurationConstants;
-import models.validators.ListWorkflowsInputValidator;
 import utils.*;
+import validators.ListWorkflowsInputValidator;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ListWorkflowsHandler implements
         RequestHandler<ListWorkflowsHandler.Input, ListWorkflowsHandler.Output>,
@@ -29,6 +20,7 @@ public class ListWorkflowsHandler implements
 
     private LambdaConfigurationConstants config;
     private AmazonDynamoDB dynamoClient;
+    private DynamoDBOperationsHelper dynamoOperationsHelper;
     private ListWorkflowsInputValidator inputValidator;
 
     public ListWorkflowsHandler.Output handleRequest(final ListWorkflowsHandler.Input input, final Context context) {
@@ -43,55 +35,18 @@ public class ListWorkflowsHandler implements
 
         inputValidator.validate(input);
 
-        final Workflow workflowModel = new Workflow();
-        workflowModel.setId(input.getStartingWorkflowId());
-        workflowModel.setOwnerId(
-                String.join(
-                        "@",
-                        ArnHelper.getOwnerIdFromUserArn(input.getUserArn()),
-                        ArnHelper.getAuthProviderFromUserArn(input.getUserArn())));
-
-        Logger.log(context.getLogger(), "Will query for workflows with ownerId='%s'", workflowModel.getOwnerId());
-
-        Long createdBefore = input.getCreatedBefore();
-
-        Map<String, AttributeValue> startKey = null;
-        if (createdBefore != null && input.getStartingWorkflowId() != null) {
-            startKey = new HashMap<>(4);
-
-            startKey.put(Workflow.DDB_ID, new AttributeValue().withS(input.getStartingWorkflowId()));
-            startKey.put(Workflow.DDB_OWNER_ID, new AttributeValue().withS(workflowModel.getOwnerId()));
-            startKey.put(Workflow.DDB_CREATION_DATE_MILLIS, new AttributeValue().withN(String.valueOf(createdBefore)));
-        } else {
-            createdBefore = System.currentTimeMillis();
-        }
-
-        Logger.log(context.getLogger(), "Will get workflows with '%s' <= '%s' and get the first '%d' results",
-                Workflow.DDB_CREATION_DATE_MILLIS,
-                createdBefore,
+        final QueryResultPage<Workflow> workflowsByOwnerPage = dynamoOperationsHelper.getWorkflowsByOwner(
+                input.getUserArn(),
+                input.getStartingWorkflowId(),
+                input.getCreatedBefore(),
                 input.getResultsPerPage());
 
-        final Condition rangeKeyCondition = new Condition()
-                .withComparisonOperator(ComparisonOperator.LE)
-                .withAttributeValueList(new AttributeValue().withN(String.valueOf(createdBefore)));
-
-        final DynamoDBQueryExpression<Workflow> query = new DynamoDBQueryExpression<Workflow>()
-                .withHashKeyValues(workflowModel)
-                .withConsistentRead(false)
-                .withScanIndexForward(false)
-                .withExclusiveStartKey(startKey)
-                .withRangeKeyCondition(Workflow.DDB_CREATION_DATE_MILLIS, rangeKeyCondition)
-                .withLimit(input.getResultsPerPage());
-
-        final DynamoDBMapper dynamoDBMapper = new DynamoDBMapper(dynamoClient);
-        QueryResultPage<Workflow> workflowQueryResultPage = dynamoDBMapper.queryPage(Workflow.class, query);
-
-        for (final Workflow wf : workflowQueryResultPage.getResults()) {
-            Logger.log(context.getLogger(), "Found workflow='%s' that is owned by '%s'", wf, workflowModel.getOwnerId());
+        for (final Workflow wf : workflowsByOwnerPage.getResults()) {
+            Logger.log(context.getLogger(), "Found workflow='%s' that is owned by '%s'", wf, wf.getOwnerId());
         }
 
         final ListWorkflowsHandler.Output output = new ListWorkflowsHandler.Output();
-        output.setWorkflows(workflowQueryResultPage.getResults());
+        output.setWorkflows(workflowsByOwnerPage.getResults());
 
         return output;
     }
@@ -100,7 +55,8 @@ public class ListWorkflowsHandler implements
         config = FileReader.readObjectFromFile(Constants.CONFIG_FILE_PATH, LambdaConfigurationConstants.class);
         Logger.log(context.getLogger(), "Using lambda config '%s'", config);
 
-        dynamoClient = new DynamoDBHelper(context.getLogger()).getDynamoDBClient(config);
+        dynamoClient = new DynamoDBClientHelper(context.getLogger()).getDynamoDBClient(config);
+        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient);
         inputValidator = new ListWorkflowsInputValidator(context);
     }
 

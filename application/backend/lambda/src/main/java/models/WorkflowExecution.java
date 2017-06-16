@@ -1,7 +1,7 @@
 package models;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
-import models.converters.StatusConverter;
+import converters.StatusConverter;
 
 import java.util.Objects;
 
@@ -45,13 +45,28 @@ public class WorkflowExecution {
      */
     private long startDateMillis;
 
+    /**
+     * The version of task. Used as a mutex via optimistic locking. See
+     * <a href="http://www.orafaq.com/papers/locking.pdf">Oracle Optimistic Locking</a>
+     * and/or
+     * <a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.OptimisticLocking.html">
+     *     DynamoDB Optimistic Locking</a>
+     * for more details.
+     */
+    private Long version;
+
     public static final String DDB_WORKFLOW_ID = "WorkflowId";
+    public static final String DDB_WORKFLOW_ID_GSI = "WorkflowIdGSI";
     public static final String DDB_ID = "Id";
     public static final String DDB_OWNER_ID = "OwnerId";
     public static final String DDB_START_DATE_MILLIS = "StartDateMillis";
     public static final String DDB_STATUS = "Status";
+    public static final String DDB_VERSION = "Version";
 
-    @DynamoDBHashKey(attributeName = DDB_WORKFLOW_ID)
+    @DynamoDBIndexHashKey(
+            attributeName = DDB_WORKFLOW_ID,
+            globalSecondaryIndexName = DDB_WORKFLOW_ID_GSI
+    )
     public String getWorkflowId() {
         return workflowId;
     }
@@ -60,7 +75,7 @@ public class WorkflowExecution {
         this.workflowId = workflowId;
     }
 
-    @DynamoDBAttribute(attributeName = DDB_ID)
+    @DynamoDBHashKey(attributeName = DDB_ID)
     public String getId() {
         return id;
     }
@@ -106,6 +121,15 @@ public class WorkflowExecution {
         this.startDateMillis = startDateMillis;
     }
 
+    @DynamoDBVersionAttribute(attributeName = DDB_VERSION)
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     @DynamoDBIgnore
     public static String getTableName() {
         return TABLE_NAME;
@@ -121,12 +145,13 @@ public class WorkflowExecution {
                 Objects.equals(workflowId, that.workflowId) &&
                 Objects.equals(id, that.id) &&
                 Objects.equals(ownerId, that.ownerId) &&
-                status == that.status;
+                status == that.status &&
+                Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(workflowId, id, ownerId, status, creationDateMillis, startDateMillis);
+        return Objects.hash(workflowId, id, ownerId, status, creationDateMillis, startDateMillis, version);
     }
 
     @Override
@@ -138,6 +163,7 @@ public class WorkflowExecution {
                 ", status=" + status +
                 ", creationDateMillis=" + creationDateMillis +
                 ", startDateMillis=" + startDateMillis +
+                ", version=" + version +
                 '}';
     }
 }

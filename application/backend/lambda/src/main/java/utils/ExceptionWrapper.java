@@ -31,12 +31,20 @@ public class ExceptionWrapper<I, O> {
             e.printStackTrace();
             final String log = Logger.log(
                     context.getLogger(), "Exception while trying to handle request: '%s'!", e.getMessage());
+
+            if (e.getMessage() == null) {
+                throw new InternalServerException("Internal server error!");
+            }
             throw new BadRequestException(log);
 
         } catch (RuntimeException e) {
             e.printStackTrace();
             final String log = Logger.log(
                     context.getLogger(), "Exception while trying to handle request: '%s'!", e.getMessage());
+
+            if (e.getMessage() == null) {
+                throw new InternalServerException("Internal server error!");
+            }
             throw new InternalServerException(log);
         }
     }

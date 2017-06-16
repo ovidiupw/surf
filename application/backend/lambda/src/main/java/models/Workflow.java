@@ -2,7 +2,7 @@ package models;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.google.common.base.Preconditions;
-import models.converters.WorkflowMetadataConverter;
+import converters.WorkflowMetadataConverter;
 
 import java.util.Objects;
 

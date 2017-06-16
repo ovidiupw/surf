@@ -1,4 +1,4 @@
-package models.interpolators;
+package interpolators;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.base.Preconditions;
@@ -6,9 +6,9 @@ import com.google.common.base.Strings;
 import models.Workflow;
 import models.exceptions.BadRequestException;
 import models.exceptions.InternalServerException;
-import utils.ArnHelper;
 import utils.Logger;
 import utils.RandomGenerator;
+import utils.SurfObjectMother;
 
 import javax.annotation.Nonnull;
 
@@ -32,10 +32,7 @@ public class WorkflowInterpolator implements Interpolator<Workflow> {
         interpolatedWorkflow.setCreationDateMillis(System.currentTimeMillis());
         interpolatedWorkflow.setId(RandomGenerator.randomUUID());
 
-        final String fullOwnerId = String.join(
-                "@",
-                ArnHelper.getOwnerIdFromUserArn(userArn),
-                ArnHelper.getAuthProviderFromUserArn(userArn));
+        final String fullOwnerId = SurfObjectMother.getOwnerId(userArn);
 
         interpolatedWorkflow.setOwnerId(fullOwnerId);
         interpolatedWorkflow.setName(workflow.getName());

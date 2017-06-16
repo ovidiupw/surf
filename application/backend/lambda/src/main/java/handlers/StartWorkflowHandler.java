@@ -1,22 +1,94 @@
 package handlers;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.sns.AmazonSNS;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import models.Validateable;
 import models.Workflow;
-import models.WorkflowMetadata;
+import models.WorkflowExecution;
+import models.config.LambdaConfigurationConstants;
+import models.exceptions.BadRequestException;
+import utils.*;
+import validators.StartWorkflowInputValidator;
 
-public class StartWorkflowHandler implements RequestHandler<StartWorkflowHandler.Input, StartWorkflowHandler.Output> {
+public class StartWorkflowHandler implements
+        RequestHandler<StartWorkflowHandler.Input, StartWorkflowHandler.Output>,
+        WrappableRequestHandler<StartWorkflowHandler.Input, StartWorkflowHandler.Output> {
 
-    private LambdaLogger LOG;
+    private LambdaConfigurationConstants config;
+    private AmazonDynamoDB dynamoClient;
+    private DynamoDBOperationsHelper dynamoOperationsHelper;
+    private AmazonSNS snsClient;
+    private SNSOperationsHelper snsOperationsHelper;
+    private StartWorkflowInputValidator inputValidator;
 
     public StartWorkflowHandler.Output handleRequest(final StartWorkflowHandler.Input input, final Context context) {
-        LOG = context.getLogger();
-        LOG.log(input.toString());
-        return null;
+        final ExceptionWrapper<Input, Output> exceptionWrapper = new ExceptionWrapper<>(input, context);
+        return exceptionWrapper.doHandleRequest(this);
     }
 
-    public static class Input {
+    @Override
+    public Output doHandleRequest(Input input, Context context) {
+        Logger.log(context.getLogger(), "input=%s", input.toString());
+        initializeInstance(context);
+
+        inputValidator.validate(input);
+
+        final Workflow workflow = dynamoOperationsHelper.getWorkflow(input.getWorkflowId());
+        if (workflow == null) {
+            throw new BadRequestException(
+                    "The workflow was deleted while trying to start a new execution based on its data!");
+        }
+
+        final WorkflowExecution workflowExecution
+                = SurfObjectMother.createWorkflowExecution(workflow, input.getUserArn());
+
+        Logger.log(context.getLogger(), "Trying to save new workflow execution to database...");
+        final WorkflowExecution savedWorkflowExecution = dynamoOperationsHelper.saveWorkflowExecution(workflowExecution);
+        Logger.log(context.getLogger(), "Successfully saved new workflow execution='%s' to database!", savedWorkflowExecution);
+
+        final InitializeCrawlSessionHandler.Input initializeCrawlSessionInput
+                = SurfObjectMother.generateInitializeCrawlSessionInput(
+                savedWorkflowExecution.getId(),
+                workflow.getMetadata().getRootAddress(),
+                0);
+
+        Logger.log(context.getLogger(),
+                "Trying to send SNS notification to 'InitializeCrawlSessionHandler' with payload='%s'...",
+                initializeCrawlSessionInput);
+
+        final String targetSNSTopicArn = config.getInitializeCrawlSessionSNSTopicArn();
+        try {
+            String message = snsOperationsHelper.publishMessage(targetSNSTopicArn, initializeCrawlSessionInput);
+            Logger.log(context.getLogger(),
+                    "Successfully published message='%s' to SNS topicArn='%s'", message, targetSNSTopicArn);
+
+        } catch (JsonProcessingException | RuntimeException e) {
+            Logger.log(context.getLogger(), "Could not publish SNS notification to topicArn='%s'", targetSNSTopicArn);
+            throw new RuntimeException(e); // let the ExceptionWrapper deal with this unexpected exception
+        }
+
+        final StartWorkflowHandler.Output output = new StartWorkflowHandler.Output();
+        output.setWorkflowExecution(savedWorkflowExecution);
+        return output;
+    }
+
+    private void initializeInstance(final Context context) {
+        config = FileReader.readObjectFromFile(Constants.CONFIG_FILE_PATH, LambdaConfigurationConstants.class);
+        Logger.log(context.getLogger(), "Using lambda config '%s'", config);
+
+        dynamoClient = new DynamoDBClientHelper(context.getLogger()).getDynamoDBClient(config);
+        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient);
+        snsClient = new SNSClientHelper(context.getLogger()).getSNSClient(config);
+        snsOperationsHelper = new SNSOperationsHelper(snsClient, context);
+        inputValidator = new StartWorkflowInputValidator(context, dynamoClient);
+    }
+
+    public static class Input implements Validateable {
         private String userArn;
         private String workflowId;
 
@@ -43,8 +115,35 @@ public class StartWorkflowHandler implements RequestHandler<StartWorkflowHandler
                     ", workflowId='" + workflowId + '\'' +
                     '}';
         }
+
+        public void validate() {
+            Preconditions.checkArgument(
+                    !Strings.isNullOrEmpty(userArn),
+                    "The input 'userArn' must not be null or empty"
+            );
+            Preconditions.checkArgument(
+                    !Strings.isNullOrEmpty(workflowId),
+                    "The input 'workflowId' must not be null or empty, but a valid workflow id."
+            );
+        }
     }
 
     public static class Output {
+        private WorkflowExecution workflowExecution;
+
+        public WorkflowExecution getWorkflowExecution() {
+            return workflowExecution;
+        }
+
+        public void setWorkflowExecution(WorkflowExecution workflowExecution) {
+            this.workflowExecution = workflowExecution;
+        }
+
+        @Override
+        public String toString() {
+            return "Output{" +
+                    "workflowExecution=" + workflowExecution +
+                    '}';
+        }
     }
 }

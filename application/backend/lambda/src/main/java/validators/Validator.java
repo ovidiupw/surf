@@ -1,7 +1,4 @@
-package models.validators;
-
-import models.exceptions.BadRequestException;
-import models.exceptions.InternalServerException;
+package validators;
 
 import javax.annotation.Nonnull;
 

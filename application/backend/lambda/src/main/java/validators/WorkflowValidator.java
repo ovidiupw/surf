@@ -1,11 +1,9 @@
-package models.validators;
+package validators;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.lambda.runtime.Context;
 import models.Workflow;
-import models.exceptions.BadRequestException;
 import models.exceptions.InternalServerException;
 import utils.Logger;
 

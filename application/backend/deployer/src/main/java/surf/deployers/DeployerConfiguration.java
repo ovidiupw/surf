@@ -2,35 +2,24 @@ package surf.deployers;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.regions.Regions;
-import com.amazonaws.services.lambda.model.FunctionCode;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
-import org.apache.maven.shared.invoker.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import surf.exceptions.OperationFailedException;
 import surf.utility.ExitCode;
 import surf.utility.FileReader;
 
 import javax.annotation.Nonnull;
-import java.io.File;
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 public class DeployerConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(DeployerConfiguration.class);
 
-    private static final String MAVEN_GOAL = "package";
-    private static final String MAVEN_LAMBDA_POM_PATH = "../lambda/pom.xml";
-    public static final String MAVEN_HOME = "/usr/local/";
-
     private ClientConfiguration clientConfiguration;
     private Regions awsClientRegion;
-    private FunctionCode lambdaFunctionCode;
+    private String lambdaCodePath;
     private String lambdaRuntime;
     private String apiGatewayEndpoint;
     private String awsAccountId;
@@ -58,6 +47,8 @@ public class DeployerConfiguration {
     private long dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits;
     private long dynamoDBCrawlMetadataTableReadCapacityUnits;
     private long dynamoDBCrawlMetadataTableWriteCapacityUnits;
+    private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits;
+    private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits;
 
     public static DeployerConfiguration fromFile(@Nonnull final String configFilePath) {
         try {
@@ -78,17 +69,13 @@ public class DeployerConfiguration {
         final ClientConfiguration clientConfiguration = new ClientConfiguration()
                 .withClientExecutionTimeout((int) TimeUnit.SECONDS.toMillis(config.getAwsClientRequestTimeoutSeconds()));
 
-        buildLambdaCodeJar();
-        final FunctionCode lambdaFunctionsCode = new FunctionCode()
-                .withZipFile(ByteBuffer.wrap(Files.readAllBytes(new File(config.getLambdaCodePath()).toPath())));
-
         final String apiGatewayLambdaFunctionsPath = String.format(
                 "arn:aws:apigateway:%s:lambda:path/2015-03-31/functions/",
                 config.getAwsClientRegion());
 
         return new DeployerConfiguration.Builder()
                 .withClientConfiguration(clientConfiguration)
-                .withLambdaFunctionCode(lambdaFunctionsCode)
+                .withLambdaCodePath(config.getLambdaCodePath())
                 .withLambdaRuntime(config.getLambdaRuntime())
                 .withAWSClientRegion(Regions.fromName(config.getAwsClientRegion()))
                 .withAwsAccountId(config.getAwsAccountId())
@@ -117,6 +104,8 @@ public class DeployerConfiguration {
                 .withDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits(config.getDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits())
                 .withDynamoDBCrawlMetadataTableReadCapacityUnits(config.getDynamoDBCrawlMetadataTableReadCapacityUnits())
                 .withDynamoDBCrawlMetadataTableWriteCapacityUnits(config.getDynamoDBCrawlMetadataTableWriteCapacityUnits())
+                .withDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits(config.getDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits())
+                .withDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits(config.getDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits())
                 .build();
     }
 
@@ -127,25 +116,6 @@ public class DeployerConfiguration {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
         return objectMapper.readValue(configurationConstantsFileContent, DeployerConfigurationConstants.class);
     }
-
-    private static void buildLambdaCodeJar() {
-        LOG.info("Trying to execute maven goal with name={} for pom with path={}", MAVEN_GOAL, MAVEN_LAMBDA_POM_PATH);
-
-        final InvocationRequest request = new DefaultInvocationRequest();
-        request.setPomFile(new File(MAVEN_LAMBDA_POM_PATH));
-        request.setGoals(Collections.singletonList(MAVEN_GOAL));
-
-        final Invoker invoker = new DefaultInvoker();
-        invoker.setMavenHome(new File(MAVEN_HOME));
-        try {
-            invoker.execute(request);
-        } catch (MavenInvocationException e) {
-            LOG.error("There was an error while trying to execute maven goal!", e);
-            throw new OperationFailedException(e);
-        }
-    }
-
-
 
     public ClientConfiguration getClientConfiguration() {
         return clientConfiguration;
@@ -163,12 +133,12 @@ public class DeployerConfiguration {
         this.awsClientRegion = awsClientRegion;
     }
 
-    public FunctionCode getLambdaFunctionCode() {
-        return lambdaFunctionCode;
+    public String getLambdaCodePath() {
+        return lambdaCodePath;
     }
 
-    private void setLambdaFunctionCode(FunctionCode lambdaFunctionCode) {
-        this.lambdaFunctionCode = lambdaFunctionCode;
+    private void setLambdaCodePath(String lambdaCodePath) {
+        this.lambdaCodePath = lambdaCodePath;
     }
 
     public String getLambdaRuntime() {
@@ -387,10 +357,26 @@ public class DeployerConfiguration {
         this.lambdaConfigFilePath = lambdaConfigFilePath;
     }
 
+    public long getDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits() {
+        return dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits() {
+        return dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits(long dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits) {
+        this.dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits = dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits(long dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits) {
+        this.dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits = dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits;
+    }
+
     public static class Builder {
         private ClientConfiguration clientConfiguration;
         private Regions region;
-        private FunctionCode lambdaFunctionCode;
+        private String lambdaCodePath;
         private String lambdaRuntime;
         private String awsAccountId;
         private String apiGatewayEndpoint;
@@ -418,11 +404,13 @@ public class DeployerConfiguration {
         private long dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits;
         private long dynamoDBCrawlMetadataTableReadCapacityUnits;
         private long dynamoDBCrawlMetadataTableWriteCapacityUnits;
+        private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits;
+        private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits;
 
         public DeployerConfiguration build() {
             Preconditions.checkNotNull(clientConfiguration);
             Preconditions.checkNotNull(region);
-            Preconditions.checkNotNull(lambdaFunctionCode);
+            Preconditions.checkNotNull(lambdaCodePath);
             Preconditions.checkNotNull(lambdaRuntime);
             Preconditions.checkNotNull(awsAccountId);
             Preconditions.checkNotNull(apiGatewayEndpoint);
@@ -449,10 +437,12 @@ public class DeployerConfiguration {
             Preconditions.checkArgument(dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits >= 0);
             Preconditions.checkArgument(dynamoDBCrawlMetadataTableReadCapacityUnits >= 0);
             Preconditions.checkArgument(dynamoDBCrawlMetadataTableWriteCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits >= 0);
 
             final DeployerConfiguration deployerConfiguration = new DeployerConfiguration();
             deployerConfiguration.setClientConfiguration(clientConfiguration);
-            deployerConfiguration.setLambdaFunctionCode(lambdaFunctionCode);
+            deployerConfiguration.setLambdaCodePath(lambdaCodePath);
             deployerConfiguration.setAwsClientRegion(region);
             deployerConfiguration.setLambdaRuntime(lambdaRuntime);
             deployerConfiguration.setAwsAccountId(awsAccountId);
@@ -481,6 +471,8 @@ public class DeployerConfiguration {
             deployerConfiguration.setDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits(dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits);
             deployerConfiguration.setDynamoDBCrawlMetadataTableReadCapacityUnits(dynamoDBCrawlMetadataTableReadCapacityUnits);
             deployerConfiguration.setDynamoDBCrawlMetadataTableWriteCapacityUnits(dynamoDBCrawlMetadataTableWriteCapacityUnits);
+            deployerConfiguration.setDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits(dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits);
+            deployerConfiguration.setDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits(dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits);
             return deployerConfiguration;
         }
 
@@ -496,9 +488,9 @@ public class DeployerConfiguration {
             return this;
         }
 
-        public DeployerConfiguration.Builder withLambdaFunctionCode(@Nonnull final FunctionCode lambdaFunctionCode) {
-            Preconditions.checkNotNull(lambdaFunctionCode);
-            this.lambdaFunctionCode = lambdaFunctionCode;
+        public DeployerConfiguration.Builder withLambdaCodePath(@Nonnull final String path) {
+            Preconditions.checkNotNull(path);
+            this.lambdaCodePath = path;
             return this;
         }
 
@@ -659,6 +651,18 @@ public class DeployerConfiguration {
         public DeployerConfiguration.Builder withDynamoDBCrawlMetadataTableWriteCapacityUnits(@Nonnull final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBCrawlMetadataTableWriteCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits = units;
             return this;
         }
     }

@@ -1,4 +1,4 @@
-package models.validators;
+package validators;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import handlers.CreateWorkflowHandler;

@@ -11,6 +11,7 @@ import surf.deployers.api.ApiDeployer;
 import surf.deployers.dynamo.DynamoDeployer;
 import surf.deployers.iam.IAMDeployer;
 import surf.deployers.lambda.LambdaDeployer;
+import surf.deployers.s3.S3Deployer;
 import surf.deployers.sleep.SleepDeployer;
 import surf.deployers.sns.SNSDeployer;
 import surf.deployment.Deployment;
@@ -62,16 +63,18 @@ public class Main {
         final Deployment deployment = new Deployment("Deployment Stage #1: Complete deployment");
         final Injector injector = Guice.createInjector(new DeployerConfigurationModule(deployerConfiguration));
 
+        final Deployer s3Deployer = injector.getInstance(S3Deployer.class);
         final Deployer iamDeployer = injector.getInstance(IAMDeployer.class);
         final Deployer lambdaDeployer = injector.getInstance(LambdaDeployer.class);
         final Deployer apiDeployer = injector.getInstance(ApiDeployer.class);
         final Deployer dynamoDeployer = injector.getInstance(DynamoDeployer.class);
         final Deployer snsDeployer = injector.getInstance(SNSDeployer.class);
         // TODO the sleep deployer should really be set to something between 15 and 30 seconds
-        final Deployer sleepDeployer = new SleepDeployer(1, TimeUnit.SECONDS);
+        final Deployer sleepDeployer = new SleepDeployer(30, TimeUnit.SECONDS);
 
         /* The order of chaining the deployers matters. */
         deployment
+                .chainDeployer(s3Deployer)
                 .chainDeployer(iamDeployer)
                 .chainDeployer(sleepDeployer) // ensure IAM permissions consistency in AWS
                 .chainDeployer(lambdaDeployer)
@@ -87,11 +90,13 @@ public class Main {
         final Deployment deployment = new Deployment("Deployment Stage #2: Lambda-only deployment");
         final Injector injector = Guice.createInjector(new DeployerConfigurationModule(deployerConfiguration));
 
+        final Deployer s3Deployer = injector.getInstance(S3Deployer.class);
         final Deployer iamDeployer = injector.getInstance(IAMDeployer.class);
         final Deployer lambdaDeployer = injector.getInstance(LambdaDeployer.class);
 
         /* The order of chaining the deployers matters. */
         deployment
+                .chainDeployer(s3Deployer)
                 .chainDeployer(iamDeployer)
                 .chainDeployer(lambdaDeployer);
 

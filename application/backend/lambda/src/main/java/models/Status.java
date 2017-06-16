@@ -10,7 +10,8 @@ public enum Status {
     Pending("Pending"),
     Active("Active"),
     Failed("Failed"),
-    Completed("Completed");
+    Cancelled("Cancelled"),
+    Completed("Completed"),;
 
     private final String name;
 

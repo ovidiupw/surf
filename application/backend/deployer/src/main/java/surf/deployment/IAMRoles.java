@@ -267,7 +267,7 @@ public class IAMRoles {
         this.apiAuthorizerLambdaRole = apiAuthorizerLambdaRole;
     }
 
-    public void setApiGatewayInvokeLambdaRole(Role apiGatewayInvokeLambdaRole) {
+    private void setApiGatewayInvokeLambdaRole(Role apiGatewayInvokeLambdaRole) {
         this.apiGatewayInvokeLambdaRole = apiGatewayInvokeLambdaRole;
     }
 

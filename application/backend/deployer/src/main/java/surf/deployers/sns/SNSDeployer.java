@@ -41,7 +41,9 @@ public class SNSDeployer implements Deployer {
         verifyInitializeCrawlSessionLambdaArnIsInContext(context);
         final AmazonSNS snsClient = initializeSNSClient();
 
-        final CreateTopicResult initCrawlSessionTopic = createTopic(snsClient, SNS_INITIALIZE_CRAWL_SESSION_TOPIC_NAME);
+        final CreateTopicResult initCrawlSessionTopic
+                = createTopic(snsClient, SNS_INITIALIZE_CRAWL_SESSION_TOPIC_NAME);
+
         subscribeLambdaToTopic(
                 snsClient,
                 context.getLambdaFunctionsData().getInitializeCrawlSessionData().getFunctionArn(),

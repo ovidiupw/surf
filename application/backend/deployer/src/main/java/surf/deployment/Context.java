@@ -20,6 +20,8 @@ public class Context {
     private TableDescription crawlMetadataDynamoDBTable;
     private String initializeCrawlSessionSNSTopicArn;
     private CreateAuthorizerResult apiAuthorizer;
+    private String s3AppConfigBucketName;
+    private String s3LambdaCodeKey;
 
     public void setIAMRoles(@Nonnull final IAMRoles IAMRoles) {
         Preconditions.checkNotNull(IAMRoles);
@@ -108,6 +110,24 @@ public class Context {
         this.apiAuthorizer = apiAuthorizer;
     }
 
+    public void setS3AppConfigBucketName(@Nonnull final String bucketName) {
+        Preconditions.checkNotNull(bucketName);
+        if (this.s3AppConfigBucketName != null) {
+            throw new UnsupportedOperationException(
+                    "S3 app config bucket name was already set in this context!");
+        }
+        this.s3AppConfigBucketName = bucketName;
+    }
+
+    public void setS3LambdaCodeKey(@Nonnull final String objectKey) {
+        Preconditions.checkNotNull(objectKey);
+        if (this.s3LambdaCodeKey != null) {
+            throw new UnsupportedOperationException(
+                    "S3 lambda code key was already set in this context!");
+        }
+        this.s3LambdaCodeKey = objectKey;
+    }
+
     public IAMRoles getIAMRoles() {
         return IAMRoles;
     }
@@ -148,6 +168,14 @@ public class Context {
         return apiAuthorizer;
     }
 
+    public String getS3AppConfigBucketName() {
+        return s3AppConfigBucketName;
+    }
+
+    public String getS3LambdaCodeKey() {
+        return s3LambdaCodeKey;
+    }
+
     @Override
     public String toString() {
         return "Context{" +
@@ -161,6 +189,9 @@ public class Context {
                 ", crawlMetadataDynamoDBTable=" + crawlMetadataDynamoDBTable +
                 ", initializeCrawlSessionSNSTopicArn='" + initializeCrawlSessionSNSTopicArn + '\'' +
                 ", apiAuthorizer=" + apiAuthorizer +
+                ", s3AppConfigBucketName='" + s3AppConfigBucketName + '\'' +
+                ", s3LambdaCodeKey='" + s3LambdaCodeKey + '\'' +
                 '}';
     }
+
 }

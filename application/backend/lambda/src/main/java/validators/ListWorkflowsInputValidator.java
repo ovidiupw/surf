@@ -1,4 +1,4 @@
-package models.validators;
+package validators;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import handlers.ListWorkflowsHandler;
@@ -14,7 +14,7 @@ public class ListWorkflowsInputValidator implements Validator<ListWorkflowsHandl
     }
 
     @Override
-    public void validate(@Nonnull ListWorkflowsHandler.Input input) {
+    public void validate(@Nonnull final ListWorkflowsHandler.Input input) {
         Logger.log(context.getLogger(), "Validating ListWorkflowsHandler.Input '%s'...", input);
         input.validate();
         Logger.log(context.getLogger(), "ListWorkflowsHandler.Input successfully passed the validation tests!");

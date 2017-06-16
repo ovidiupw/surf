@@ -1,8 +1,8 @@
 package models;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
-import models.converters.StatusConverter;
-import models.converters.WorkflowExecutionTaskFailureConverter;
+import converters.StatusConverter;
+import converters.WorkflowExecutionTaskFailureConverter;
 
 import java.util.List;
 import java.util.Objects;

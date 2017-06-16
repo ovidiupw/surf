@@ -27,5 +27,7 @@
   "dynamoDBWorkflowExecutionTasksTableReadCapacityUnits": "2",
   "dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits": "2",
   "dynamoDBCrawlMetadataTableReadCapacityUnits": "2",
-  "dynamoDBCrawlMetadataTableWriteCapacityUnits": "2"
+  "dynamoDBCrawlMetadataTableWriteCapacityUnits": "2",
+  "dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits": "2",
+  "dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits": "2"
 }
