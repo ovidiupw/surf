@@ -1,4 +1,4 @@
-package models;
+package models.workflow;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import converters.StatusConverter;
@@ -46,6 +46,21 @@ public class WorkflowExecution {
     private long startDateMillis;
 
     /**
+     * The date, as epoch milliseconds, when the workflow execution ended.
+     */
+    private long endDateMillis;
+
+    /**
+     * The Amazon ARN resource identifier for the state machine created when initializing a new crawling session.
+     */
+    private String stateMachineArn;
+
+    /**
+     * The Amazon ARN resource identifier for the crawling session's {@link #stateMachineArn state machine}
+     */
+    private String stateMachineExecutionArn;
+
+    /**
      * The version of task. Used as a mutex via optimistic locking. See
      * <a href="http://www.orafaq.com/papers/locking.pdf">Oracle Optimistic Locking</a>
      * and/or
@@ -58,9 +73,13 @@ public class WorkflowExecution {
     public static final String DDB_WORKFLOW_ID = "WorkflowId";
     public static final String DDB_WORKFLOW_ID_GSI = "WorkflowIdGSI";
     public static final String DDB_ID = "Id";
+    public static final String DDB_CREATION_DATE_MILLIS = "CreationDateMillis";
     public static final String DDB_OWNER_ID = "OwnerId";
     public static final String DDB_START_DATE_MILLIS = "StartDateMillis";
+    public static final String DDB_END_DATE_MILLIS = "EndDateMillis";
     public static final String DDB_STATUS = "Status";
+    public static final String DDB_STATE_MACHINE_ARN = "StateMachineArn";
+    public static final String DDB_STATE_MACHINE_EXECUTION_ARN = "StateMachineExecutionArn";
     public static final String DDB_VERSION = "Version";
 
     @DynamoDBIndexHashKey(
@@ -103,7 +122,7 @@ public class WorkflowExecution {
         this.status = status;
     }
 
-    @DynamoDBIgnore
+    @DynamoDBAttribute(attributeName = DDB_CREATION_DATE_MILLIS)
     public long getCreationDateMillis() {
         return creationDateMillis;
     }
@@ -119,6 +138,33 @@ public class WorkflowExecution {
 
     public void setStartDateMillis(long startDateMillis) {
         this.startDateMillis = startDateMillis;
+    }
+
+    @DynamoDBAttribute(attributeName = DDB_END_DATE_MILLIS)
+    public long getEndDateMillis() {
+        return endDateMillis;
+    }
+
+    public void setEndDateMillis(long endDateMillis) {
+        this.endDateMillis = endDateMillis;
+    }
+
+    @DynamoDBAttribute(attributeName = DDB_STATE_MACHINE_ARN)
+    public String getStateMachineArn() {
+        return stateMachineArn;
+    }
+
+    public void setStateMachineArn(String stateMachineArn) {
+        this.stateMachineArn = stateMachineArn;
+    }
+
+    @DynamoDBAttribute(attributeName = DDB_STATE_MACHINE_EXECUTION_ARN)
+    public String getStateMachineExecutionArn() {
+        return stateMachineExecutionArn;
+    }
+
+    public void setStateMachineExecutionArn(String stateMachineExecutionArn) {
+        this.stateMachineExecutionArn = stateMachineExecutionArn;
     }
 
     @DynamoDBVersionAttribute(attributeName = DDB_VERSION)
@@ -142,16 +188,19 @@ public class WorkflowExecution {
         WorkflowExecution that = (WorkflowExecution) o;
         return creationDateMillis == that.creationDateMillis &&
                 startDateMillis == that.startDateMillis &&
+                endDateMillis == that.endDateMillis &&
                 Objects.equals(workflowId, that.workflowId) &&
                 Objects.equals(id, that.id) &&
                 Objects.equals(ownerId, that.ownerId) &&
                 status == that.status &&
+                Objects.equals(stateMachineArn, that.stateMachineArn) &&
+                Objects.equals(stateMachineExecutionArn, that.stateMachineExecutionArn) &&
                 Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(workflowId, id, ownerId, status, creationDateMillis, startDateMillis, version);
+        return Objects.hash(workflowId, id, ownerId, status, creationDateMillis, startDateMillis, endDateMillis, stateMachineArn, stateMachineExecutionArn, version);
     }
 
     @Override
@@ -163,6 +212,9 @@ public class WorkflowExecution {
                 ", status=" + status +
                 ", creationDateMillis=" + creationDateMillis +
                 ", startDateMillis=" + startDateMillis +
+                ", endDateMillis=" + endDateMillis +
+                ", stateMachineArn='" + stateMachineArn + '\'' +
+                ", stateMachineExecutionArn='" + stateMachineExecutionArn + '\'' +
                 ", version=" + version +
                 '}';
     }

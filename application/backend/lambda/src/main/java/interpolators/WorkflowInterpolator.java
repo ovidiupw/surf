@@ -3,7 +3,7 @@ package interpolators;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import models.Workflow;
+import models.workflow.Workflow;
 import models.exceptions.BadRequestException;
 import models.exceptions.InternalServerException;
 import utils.Logger;
@@ -30,7 +30,7 @@ public class WorkflowInterpolator implements Interpolator<Workflow> {
 
         final Workflow interpolatedWorkflow = new Workflow();
         interpolatedWorkflow.setCreationDateMillis(System.currentTimeMillis());
-        interpolatedWorkflow.setId(RandomGenerator.randomUUID());
+        interpolatedWorkflow.setId(RandomGenerator.randomUUIDWithTimestamp());
 
         final String fullOwnerId = SurfObjectMother.getOwnerId(userArn);
 

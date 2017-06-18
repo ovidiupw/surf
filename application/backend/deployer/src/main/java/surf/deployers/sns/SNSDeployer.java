@@ -14,6 +14,7 @@ import surf.deployment.Context;
 import surf.exceptions.OperationFailedException;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 
 public class SNSDeployer implements Deployer {
 
@@ -90,6 +91,17 @@ public class SNSDeployer implements Deployer {
             final CreateTopicResult topic = snsClient.createTopic(new CreateTopicRequest()
                     .withName(topicName));
             LOG.info("Successfully created SNS topic with name={}, arn={}!", topicName, topic.getTopicArn());
+
+            LOG.info("Trying to add \"Publish\", \"Subscribe\", \"Receive\" permissions to SNS topic with name={}",
+                    topicName);
+            snsClient.addPermission(new AddPermissionRequest()
+                    .withTopicArn(topic.getTopicArn())
+                    .withActionNames(Arrays.asList("Publish", "Subscribe", "Receive"))
+                    .withAWSAccountIds(deployerConfiguration.getAwsAccountId())
+                    .withLabel("sns_invoke_lambda"));
+            LOG.info("Successfully added permissions to topic!");
+
+
             return topic;
         } catch (InvalidParameterException
                 | TopicLimitExceededException

@@ -114,7 +114,8 @@ public class LambdaDeployer implements Deployer {
                 .withS3Bucket(context.getS3AppConfigBucketName())
                 .withS3Key(context.getS3LambdaCodeKey());
 
-        LOG.info("Set function code to s3Bucket='{}' and s3Key='{}'");
+        LOG.info("Set function code to s3Bucket='{}' and s3Key='{}'",
+                context.getS3AppConfigBucketName(), context.getS3LambdaCodeKey());
 
         final CreateFunctionRequest createFunctionRequest = new CreateFunctionRequest()
                 .withFunctionName(functionConfig.getFunctionName())

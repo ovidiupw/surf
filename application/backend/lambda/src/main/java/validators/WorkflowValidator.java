@@ -3,7 +3,7 @@ package validators;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.lambda.runtime.Context;
-import models.Workflow;
+import models.workflow.Workflow;
 import models.exceptions.InternalServerException;
 import utils.Logger;
 

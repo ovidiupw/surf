@@ -1,15 +1,14 @@
-package utils;
+package utils.aws.sns;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.model.PublishRequest;
-import com.amazonaws.services.sns.model.PublishResult;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import handlers.InitializeCrawlSessionHandler;
+import utils.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

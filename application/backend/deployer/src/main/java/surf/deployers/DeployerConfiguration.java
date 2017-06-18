@@ -49,6 +49,8 @@ public class DeployerConfiguration {
     private long dynamoDBCrawlMetadataTableWriteCapacityUnits;
     private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits;
     private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits;
+    private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits;
+    private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
 
     public static DeployerConfiguration fromFile(@Nonnull final String configFilePath) {
         try {
@@ -106,6 +108,8 @@ public class DeployerConfiguration {
                 .withDynamoDBCrawlMetadataTableWriteCapacityUnits(config.getDynamoDBCrawlMetadataTableWriteCapacityUnits())
                 .withDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits(config.getDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits())
                 .withDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits(config.getDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits())
+                .withDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits(config.getDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits())
+                .withDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits(config.getDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits())
                 .build();
     }
 
@@ -373,6 +377,22 @@ public class DeployerConfiguration {
         this.dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits = dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits;
     }
 
+    public long getDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits() {
+        return dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits() {
+        return dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits(long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits) {
+        this.dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits = dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits;
+    }
+
+    private void setDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits(long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits) {
+        this.dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits = dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
+    }
+
     public static class Builder {
         private ClientConfiguration clientConfiguration;
         private Regions region;
@@ -406,6 +426,8 @@ public class DeployerConfiguration {
         private long dynamoDBCrawlMetadataTableWriteCapacityUnits;
         private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits;
         private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits;
+        private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits;
+        private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
 
         public DeployerConfiguration build() {
             Preconditions.checkNotNull(clientConfiguration);
@@ -439,6 +461,8 @@ public class DeployerConfiguration {
             Preconditions.checkArgument(dynamoDBCrawlMetadataTableWriteCapacityUnits >= 0);
             Preconditions.checkArgument(dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits >= 0);
             Preconditions.checkArgument(dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits >= 0);
 
             final DeployerConfiguration deployerConfiguration = new DeployerConfiguration();
             deployerConfiguration.setClientConfiguration(clientConfiguration);
@@ -473,6 +497,9 @@ public class DeployerConfiguration {
             deployerConfiguration.setDynamoDBCrawlMetadataTableWriteCapacityUnits(dynamoDBCrawlMetadataTableWriteCapacityUnits);
             deployerConfiguration.setDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits(dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits);
             deployerConfiguration.setDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits(dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits);
+            deployerConfiguration.setDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits(dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits);
+            deployerConfiguration.setDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits(dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits);
+
             return deployerConfiguration;
         }
 
@@ -663,6 +690,18 @@ public class DeployerConfiguration {
         public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits(@Nonnull final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits(@Nonnull final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits = units;
             return this;
         }
     }

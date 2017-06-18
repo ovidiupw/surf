@@ -8,21 +8,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import models.Validateable;
-import models.Workflow;
-import models.WorkflowExecution;
+import models.workflow.Workflow;
+import models.workflow.WorkflowExecution;
 import models.config.LambdaConfigurationConstants;
 import models.exceptions.BadRequestException;
+import models.workflow.WorkflowTask;
 import utils.*;
+import utils.aws.dynamo.DynamoDBClientHelper;
+import utils.aws.dynamo.DynamoDBOperationsHelper;
+import utils.aws.sns.SNSClientHelper;
+import utils.aws.sns.SNSOperationsHelper;
 import validators.StartWorkflowInputValidator;
 
 public class StartWorkflowHandler implements
         RequestHandler<StartWorkflowHandler.Input, StartWorkflowHandler.Output>,
         WrappableRequestHandler<StartWorkflowHandler.Input, StartWorkflowHandler.Output> {
 
+    private static final int STARTING_DEPTH_LEVEL = 0;
+
     private LambdaConfigurationConstants config;
-    private AmazonDynamoDB dynamoClient;
     private DynamoDBOperationsHelper dynamoOperationsHelper;
-    private AmazonSNS snsClient;
     private SNSOperationsHelper snsOperationsHelper;
     private StartWorkflowInputValidator inputValidator;
 
@@ -51,11 +56,21 @@ public class StartWorkflowHandler implements
         final WorkflowExecution savedWorkflowExecution = dynamoOperationsHelper.saveWorkflowExecution(workflowExecution);
         Logger.log(context.getLogger(), "Successfully saved new workflow execution='%s' to database!", savedWorkflowExecution);
 
+        final WorkflowTask workflowTask = SurfObjectMother.createWorkflowTask(
+                        workflowExecution.getId(),
+                        workflowExecution.getOwnerId(),
+                        workflow.getMetadata(),
+                        workflow.getMetadata().getRootAddress(),
+                        STARTING_DEPTH_LEVEL);
+
+        Logger.log(context.getLogger(), "Trying to save the task='%s' for crawling the root address in the database...", workflowTask);
+        final WorkflowTask savedWorkflowTask = dynamoOperationsHelper.putWorkflowTask(workflowTask);
+        Logger.log(context.getLogger(), "Successfully saved the task='%s' in the database!", savedWorkflowTask);
+
         final InitializeCrawlSessionHandler.Input initializeCrawlSessionInput
                 = SurfObjectMother.generateInitializeCrawlSessionInput(
                 savedWorkflowExecution.getId(),
-                workflow.getMetadata().getRootAddress(),
-                0);
+                STARTING_DEPTH_LEVEL);
 
         Logger.log(context.getLogger(),
                 "Trying to send SNS notification to 'InitializeCrawlSessionHandler' with payload='%s'...",
@@ -81,9 +96,10 @@ public class StartWorkflowHandler implements
         config = FileReader.readObjectFromFile(Constants.CONFIG_FILE_PATH, LambdaConfigurationConstants.class);
         Logger.log(context.getLogger(), "Using lambda config '%s'", config);
 
-        dynamoClient = new DynamoDBClientHelper(context.getLogger()).getDynamoDBClient(config);
-        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient);
-        snsClient = new SNSClientHelper(context.getLogger()).getSNSClient(config);
+        final AmazonDynamoDB dynamoClient = new DynamoDBClientHelper(context.getLogger()).getDynamoDBClient(config);
+        final AmazonSNS snsClient = new SNSClientHelper(context.getLogger()).getSNSClient(config);
+
+        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient, context.getLogger());
         snsOperationsHelper = new SNSOperationsHelper(snsClient, context);
         inputValidator = new StartWorkflowInputValidator(context, dynamoClient);
     }

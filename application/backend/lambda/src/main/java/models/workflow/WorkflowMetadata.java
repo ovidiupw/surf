@@ -1,6 +1,7 @@
-package models;
+package models.workflow;
 
 import com.google.common.base.Preconditions;
+import models.Validateable;
 import utils.CrawlDataValidator;
 
 import java.util.Objects;
@@ -259,8 +260,8 @@ public class WorkflowMetadata implements Validateable {
                 "The workflow metadata 'maxConcurrentCrawlers' must be >= 1!"
         );
         Preconditions.checkArgument(
-                getCrawlerTimeoutSeconds() >= 1 && getCrawlerTimeoutSeconds() < 300,
-                "The workflow metadata 'crawlerTimeoutSeconds' must be between 1 and 299 seconds!"
+                getCrawlerTimeoutSeconds() >= 5 && getCrawlerTimeoutSeconds() < 300,
+                "The workflow metadata 'crawlerTimeoutSeconds' must be between 5 and 299 seconds!"
         );
 
         Preconditions.checkNotNull(

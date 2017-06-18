@@ -36,11 +36,14 @@ public class DeploymentFinalizer {
         LOG.info("Dumping lambda configuration to file with path='{}'", lambdaConfigFilePath);
 
         final LambdaConfigurationConstants clientConstants = new LambdaConfigurationConstants.Builder()
-                .withInitializeCrawlSessionSNSTopicArn(deployment.getContext().getInitializeCrawlSessionSNSTopicArn())
                 .withAwsClientRegion(deployerConfiguration.getAwsClientRegion().getName())
                 .withAwsClientExecutionTimeoutSeconds(
                         (int) TimeUnit.MILLISECONDS.toSeconds(
                                 deployerConfiguration.getClientConfiguration().getClientExecutionTimeout()))
+                .withStepFunctionsInvokeLambdaRoleArn(deployment.getContext().getIAMRoles().getSfnInvokeLambdaRole().getArn())
+                .withInitializeCrawlSessionSNSTopicArn(deployment.getContext().getInitializeCrawlSessionSNSTopicArn())
+                .withFinalizeCrawlSessionLambdaArn(deployment.getContext().getLambdaFunctionsData().getFinalizeCrawlSessionData().getFunctionArn())
+                .withCrawlWebPageLambdaArn(deployment.getContext().getLambdaFunctionsData().getCrawlWebPageData().getFunctionArn())
                 .build();
 
         dumpObjectToFile(clientConstants, lambdaConfigFilePath);

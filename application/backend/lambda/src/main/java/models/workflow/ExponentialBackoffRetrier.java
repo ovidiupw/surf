@@ -1,6 +1,7 @@
-package models;
+package models.workflow;
 
 import com.google.common.base.Preconditions;
+import models.Validateable;
 
 import java.util.Objects;
 import java.util.Set;

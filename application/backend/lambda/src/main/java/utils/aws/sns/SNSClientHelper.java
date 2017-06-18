@@ -1,4 +1,4 @@
-package utils;
+package utils.aws.sns;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -7,6 +7,7 @@ import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import models.config.LambdaConfigurationConstants;
+import utils.Logger;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;

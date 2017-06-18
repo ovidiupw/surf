@@ -6,10 +6,12 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import models.Validateable;
-import models.Workflow;
+import models.workflow.Workflow;
 import models.config.LambdaConfigurationConstants;
 import interpolators.Interpolator;
 import interpolators.WorkflowInterpolator;
+import utils.aws.dynamo.DynamoDBClientHelper;
+import utils.aws.dynamo.DynamoDBOperationsHelper;
 import validators.CreateWorkflowInputValidator;
 import validators.Validator;
 import validators.WorkflowValidator;
@@ -52,7 +54,7 @@ public class CreateWorkflowHandler implements
         Logger.log(context.getLogger(), "Using lambda config '%s'", config);
 
         dynamoClient = new DynamoDBClientHelper(context.getLogger()).getDynamoDBClient(config);
-        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient);
+        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient, context.getLogger());
         inputValidator = new CreateWorkflowInputValidator(context);
         interpolator = new WorkflowInterpolator(context, userArn);
         workflowValidator = new WorkflowValidator(context, dynamoClient);

@@ -3,9 +3,9 @@ package validators;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.lambda.runtime.Context;
 import handlers.StartWorkflowHandler;
-import models.Workflow;
+import models.workflow.Workflow;
 import models.exceptions.BadRequestException;
-import utils.DynamoDBOperationsHelper;
+import utils.aws.dynamo.DynamoDBOperationsHelper;
 import utils.Logger;
 import utils.SurfObjectMother;
 
@@ -26,7 +26,7 @@ public class StartWorkflowInputValidator implements Validator<StartWorkflowHandl
     @Override
     public void validate(@Nonnull final StartWorkflowHandler.Input input) {
         Logger.log(context.getLogger(), "Validating StartWorkflow.Input '%s'...", input);
-        DynamoDBOperationsHelper dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient);
+        DynamoDBOperationsHelper dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient, context.getLogger());
 
         input.validate();
 

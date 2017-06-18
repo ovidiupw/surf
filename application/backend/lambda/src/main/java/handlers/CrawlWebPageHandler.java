@@ -3,36 +3,25 @@ package handlers;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import models.workflow.CrawlWebPageStateInput;
+import models.workflow.CrawlWebPageStateOutput;
 
-public class CrawlWebPageHandler implements RequestHandler<CrawlWebPageHandler.Input, CrawlWebPageHandler.Output> {
+public class CrawlWebPageHandler implements RequestHandler<CrawlWebPageStateInput, CrawlWebPageStateOutput> {
 
     private LambdaLogger LOG;
 
-    public CrawlWebPageHandler.Output handleRequest(final CrawlWebPageHandler.Input input, final Context context) {
+    public CrawlWebPageStateOutput handleRequest(final CrawlWebPageStateInput input, final Context context) {
+        /* Any exceptions raised in this will be caught as a {@link StepFunctionsError} object
+        in FinalizeCrawlSessionHandler */
+
         LOG = context.getLogger();
         LOG.log(input.toString());
-        return null;
+
+        final CrawlWebPageStateOutput output = new CrawlWebPageStateOutput();
+        output.setWorkflowExecutionId(input.getWorkflowExecutionId());
+        output.setWorkflowTaskId(input.getWorkflowTaskId());
+
+        return output;
     }
 
-    public static class Input {
-        private String userArn;
-
-        public String getUserArn() {
-            return userArn;
-        }
-
-        public void setUserArn(String userArn) {
-            this.userArn = userArn;
-        }
-
-        @Override
-        public String toString() {
-            return "CrawlWebPage Input{" +
-                    "userArn='" + userArn + '\'' +
-                    '}';
-        }
-    }
-
-    public static class Output {
-    }
 }

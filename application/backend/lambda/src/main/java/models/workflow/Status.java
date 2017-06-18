@@ -1,8 +1,6 @@
-package models;
+package models.workflow;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import javax.annotation.Nonnull;
 

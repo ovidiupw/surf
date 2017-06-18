@@ -1,8 +1,8 @@
-package models;
+package models.workflow;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import models.Validateable;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;

@@ -8,7 +8,7 @@ public class RandomGenerator {
         throw new UnsupportedOperationException("This class is not instantiable!");
     }
 
-    public static String randomUUID() {
+    public static String randomUUIDWithTimestamp() {
         return String.join("-", UUID.randomUUID().toString(), String.valueOf(System.currentTimeMillis()));
     }
 

@@ -9,6 +9,13 @@
     <version>1.0-SNAPSHOT</version>
     <name>surf-backend-deployer</name>
 
+    <repositories>
+        <repository>
+            <id>jcenter</id>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
+    </repositories>
+
     <dependencies>
 
         <!-- ######## Lambda module dependency ######## -->
@@ -127,6 +134,13 @@
             <groupId>net.lingala.zip4j</groupId>
             <artifactId>zip4j</artifactId>
             <version>1.3.2</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.jtwig</groupId>
+            <artifactId>jtwig-core</artifactId>
+            <version>5.85.3.RELEASE</version>
         </dependency>
 
 

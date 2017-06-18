@@ -20,7 +20,7 @@
         "states:StartExecution"
       ],
       "Effect": "Allow",
-      "Resource": "arn:aws:states:*:*:*:*"
+      "Resource": "arn:aws:states:*:*:*"
     },
     {
       "Sid": "3",
@@ -29,6 +29,16 @@
       ],
       "Effect": "Allow",
       "Resource": "*"
+    },
+    {
+      "Sid": "4",
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::{{ AWSAccountId }}:role/{{ PassRoleResourceName }}"
+      ]
     }
   ]
 }

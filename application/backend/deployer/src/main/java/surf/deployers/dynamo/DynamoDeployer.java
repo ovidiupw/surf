@@ -6,10 +6,10 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
-import models.CrawlMetadata;
-import models.Workflow;
-import models.WorkflowExecution;
-import models.WorkflowExecutionTask;
+import models.workflow.CrawlMetadata;
+import models.workflow.Workflow;
+import models.workflow.WorkflowExecution;
+import models.workflow.WorkflowTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.Deployer;
@@ -128,16 +128,33 @@ public class DynamoDeployer implements Deployer {
 
     private TableDescription createWorkflowExecutionTasksTable(AmazonDynamoDB dynamoClient) {
         LOG.info("Trying to create DynamoDB table with name={}, readCapacityUnits={}, writeCapacityUnits={}",
-                WorkflowExecutionTask.getTableName(),
+                WorkflowTask.getTableName(),
                 deployerConfiguration.getDynamoDBWorkflowExecutionTasksTableReadCapacityUnits(),
                 deployerConfiguration.getDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits());
 
         final DynamoDBMapper dynamoDBMapper = new DynamoDBMapper(dynamoClient);
-        final CreateTableRequest createTableRequest = dynamoDBMapper.generateCreateTableRequest(WorkflowExecutionTask.class);
+        final CreateTableRequest createTableRequest = dynamoDBMapper.generateCreateTableRequest(WorkflowTask.class);
         createTableRequest.setProvisionedThroughput(new ProvisionedThroughput(
                 deployerConfiguration.getDynamoDBWorkflowExecutionTasksTableReadCapacityUnits(),
                 deployerConfiguration.getDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits()
         ));
+
+        final List<GlobalSecondaryIndex> globalSecondaryIndexes = createTableRequest.getGlobalSecondaryIndexes();
+        for (final GlobalSecondaryIndex gsi : globalSecondaryIndexes) {
+            switch (gsi.getIndexName()) {
+                case WorkflowTask.DDB_WORKFLOW_EXECUTION_ID_STATUS_DEPTH_GSI: {
+                    gsi.setProvisionedThroughput(new ProvisionedThroughput(
+                            deployerConfiguration.getDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits(),
+                            deployerConfiguration.getDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits()
+                    ));
+                    gsi.setProjection(new Projection().withProjectionType(ProjectionType.ALL));
+                    break;
+                }
+                default: {
+                    throw new OperationFailedException(new UnsupportedOperationException("DDB GSI name not covered!"));
+                }
+            }
+        }
 
         return createOrDescribeTable(dynamoClient, createTableRequest);
     }

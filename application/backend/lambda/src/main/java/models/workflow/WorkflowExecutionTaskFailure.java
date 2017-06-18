@@ -1,4 +1,4 @@
-package models;
+package models.workflow;
 
 import java.util.Objects;
 

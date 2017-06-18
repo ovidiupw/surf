@@ -65,7 +65,10 @@ public class IAMDeployer implements Deployer {
                 = createRoleWithConfig(iamClient, new GetWorkflowLambdaRole());
 
         final Role initializeCrawlSessionLambdaRole
-                = createRoleWithConfig(iamClient, new InitializeCrawlSessionLambdaRole());
+                = createRoleWithConfig(iamClient,
+                new InitializeCrawlSessionLambdaRole(
+                        sfnInvokeLambdaRole,
+                        deployerConfiguration.getAwsAccountId()));
         final Role crawlWebPageLambdaRole
                 = createRoleWithConfig(iamClient, new CrawlWebPageLambdaRole());
         final Role finalizeCrawlSessionLambdaRole

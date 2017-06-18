@@ -1,7 +1,7 @@
 package converters;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverter;
-import models.Status;
+import models.workflow.Status;
 
 public class StatusConverter implements DynamoDBTypeConverter<String, Status> {
     @Override

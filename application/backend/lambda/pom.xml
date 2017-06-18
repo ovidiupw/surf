@@ -11,6 +11,11 @@
     <name>surf-lambda-backend</name>
 
     <dependencies>
+
+
+        <!-- ######## AWS ######## -->
+
+
         <dependency>
             <!-- Amazon AWS group ID for Maven artifacts in the Maven Central Repository -->
             <groupId>com.amazonaws</groupId>
@@ -41,6 +46,16 @@
             <version>1.11.106</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-stepfunctions</artifactId>
+            <version>1.11.86</version>
+        </dependency>
+
+
+        <!-- ######## Guava and Guice ######## -->
+
+
         <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -54,6 +69,10 @@
             <artifactId>guice</artifactId>
             <version>4.0</version>
         </dependency>
+
+
+        <!-- ######## Utilities ######## -->
+
 
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
         <dependency>

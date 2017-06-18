@@ -32,6 +32,8 @@ public class DeployerConfigurationConstants {
     private String lambdaConfigFilePath;
     private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits;
     private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits;
+    private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits;
+    private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
 
     public String getClientConfigFilePath() {
         return clientConfigFilePath;
@@ -281,5 +283,21 @@ public class DeployerConfigurationConstants {
     public long getDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits() {
 
         return dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits() {
+        return dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits;
+    }
+
+    public long getDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits() {
+        return dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
+    }
+
+    public void setDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits(long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits) {
+        this.dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits = dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits;
+    }
+
+    public void setDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits(long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits) {
+        this.dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits = dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
     }
 }

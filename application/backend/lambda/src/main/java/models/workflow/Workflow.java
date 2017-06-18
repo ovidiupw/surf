@@ -1,8 +1,9 @@
-package models;
+package models.workflow;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.google.common.base.Preconditions;
 import converters.WorkflowMetadataConverter;
+import models.Validateable;
 
 import java.util.Objects;
 
