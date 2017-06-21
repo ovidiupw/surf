@@ -1,7 +1,7 @@
 {
   "awsAccountId": "011759591962",
   "awsAccessKey": "AKIAIZEM4QPLGEJVGO2Q",
-  "awsClientRequestTimeoutSeconds": "30",
+  "awsClientRequestTimeoutSeconds": "60",
   "awsClientRegion": "eu-west-1",
   "lambdaCodePath": "../lambda/target/surf-lambda-backend-1.0-SNAPSHOT.jar",
   "lambdaRuntime": "java8",
@@ -31,5 +31,9 @@
   "dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits": "2",
   "dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits": "2",
   "dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits": "2",
-  "dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits": "2"
+  "dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits": "2",
+  "dynamoDBVisitedPagesTableReadCapacityUnits": "2",
+  "dynamoDBVisitedPagesTableWriteCapacityUnits": "2",
+  "dynamoDBPagesToBeVisitedTableReadCapacityUnits": "2",
+  "dynamoDBPagesToBeVisitedTableWriteCapacityUnits": "2"
 }

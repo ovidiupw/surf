@@ -6,10 +6,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
-import models.workflow.CrawlMetadata;
-import models.workflow.Workflow;
-import models.workflow.WorkflowExecution;
-import models.workflow.WorkflowTask;
+import models.workflow.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.Deployer;
@@ -39,8 +36,8 @@ public class DynamoDeployer implements Deployer {
         return DEPLOYER_NAME;
     }
 
-        @Override
-        public Context deploy(@Nonnull final Context context) throws OperationFailedException {
+    @Override
+    public Context deploy(@Nonnull final Context context) throws OperationFailedException {
         Preconditions.checkNotNull(context);
         final AmazonDynamoDB dynamoClient = initializeDynamoClient();
 
@@ -48,11 +45,15 @@ public class DynamoDeployer implements Deployer {
         final TableDescription workflowExecutionsTable = createWorkflowExecutionsTable(dynamoClient);
         final TableDescription workflowExecutionTasksTable = createWorkflowExecutionTasksTable(dynamoClient);
         final TableDescription crawlMetadataTable = createCrawlMetadataTable(dynamoClient);
+        final TableDescription visitedPagesTable = createVisitedPagesTable(dynamoClient);
+        final TableDescription pagesToBeVisitedTable = createPagesToBeVisitedTable(dynamoClient);
 
         context.setWorkflowsDynamoDBTable(workflowsTable);
         context.setWorkflowExecutionsDynamoDBTable(workflowExecutionsTable);
         context.setWorkflowExecutionTasksDynamoDBTable(workflowExecutionTasksTable);
         context.setCrawlMetadataDynamoDBTable(crawlMetadataTable);
+        context.setVisitedPagesTable(visitedPagesTable);
+        context.setPagesToBeVisitedTable(pagesToBeVisitedTable);
 
         return context;
     }
@@ -174,6 +175,52 @@ public class DynamoDeployer implements Deployer {
 
         return createOrDescribeTable(dynamoClient, createTableRequest);
     }
+
+    private TableDescription createVisitedPagesTable(@Nonnull final AmazonDynamoDB dynamoClient) {
+        LOG.info("Trying to create DynamoDB table with name={}, readCapacityUnits={}, writeCapacityUnits={}",
+                VisitedPage.getTableName(),
+                deployerConfiguration.getDynamoDBVisitedPagesTableReadCapacityUnits(),
+                deployerConfiguration.getDynamoDBVisitedPagesTableWriteCapacityUnits());
+
+        final DynamoDBMapper dynamoDBMapper = new DynamoDBMapper(dynamoClient);
+        final CreateTableRequest createTableRequest = dynamoDBMapper.generateCreateTableRequest(VisitedPage.class);
+        createTableRequest.setProvisionedThroughput(new ProvisionedThroughput(
+                deployerConfiguration.getDynamoDBVisitedPagesTableReadCapacityUnits(),
+                deployerConfiguration.getDynamoDBVisitedPagesTableWriteCapacityUnits()
+        ));
+
+        final List<LocalSecondaryIndex> localSecondaryIndexes = createTableRequest.getLocalSecondaryIndexes();
+        for (final LocalSecondaryIndex lsi : localSecondaryIndexes) {
+            switch (lsi.getIndexName()) {
+                case VisitedPage.DDB_PAGE_VISIT_DEPTH_LSI: {
+                    lsi.setProjection(new Projection().withProjectionType(ProjectionType.ALL));
+                    break;
+                }
+                default: {
+                    throw new OperationFailedException(new UnsupportedOperationException("DDB LSI name not covered!"));
+                }
+            }
+        }
+
+        return createOrDescribeTable(dynamoClient, createTableRequest);
+    }
+
+    private TableDescription createPagesToBeVisitedTable(@Nonnull final AmazonDynamoDB dynamoClient) {
+        LOG.info("Trying to create DynamoDB table with name={}, readCapacityUnits={}, writeCapacityUnits={}",
+                PageToBeVisited.getTableName(),
+                deployerConfiguration.getDynamoDBPagesToBeVisitedTableReadCapacityUnits(),
+                deployerConfiguration.getDynamoDBPagesToBeVisitedTableWriteCapacityUnits());
+
+        final DynamoDBMapper dynamoDBMapper = new DynamoDBMapper(dynamoClient);
+        final CreateTableRequest createTableRequest = dynamoDBMapper.generateCreateTableRequest(PageToBeVisited.class);
+        createTableRequest.setProvisionedThroughput(new ProvisionedThroughput(
+                deployerConfiguration.getDynamoDBPagesToBeVisitedTableReadCapacityUnits(),
+                deployerConfiguration.getDynamoDBPagesToBeVisitedTableWriteCapacityUnits()
+        ));
+
+        return createOrDescribeTable(dynamoClient, createTableRequest);
+    }
+
 
     private TableDescription createOrDescribeTable(@Nonnull final AmazonDynamoDB dynamoClient,
                                                    @Nonnull final CreateTableRequest createTableRequest) {

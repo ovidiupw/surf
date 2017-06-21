@@ -10,10 +10,12 @@ import utils.RandomGenerator;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class StateMachineExecutionDefinition {
 
-    public static final String TASK_INPUTS = "stateInputs";
+    public static final String STATE_INPUTS = "stateInputs";
+    public static final String ERROR_INFO = "errorInfo";
 
     private final StateMachineDefinition stateMachineDefinition;
     private final String id;
@@ -48,6 +50,10 @@ public class StateMachineExecutionDefinition {
             input.setMaxWebPageSizeBytes(workflowTask.getMaxWebPageSizeBytes());
             input.setUrlMatcher(workflowTask.getUrlMatcher());
             input.setSelectionPolicy(workflowTask.getSelectionPolicy());
+            input.setOwnerId(workflowTask.getOwnerId());
+            input.setMaxPagesPerDepthLevel(stateMachineDefinition.getWorkflow().getMetadata().getMaxPagesPerDepthLevel());
+            input.setCrawlerTimeoutSeconds(stateMachineDefinition.getWorkflow().getMetadata().getCrawlerTimeoutSeconds());
+            input.setMaxDepthLevel(stateMachineDefinition.getWorkflow().getMetadata().getMaxRecursionDepth());
 
             crawlWebPageStateInputs.add(input);
         }
@@ -62,7 +68,7 @@ public class StateMachineExecutionDefinition {
     }
 
     public static class Input {
-        @JsonProperty(TASK_INPUTS)
+        @JsonProperty(STATE_INPUTS)
         private List<CrawlWebPageStateInput> stateInputs;
 
         public List<CrawlWebPageStateInput> getStateInputs() {
@@ -79,5 +85,27 @@ public class StateMachineExecutionDefinition {
                     "stateInputs=" + stateInputs +
                     '}';
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StateMachineExecutionDefinition that = (StateMachineExecutionDefinition) o;
+        return Objects.equals(stateMachineDefinition, that.stateMachineDefinition) &&
+                Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stateMachineDefinition, id);
+    }
+
+    @Override
+    public String toString() {
+        return "StateMachineExecutionDefinition{" +
+                "stateMachineDefinition=" + stateMachineDefinition +
+                ", id='" + id + '\'' +
+                '}';
     }
 }

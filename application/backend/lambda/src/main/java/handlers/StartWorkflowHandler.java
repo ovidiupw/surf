@@ -4,14 +4,14 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.amazonaws.services.sns.AmazonSNS;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import models.Validateable;
-import models.workflow.Workflow;
-import models.workflow.WorkflowExecution;
 import models.config.LambdaConfigurationConstants;
 import models.exceptions.BadRequestException;
+import models.workflow.PageToBeVisited;
+import models.workflow.Workflow;
+import models.workflow.WorkflowExecution;
 import models.workflow.WorkflowTask;
 import utils.*;
 import utils.aws.dynamo.DynamoDBClientHelper;
@@ -30,6 +30,7 @@ public class StartWorkflowHandler implements
     private DynamoDBOperationsHelper dynamoOperationsHelper;
     private SNSOperationsHelper snsOperationsHelper;
     private StartWorkflowInputValidator inputValidator;
+    private Logger LOG;
 
     public StartWorkflowHandler.Output handleRequest(final StartWorkflowHandler.Input input, final Context context) {
         final ExceptionWrapper<Input, Output> exceptionWrapper = new ExceptionWrapper<>(input, context);
@@ -38,8 +39,8 @@ public class StartWorkflowHandler implements
 
     @Override
     public Output doHandleRequest(Input input, Context context) {
-        Logger.log(context.getLogger(), "input=%s", input.toString());
         initializeInstance(context);
+        LOG.info("input=%s", input.toString());
 
         inputValidator.validate(input);
 
@@ -49,43 +50,35 @@ public class StartWorkflowHandler implements
                     "The workflow was deleted while trying to start a new execution based on its data!");
         }
 
-        final WorkflowExecution workflowExecution
-                = SurfObjectMother.createWorkflowExecution(workflow, input.getUserArn());
-
-        Logger.log(context.getLogger(), "Trying to save new workflow execution to database...");
+        final WorkflowExecution workflowExecution = SurfObjectMother.createWorkflowExecution(workflow, input.getUserArn());
         final WorkflowExecution savedWorkflowExecution = dynamoOperationsHelper.saveWorkflowExecution(workflowExecution);
-        Logger.log(context.getLogger(), "Successfully saved new workflow execution='%s' to database!", savedWorkflowExecution);
 
         final WorkflowTask workflowTask = SurfObjectMother.createWorkflowTask(
-                        workflowExecution.getId(),
-                        workflowExecution.getOwnerId(),
-                        workflow.getMetadata(),
-                        workflow.getMetadata().getRootAddress(),
-                        STARTING_DEPTH_LEVEL);
+                workflowExecution.getId(),
+                workflowExecution.getOwnerId(),
+                workflow.getMetadata().getMaxWebPageSizeBytes(),
+                workflow.getMetadata().getSelectionPolicy(),
+                workflow.getMetadata().getUrlMatcher(),
+                workflow.getMetadata().getRootAddress(),
+                STARTING_DEPTH_LEVEL);
+        dynamoOperationsHelper.saveWorkflowTask(workflowTask);
 
-        Logger.log(context.getLogger(), "Trying to save the task='%s' for crawling the root address in the database...", workflowTask);
-        final WorkflowTask savedWorkflowTask = dynamoOperationsHelper.putWorkflowTask(workflowTask);
-        Logger.log(context.getLogger(), "Successfully saved the task='%s' in the database!", savedWorkflowTask);
+        final PageToBeVisited pageToBeVisited = SurfObjectMother.createPageToBeVisited(
+                workflowExecution.getId(),
+                workflowTask.getUrl()
+        );
+        dynamoOperationsHelper.savePageToBeVisited(pageToBeVisited);
 
         final InitializeCrawlSessionHandler.Input initializeCrawlSessionInput
                 = SurfObjectMother.generateInitializeCrawlSessionInput(
                 savedWorkflowExecution.getId(),
                 STARTING_DEPTH_LEVEL);
 
-        Logger.log(context.getLogger(),
-                "Trying to send SNS notification to 'InitializeCrawlSessionHandler' with payload='%s'...",
+        LOG.info("Trying to send SNS notification to 'InitializeCrawlSessionHandler' with payload='%s'...",
                 initializeCrawlSessionInput);
 
         final String targetSNSTopicArn = config.getInitializeCrawlSessionSNSTopicArn();
-        try {
-            String message = snsOperationsHelper.publishMessage(targetSNSTopicArn, initializeCrawlSessionInput);
-            Logger.log(context.getLogger(),
-                    "Successfully published message='%s' to SNS topicArn='%s'", message, targetSNSTopicArn);
-
-        } catch (JsonProcessingException | RuntimeException e) {
-            Logger.log(context.getLogger(), "Could not publish SNS notification to topicArn='%s'", targetSNSTopicArn);
-            throw new RuntimeException(e); // let the ExceptionWrapper deal with this unexpected exception
-        }
+        snsOperationsHelper.publishMessage(targetSNSTopicArn, initializeCrawlSessionInput);
 
         final StartWorkflowHandler.Output output = new StartWorkflowHandler.Output();
         output.setWorkflowExecution(savedWorkflowExecution);
@@ -93,13 +86,15 @@ public class StartWorkflowHandler implements
     }
 
     private void initializeInstance(final Context context) {
+        LOG = new Logger(context.getLogger());
+
         config = FileReader.readObjectFromFile(Constants.CONFIG_FILE_PATH, LambdaConfigurationConstants.class);
-        Logger.log(context.getLogger(), "Using lambda config '%s'", config);
+        LOG.info("Using lambda config '%s'", config);
 
-        final AmazonDynamoDB dynamoClient = new DynamoDBClientHelper(context.getLogger()).getDynamoDBClient(config);
-        final AmazonSNS snsClient = new SNSClientHelper(context.getLogger()).getSNSClient(config);
+        final AmazonDynamoDB dynamoClient = new DynamoDBClientHelper(LOG).getDynamoDBClient(config);
+        final AmazonSNS snsClient = new SNSClientHelper(LOG).getSNSClient(config);
 
-        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient, context.getLogger());
+        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient, LOG);
         snsOperationsHelper = new SNSOperationsHelper(snsClient, context);
         inputValidator = new StartWorkflowInputValidator(context, dynamoClient);
     }

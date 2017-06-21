@@ -22,6 +22,8 @@ public class Context {
     private CreateAuthorizerResult apiAuthorizer;
     private String s3AppConfigBucketName;
     private String s3LambdaCodeKey;
+    private TableDescription visitedPagesTable;
+    private TableDescription pagesToBeVisitedTable;
 
     public void setIAMRoles(@Nonnull final IAMRoles IAMRoles) {
         Preconditions.checkNotNull(IAMRoles);
@@ -128,6 +130,23 @@ public class Context {
         this.s3LambdaCodeKey = objectKey;
     }
 
+    public void setVisitedPagesTable(@Nonnull final TableDescription tableDescription) {
+        Preconditions.checkNotNull(tableDescription);
+        if (this.visitedPagesTable != null) {
+            throw new UnsupportedOperationException(
+                    "VisitedPages DynamoDB table key was already set in this context!");
+        }
+        this.visitedPagesTable = tableDescription;
+    }
+
+    public void setPagesToBeVisitedTable(TableDescription tableDescription) {
+        if (this.pagesToBeVisitedTable != null) {
+            throw new UnsupportedOperationException(
+                    "PagesToBeVisited DynamoDB table key was already set in this context!");
+        }
+        this.pagesToBeVisitedTable = tableDescription;
+    }
+
     public IAMRoles getIAMRoles() {
         return IAMRoles;
     }
@@ -176,6 +195,14 @@ public class Context {
         return s3LambdaCodeKey;
     }
 
+    public TableDescription getVisitedPagesTable() {
+        return visitedPagesTable;
+    }
+
+    public TableDescription getPagesToBeVisitedTable() {
+        return pagesToBeVisitedTable;
+    }
+
     @Override
     public String toString() {
         return "Context{" +
@@ -191,7 +218,8 @@ public class Context {
                 ", apiAuthorizer=" + apiAuthorizer +
                 ", s3AppConfigBucketName='" + s3AppConfigBucketName + '\'' +
                 ", s3LambdaCodeKey='" + s3LambdaCodeKey + '\'' +
+                ", visitedPagesTable=" + visitedPagesTable +
+                ", pagesToBeVisitedTable=" + pagesToBeVisitedTable +
                 '}';
     }
-
 }

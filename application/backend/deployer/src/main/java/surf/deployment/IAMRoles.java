@@ -2,7 +2,6 @@ package surf.deployment;
 
 import com.amazonaws.services.identitymanagement.model.Role;
 import com.google.common.base.Preconditions;
-import surf.deployers.DeployerConfiguration;
 
 import javax.annotation.Nonnull;
 

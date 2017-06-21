@@ -1,12 +1,9 @@
 package utils.aws.sfn;
 
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.stepfunctions.AWSStepFunctions;
-import com.amazonaws.services.stepfunctions.model.CreateStateMachineRequest;
-import com.amazonaws.services.stepfunctions.model.CreateStateMachineResult;
-import com.amazonaws.services.stepfunctions.model.StartExecutionRequest;
-import com.amazonaws.services.stepfunctions.model.StartExecutionResult;
+import com.amazonaws.services.stepfunctions.model.*;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import models.config.LambdaConfigurationConstants;
 import models.workflow.StateMachineDefinition;
 import models.workflow.StateMachineExecutionDefinition;
@@ -16,20 +13,20 @@ import javax.annotation.Nonnull;
 
 public class StepFunctionsOperationsHelper {
     private final AWSStepFunctions stepFunctionsClient;
-    private final LambdaLogger lambdaLogger;
+    private final Logger LOG;
     private final LambdaConfigurationConstants config;
 
     public StepFunctionsOperationsHelper(
             @Nonnull final AWSStepFunctions stepFunctionsClient,
-            @Nonnull final LambdaLogger lambdaLogger,
+            @Nonnull final Logger logger,
             @Nonnull final LambdaConfigurationConstants config) {
         Preconditions.checkNotNull(stepFunctionsClient, "The StepFunctions client was null!");
-        Preconditions.checkNotNull(lambdaLogger);
+        Preconditions.checkNotNull(logger);
         Preconditions.checkNotNull(config);
         Preconditions.checkNotNull(config.getStepFunctionsInvokeLambdaRoleArn());
 
         this.stepFunctionsClient = stepFunctionsClient;
-        this.lambdaLogger = lambdaLogger;
+        this.LOG = logger;
         this.config = config;
     }
 
@@ -38,8 +35,7 @@ public class StepFunctionsOperationsHelper {
         Preconditions.checkNotNull(stateMachineDefinition,
                 "The state machine definition cannot be null when trying to create a state machine!");
 
-        Logger.log(lambdaLogger,
-                "Trying to create state machine with definition='%s' and name='%s'...",
+        LOG.info("Trying to create state machine with definition='%s' and name='%s'...",
                 stateMachineDefinition.getStateMachine().toJson(), stateMachineDefinition.getId());
 
         final CreateStateMachineRequest createStateMachineRequest = new CreateStateMachineRequest()
@@ -49,8 +45,7 @@ public class StepFunctionsOperationsHelper {
 
         final CreateStateMachineResult stateMachine = stepFunctionsClient.createStateMachine(createStateMachineRequest);
 
-        Logger.log(lambdaLogger,
-                "Successfully created state machine with stateMachineArn='%s'", stateMachine.getStateMachineArn());
+        LOG.info("Successfully created state machine with stateMachineArn='%s'", stateMachine.getStateMachineArn());
 
         return stateMachine;
     }
@@ -64,7 +59,7 @@ public class StepFunctionsOperationsHelper {
                 "The state machine execution definition cannot be null when trying to start a new execution!");
 
         final String stateMachineExecInput = executionDefinition.buildExecutionInputJson();
-        Logger.log(lambdaLogger, "Trying to start state machine execution with input='%s'", stateMachineExecInput);
+        LOG.info("Trying to start state machine execution with input='%s'", stateMachineExecInput);
 
         final StartExecutionRequest startStateMachineRequest = new StartExecutionRequest()
                 .withStateMachineArn(stateMachine.getStateMachineArn())
@@ -72,12 +67,21 @@ public class StepFunctionsOperationsHelper {
                 .withInput(stateMachineExecInput);
         final StartExecutionResult startExecutionResult = stepFunctionsClient.startExecution(startStateMachineRequest);
 
-        Logger.log(lambdaLogger,
-                "Successfully started state machine execution with arn='%s'!",
-                startExecutionResult.getExecutionArn());
+        LOG.info("Successfully started state machine execution with arn='%s'!", startExecutionResult.getExecutionArn());
 
         return startExecutionResult;
     }
 
 
+    public void deleteStateMachine(@Nonnull final String stateMachineArn) {
+        Preconditions.checkArgument(
+                !Strings.isNullOrEmpty(stateMachineArn),
+                "State machine ARN cannot be empty or null when trying to delete it!"
+        );
+
+        LOG.info("Trying to delete state machine with ARN='%s'", stateMachineArn);
+        stepFunctionsClient.deleteStateMachine(new DeleteStateMachineRequest()
+                .withStateMachineArn(stateMachineArn));
+        LOG.info("Successfully deleted state machine with ARN='%s'", stateMachineArn);
+    }
 }

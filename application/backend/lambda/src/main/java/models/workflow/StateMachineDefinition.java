@@ -12,26 +12,31 @@ import utils.RandomGenerator;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.amazonaws.services.stepfunctions.builder.StepFunctionBuilder.*;
 
 public class StateMachineDefinition {
 
-    private static final String PARALLEL_MAIN_STATE = "ParallelMainState";
-    private static final int MAX_STEP_FUNCTIONS_ACTIVITY_WORKERS = 999;
-    private static final String SURF_CRAWLING_TASK = "SurfCrawlingTask";
+    private static final String PARALLEL_MAIN_STATE_NAME = "ParallelMainState";
     private static final String FINALIZE_CRAWLING_SESSION_STATE_NAME = "FinalizeCrawlingTask";
+
+    private static final int MAX_STEP_FUNCTIONS_ACTIVITY_WORKERS = 200;
+    private static final String SURF_CRAWLING_TASK = "SurfCrawlingTask";
 
     private String id;
     private final Workflow workflow;
+    private final WorkflowExecution workflowExecution;
     private final List<WorkflowTask> tasks;
     private final LambdaConfigurationConstants config;
 
     public StateMachineDefinition(
             @Nonnull final Workflow workflow,
+            @Nonnull final WorkflowExecution workflowExecution,
             @Nonnull final List<WorkflowTask> tasks,
             @Nonnull final LambdaConfigurationConstants config) {
         Preconditions.checkNotNull(workflow);
+        Preconditions.checkNotNull(workflowExecution);
         Preconditions.checkNotNull(tasks);
         Preconditions.checkArgument(tasks.size() > 0, "The number of tasks in a StateMachineDefinition must be >= 0!");
         Preconditions.checkNotNull(config);
@@ -40,6 +45,7 @@ public class StateMachineDefinition {
 
         this.id = RandomGenerator.randomUUIDWithTimestamp();
         this.workflow = workflow;
+        this.workflowExecution = workflowExecution;
         this.tasks = tasks;
         this.config = config;
     }
@@ -48,21 +54,20 @@ public class StateMachineDefinition {
 
         final StateMachine.Builder stateMachineBuilder = stateMachine()
                 .comment("Surf web-crawler state machine")
-                .startAt(PARALLEL_MAIN_STATE)
-                .state(PARALLEL_MAIN_STATE, buildMainParallelState())
+                .startAt(PARALLEL_MAIN_STATE_NAME)
+                .state(PARALLEL_MAIN_STATE_NAME, buildMainParallelState())
                 .state(FINALIZE_CRAWLING_SESSION_STATE_NAME, buildFinalizeCrawlingSessionState());
-
         return stateMachineBuilder.build();
     }
 
     private State.Builder buildFinalizeCrawlingSessionState() {
         return taskState()
-                .inputPath(null)
                 .comment("Surf finalize crawling session task")
                 .resource(config.getFinalizeCrawlSessionLambdaArn())
                 .timeoutSeconds((int) workflow.getMetadata().getCrawlerTimeoutSeconds())
                 .retrier(buildFinalizeCrawlingSessionRetrier())
-                .transition(end());
+                .transition(end())
+                .outputPath("$");
     }
 
     private Retrier.Builder buildFinalizeCrawlingSessionRetrier() {
@@ -74,7 +79,10 @@ public class StateMachineDefinition {
     }
 
     private State.Builder buildMainParallelState() {
-        int numberOfBranches = Math.min(MAX_STEP_FUNCTIONS_ACTIVITY_WORKERS, tasks.size());
+        int numberOfBranches = (int) Math.min(
+                Math.min(MAX_STEP_FUNCTIONS_ACTIVITY_WORKERS, workflow.getMetadata().getMaxConcurrentCrawlers()),
+                tasks.size()
+        );
 
         final Branch.Builder[] branchBuilders = new Branch.Builder[numberOfBranches];
         for (int branchNumber = 0; branchNumber < numberOfBranches; branchNumber++) {
@@ -89,11 +97,13 @@ public class StateMachineDefinition {
     }
 
     private Branch.Builder buildBranchBuilder(int branchNumber) {
+        final String branchName = String.format("%s-%d", SURF_CRAWLING_TASK, branchNumber);
+
         return branch()
                 .comment("Surf crawling task branch")
-                .startAt(SURF_CRAWLING_TASK)
-                .state(SURF_CRAWLING_TASK, taskState()
-                        .inputPath(String.format("$.%s[%d]", StateMachineExecutionDefinition.TASK_INPUTS, branchNumber))
+                .startAt(branchName)
+                .state(branchName, taskState()
+                        .inputPath(String.format("$.%s[%d]", StateMachineExecutionDefinition.STATE_INPUTS, branchNumber))
                         .comment(String.format("Surf crawling task with index='%s'", branchNumber))
                         .resource(config.getCrawlWebPageLambdaArn())
                         .timeoutSeconds((int) workflow.getMetadata().getCrawlerTimeoutSeconds())
@@ -105,6 +115,7 @@ public class StateMachineDefinition {
     private Catcher.Builder buildCrawlWebPageTaskCatcher() {
         return catcher()
                 .catchAll()
+                .resultPath(String.format("$.%s", StateMachineExecutionDefinition.ERROR_INFO))
                 .transition(next(FINALIZE_CRAWLING_SESSION_STATE_NAME));
     }
 
@@ -118,11 +129,23 @@ public class StateMachineDefinition {
         for (int retrierIndex = 0; retrierIndex < numberOfRetriers; retrierIndex++) {
             final ExponentialBackoffRetrier workflowRetrier = workflowRetriers.get(retrierIndex);
 
-            retrierBuilders[retrierIndex] = retrier()
-                    .backoffRate(workflowRetrier.getBackoffRate())
-                    .errorEquals((String[]) workflowRetrier.getErrors().toArray())
-                    .intervalSeconds(workflowRetrier.getIntervalSeconds())
-                    .maxAttempts(workflowRetrier.getMaxAttempts());
+            if (workflowRetrier.getErrors() != null || !workflowRetrier.getRetryAllErrors()) {
+                final String[] errorsToRetry = (String[]) workflowRetrier.getErrors().toArray();
+
+                retrierBuilders[retrierIndex] = retrier()
+                        .backoffRate(workflowRetrier.getBackoffRate())
+                        .errorEquals()
+                        .errorEquals(errorsToRetry)
+                        .intervalSeconds(workflowRetrier.getIntervalSeconds())
+                        .maxAttempts(workflowRetrier.getMaxAttempts());
+            } else {
+                retrierBuilders[retrierIndex] = retrier()
+                        .backoffRate(workflowRetrier.getBackoffRate())
+                        .errorEquals()
+                        .retryOnAllErrors()
+                        .intervalSeconds(workflowRetrier.getIntervalSeconds())
+                        .maxAttempts(workflowRetrier.getMaxAttempts());
+            }
         }
 
         return retrierBuilders;
@@ -137,6 +160,10 @@ public class StateMachineDefinition {
         return workflow;
     }
 
+    public WorkflowExecution getWorkflowExecution() {
+        return workflowExecution;
+    }
+
     public List<WorkflowTask> getTasks() {
         return tasks;
     }
@@ -145,6 +172,31 @@ public class StateMachineDefinition {
         return config;
     }
 
-    // TODO use a method in this class to copy all tasks from constructor and to get tasks
-    // TODO when starting a new workflow execution
+    @Override
+    public String toString() {
+        return "StateMachineDefinition{" +
+                "id='" + id + '\'' +
+                ", workflow=" + workflow +
+                ", workflowExecution=" + workflowExecution +
+                ", tasks=" + tasks +
+                ", config=" + config +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StateMachineDefinition that = (StateMachineDefinition) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(workflow, that.workflow) &&
+                Objects.equals(workflowExecution, that.workflowExecution) &&
+                Objects.equals(tasks, that.tasks) &&
+                Objects.equals(config, that.config);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, workflow, workflowExecution, tasks, config);
+    }
 }

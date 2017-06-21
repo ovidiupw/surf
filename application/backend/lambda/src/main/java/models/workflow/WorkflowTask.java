@@ -6,8 +6,8 @@ import converters.StatusConverter;
 import converters.WorkflowExecutionTaskFailureConverter;
 import converters.WorkflowTaskStatusAndDepthConverter;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represents a unit of work that a TaskCrawler is able to fetch.
@@ -87,25 +87,15 @@ public class WorkflowTask {
     private long endDate;
 
     /**
-     * The list of {@link WorkflowExecutionTaskFailure failures} that were encountered while trying
+     * The list of {@link WorkflowExecutionFailure executionFailures} that were encountered while trying
      * to execute the web crawling task.
      */
-    private List<WorkflowExecutionTaskFailure> failures;
+    private Set<WorkflowExecutionFailure> executionFailures;
 
     /**
      * Corroboration between status and depth fields in order to be able to do useful queries on index.
      */
     private String statusAndDepth;
-
-    /**
-     * The version of task. Used as a mutex via optimistic locking. See
-     * <a href="http://www.orafaq.com/papers/locking.pdf">Oracle Optimistic Locking</a>
-     * and/or
-     * <a href="http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBMapper.OptimisticLocking.html">
-     *     DynamoDB Optimistic Locking</a>
-     * for more details.
-     */
-    private Long version;
 
     public static final String DDB_ID = "Id";
     public static final String DDB_CREATION_DATE_MILLIS = "CreationDateMillis";
@@ -118,11 +108,10 @@ public class WorkflowTask {
     public static final String DDB_STATUS_AND_DEPTH = "StatusAndDepth";
     public static final String DDB_MAX_WEBPAGE_SIZE_BYTES = "MaxWebPageSizeBytes";
     public static final String DDB_SELECTION_POLICY = "SelectionPolicy";
-    public static final String DDB_VERSION = "Version";
     public static final String DDB_URL_MATCHER = "URLMatcher";
     public static final String DDB_START_DATE = "StartDate";
     public static final String DDB_END_DATE = "EndDate";
-    public static final String DDB_FAILURES = "Failures";
+    public static final String DDB_EXECUTION_FAILURES = "ExecutionFailures";
 
     @DynamoDBHashKey(attributeName = DDB_ID)
     public String getId() {
@@ -184,16 +173,6 @@ public class WorkflowTask {
         this.statusAndDepth = statusAndDepth;
     }
 
-    @DynamoDBVersionAttribute(attributeName = DDB_VERSION)
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
-
-
     @DynamoDBAttribute(attributeName = DDB_START_DATE)
     public long getStartDate() {
         return startDate;
@@ -230,14 +209,14 @@ public class WorkflowTask {
         this.depth = depth;
     }
 
-    @DynamoDBAttribute(attributeName = DDB_FAILURES)
+    @DynamoDBAttribute(attributeName = DDB_EXECUTION_FAILURES)
     @DynamoDBTypeConverted(converter = WorkflowExecutionTaskFailureConverter.class)
-    public List<WorkflowExecutionTaskFailure> getFailures() {
-        return failures;
+    public Set<WorkflowExecutionFailure> getExecutionFailures() {
+        return executionFailures;
     }
 
-    public void setFailures(List<WorkflowExecutionTaskFailure> failures) {
-        this.failures = failures;
+    public void setExecutionFailures(Set<WorkflowExecutionFailure> executionFailures) {
+        this.executionFailures = executionFailures;
     }
 
     @DynamoDBAttribute(attributeName = DDB_MAX_WEBPAGE_SIZE_BYTES)
@@ -291,13 +270,13 @@ public class WorkflowTask {
                 Objects.equals(url, that.url) &&
                 Objects.equals(urlMatcher, that.urlMatcher) &&
                 Objects.equals(selectionPolicy, that.selectionPolicy) &&
-                Objects.equals(failures, that.failures) &&
-                Objects.equals(version, that.version);
+                Objects.equals(executionFailures, that.executionFailures) &&
+                Objects.equals(statusAndDepth, that.statusAndDepth);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, creationDateMillis, workflowExecutionId, ownerId, status, maxWebPageSizeBytes, depth, url, urlMatcher, selectionPolicy, startDate, endDate, failures, version);
+        return Objects.hash(id, creationDateMillis, workflowExecutionId, ownerId, status, maxWebPageSizeBytes, depth, url, urlMatcher, selectionPolicy, startDate, endDate, executionFailures, statusAndDepth);
     }
 
     @Override
@@ -315,8 +294,7 @@ public class WorkflowTask {
                 ", selectionPolicy=" + selectionPolicy +
                 ", startDate=" + startDate +
                 ", endDate=" + endDate +
-                ", failures=" + failures +
-                ", version=" + version +
+                ", executionFailures=" + executionFailures +
                 '}';
     }
 }

@@ -12,8 +12,15 @@ import java.util.Set;
 public class ExponentialBackoffRetrier implements Validateable {
     /**
      * The names of the errors which should be retried by using this retrier.
+     * The name of the errors represent fully qualified Java class names.
      */
     private Set<String> errors;
+
+    /**
+     * Flag indicating if all errors should be retried. The definition of {@link #errors} becomes irrelevant
+     * if this is set to true.
+     */
+    private boolean retryAllErrors;
 
     /**
      * The number of seconds to wait before the first retry attempt.
@@ -64,26 +71,36 @@ public class ExponentialBackoffRetrier implements Validateable {
         this.maxAttempts = maxAttempts;
     }
 
+    public boolean getRetryAllErrors() {
+        return retryAllErrors;
+    }
+
+    public void setRetryAllErrors(boolean retryAllErrors) {
+        this.retryAllErrors = retryAllErrors;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ExponentialBackoffRetrier exponentialBackoffRetrier = (ExponentialBackoffRetrier) o;
-        return intervalSeconds == exponentialBackoffRetrier.intervalSeconds &&
-                Double.compare(exponentialBackoffRetrier.backoffRate, backoffRate) == 0 &&
-                maxAttempts == exponentialBackoffRetrier.maxAttempts &&
-                Objects.equals(errors, exponentialBackoffRetrier.errors);
+        ExponentialBackoffRetrier that = (ExponentialBackoffRetrier) o;
+        return retryAllErrors == that.retryAllErrors &&
+                intervalSeconds == that.intervalSeconds &&
+                Double.compare(that.backoffRate, backoffRate) == 0 &&
+                maxAttempts == that.maxAttempts &&
+                Objects.equals(errors, that.errors);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(errors, intervalSeconds, backoffRate, maxAttempts);
+        return Objects.hash(errors, retryAllErrors, intervalSeconds, backoffRate, maxAttempts);
     }
 
     @Override
     public String toString() {
         return "ExponentialBackoffRetrier{" +
                 "errors=" + errors +
+                ", retryAllErrors=" + retryAllErrors +
                 ", intervalSeconds=" + intervalSeconds +
                 ", backoffRate=" + backoffRate +
                 ", maxAttempts=" + maxAttempts +
@@ -91,21 +108,24 @@ public class ExponentialBackoffRetrier implements Validateable {
     }
 
     public void validate() {
-        Preconditions.checkNotNull(
-                errors,
-                "ExponentialBackoffRetrier 'errors' must not be null"
-        );
+        if (!retryAllErrors) {
+            Preconditions.checkNotNull(
+                    errors,
+                    "ExponentialBackoffRetrier 'errors' must not be null but can be an empty set! " +
+                            "If 'retryAllErrors' is set to 'true', then 'errors' can be null."
+            );
+        }
         Preconditions.checkArgument(
                 intervalSeconds >= 0,
-                "ExponentialBackoffRetrier 'intervalSeconds' must not be null"
+                "ExponentialBackoffRetrier 'intervalSeconds' must be >= 0!"
         );
         Preconditions.checkArgument(
                 backoffRate >= 1,
-                "ExponentialBackoffRetrier 'backoffRate' must not be null"
+                "ExponentialBackoffRetrier 'backoffRate' must be >= 1!"
         );
         Preconditions.checkArgument(
                 maxAttempts >= 0,
-                "ExponentialBackoffRetrier 'maxAttempts' must not be null"
+                "ExponentialBackoffRetrier 'maxAttempts' must be >= 0!"
         );
     }
 }

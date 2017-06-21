@@ -5,17 +5,17 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import models.Validateable;
-import models.workflow.Workflow;
-import models.config.LambdaConfigurationConstants;
 import interpolators.Interpolator;
 import interpolators.WorkflowInterpolator;
+import models.Validateable;
+import models.config.LambdaConfigurationConstants;
+import models.workflow.Workflow;
+import utils.*;
 import utils.aws.dynamo.DynamoDBClientHelper;
 import utils.aws.dynamo.DynamoDBOperationsHelper;
 import validators.CreateWorkflowInputValidator;
 import validators.Validator;
 import validators.WorkflowValidator;
-import utils.*;
 
 public class CreateWorkflowHandler implements
         RequestHandler<CreateWorkflowHandler.Input, CreateWorkflowHandler.Output>,
@@ -23,10 +23,9 @@ public class CreateWorkflowHandler implements
 
     private Interpolator<Workflow> interpolator;
     private Validator<Workflow> workflowValidator;
-    private AmazonDynamoDB dynamoClient;
     private DynamoDBOperationsHelper dynamoOperationsHelper;
     private Validator<CreateWorkflowHandler.Input> inputValidator;
-    private LambdaConfigurationConstants config;
+    private Logger LOG;
 
     public CreateWorkflowHandler.Output handleRequest(final CreateWorkflowHandler.Input input, final Context context) {
         final ExceptionWrapper<Input, Output> exceptionWrapper = new ExceptionWrapper<>(input, context);
@@ -34,8 +33,8 @@ public class CreateWorkflowHandler implements
     }
 
     public CreateWorkflowHandler.Output doHandleRequest(final Input input, final Context context) {
-        Logger.log(context.getLogger(), "input=%s", input.toString());
         initializeInstance(context, input.getUserArn());
+        LOG.info("Input=%s", input.toString());
 
         inputValidator.validate(input);
         final Workflow workflow = input.getWorkflow();
@@ -50,11 +49,15 @@ public class CreateWorkflowHandler implements
     }
 
     private void initializeInstance(final Context context, final String userArn) {
-        config = FileReader.readObjectFromFile(Constants.CONFIG_FILE_PATH, LambdaConfigurationConstants.class);
-        Logger.log(context.getLogger(), "Using lambda config '%s'", config);
+        LOG = new Logger(context.getLogger());
 
-        dynamoClient = new DynamoDBClientHelper(context.getLogger()).getDynamoDBClient(config);
-        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient, context.getLogger());
+        final LambdaConfigurationConstants config
+                = FileReader.readObjectFromFile(Constants.CONFIG_FILE_PATH, LambdaConfigurationConstants.class);
+        LOG.info("Using lambda config '%s'", config);
+
+        final AmazonDynamoDB dynamoClient = new DynamoDBClientHelper(LOG).getDynamoDBClient(config);
+
+        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient, LOG);
         inputValidator = new CreateWorkflowInputValidator(context);
         interpolator = new WorkflowInterpolator(context, userArn);
         workflowValidator = new WorkflowValidator(context, dynamoClient);

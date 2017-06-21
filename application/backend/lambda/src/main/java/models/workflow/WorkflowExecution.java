@@ -2,8 +2,10 @@ package models.workflow;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import converters.StatusConverter;
+import converters.WorkflowExecutionTaskFailureConverter;
 
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A WorkflowExecution represents a running instance of a {@link Workflow}.
@@ -51,14 +53,15 @@ public class WorkflowExecution {
     private long endDateMillis;
 
     /**
-     * The Amazon ARN resource identifier for the state machine created when initializing a new crawling session.
+     * The list of {@link WorkflowExecutionFailure executionFailures} that were encountered while trying
+     * to execute the web crawling task.
      */
-    private String stateMachineArn;
+    private Set<WorkflowExecutionFailure> executionFailures;
 
     /**
-     * The Amazon ARN resource identifier for the crawling session's {@link #stateMachineArn state machine}
+     * The ARN of the state machine started by {@link handlers.InitializeCrawlSessionHandler}
      */
-    private String stateMachineExecutionArn;
+    private String stateMachineArn;
 
     /**
      * The version of task. Used as a mutex via optimistic locking. See
@@ -78,8 +81,8 @@ public class WorkflowExecution {
     public static final String DDB_START_DATE_MILLIS = "StartDateMillis";
     public static final String DDB_END_DATE_MILLIS = "EndDateMillis";
     public static final String DDB_STATUS = "Status";
+    public static final String DDB_EXECUTION_FAILURES = "ExecutionFailure";
     public static final String DDB_STATE_MACHINE_ARN = "StateMachineArn";
-    public static final String DDB_STATE_MACHINE_EXECUTION_ARN = "StateMachineExecutionArn";
     public static final String DDB_VERSION = "Version";
 
     @DynamoDBIndexHashKey(
@@ -149,6 +152,16 @@ public class WorkflowExecution {
         this.endDateMillis = endDateMillis;
     }
 
+    @DynamoDBAttribute(attributeName = DDB_EXECUTION_FAILURES)
+    @DynamoDBTypeConverted(converter = WorkflowExecutionTaskFailureConverter.class)
+    public Set<WorkflowExecutionFailure> getExecutionFailures() {
+        return executionFailures;
+    }
+
+    public void setExecutionFailures(Set<WorkflowExecutionFailure> executionFailures) {
+        this.executionFailures = executionFailures;
+    }
+
     @DynamoDBAttribute(attributeName = DDB_STATE_MACHINE_ARN)
     public String getStateMachineArn() {
         return stateMachineArn;
@@ -156,15 +169,6 @@ public class WorkflowExecution {
 
     public void setStateMachineArn(String stateMachineArn) {
         this.stateMachineArn = stateMachineArn;
-    }
-
-    @DynamoDBAttribute(attributeName = DDB_STATE_MACHINE_EXECUTION_ARN)
-    public String getStateMachineExecutionArn() {
-        return stateMachineExecutionArn;
-    }
-
-    public void setStateMachineExecutionArn(String stateMachineExecutionArn) {
-        this.stateMachineExecutionArn = stateMachineExecutionArn;
     }
 
     @DynamoDBVersionAttribute(attributeName = DDB_VERSION)
@@ -193,14 +197,14 @@ public class WorkflowExecution {
                 Objects.equals(id, that.id) &&
                 Objects.equals(ownerId, that.ownerId) &&
                 status == that.status &&
+                Objects.equals(executionFailures, that.executionFailures) &&
                 Objects.equals(stateMachineArn, that.stateMachineArn) &&
-                Objects.equals(stateMachineExecutionArn, that.stateMachineExecutionArn) &&
                 Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(workflowId, id, ownerId, status, creationDateMillis, startDateMillis, endDateMillis, stateMachineArn, stateMachineExecutionArn, version);
+        return Objects.hash(workflowId, id, ownerId, status, creationDateMillis, startDateMillis, endDateMillis, executionFailures, stateMachineArn, version);
     }
 
     @Override
@@ -213,8 +217,8 @@ public class WorkflowExecution {
                 ", creationDateMillis=" + creationDateMillis +
                 ", startDateMillis=" + startDateMillis +
                 ", endDateMillis=" + endDateMillis +
+                ", executionFailures=" + executionFailures +
                 ", stateMachineArn='" + stateMachineArn + '\'' +
-                ", stateMachineExecutionArn='" + stateMachineExecutionArn + '\'' +
                 ", version=" + version +
                 '}';
     }

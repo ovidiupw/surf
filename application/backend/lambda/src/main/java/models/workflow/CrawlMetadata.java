@@ -1,10 +1,8 @@
 package models.workflow;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
 
+import javax.annotation.Nonnull;
 import java.util.Objects;
 
 @DynamoDBTable(tableName = CrawlMetadata.TABLE_NAME)
@@ -22,18 +20,18 @@ public class CrawlMetadata {
     private String id;
 
     /**
-     * The S3 bucket where the crawl data is stored.
+     * The S3 link to the object where the crawl data is stored.
      */
-    private String s3Bucket;
+    private String s3Link;
 
     /**
      * The time, as epoch milliseconds, when the crawled data was inserted into the S3 bucket.
      */
-    private String creationDateMillis;
+    private long creationDateMillis;
 
     static final String DDB_WORKFLOW_EXECUTION_ID = "WorkflowExecutionId";
     static final String DDB_ID = "Id";
-    static final String DDB_S3_BUCKET = "S3Bucket";
+    static final String DDB_S3_BUCKET = "S3Link";
     static final String DDB_CREATION_DATE_MILLIS = "CreationDateMillis";
 
     @DynamoDBHashKey(attributeName = DDB_WORKFLOW_EXECUTION_ID)
@@ -56,25 +54,26 @@ public class CrawlMetadata {
 
     @DynamoDBAttribute(attributeName = DDB_S3_BUCKET)
     public String getS3Bucket() {
-        return s3Bucket;
+        return s3Link;
     }
 
     public void setS3Bucket(String s3Bucket) {
-        this.s3Bucket = s3Bucket;
+        this.s3Link = s3Bucket;
     }
 
     @DynamoDBAttribute(attributeName = DDB_CREATION_DATE_MILLIS)
-    public String getCreationDateMillis() {
+    public long getCreationDateMillis() {
         return creationDateMillis;
     }
 
-    public void setCreationDateMillis(String creationDateMillis) {
+    public void setCreationDateMillis(long creationDateMillis) {
         this.creationDateMillis = creationDateMillis;
     }
 
     /**
      * @return The DynamoDB table name associated with this class.
      */
+    @DynamoDBIgnore
     public static String getTableName() {
         return TABLE_NAME;
     }
@@ -83,16 +82,16 @@ public class CrawlMetadata {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CrawlMetadata that = (CrawlMetadata) o;
-        return Objects.equals(workflowExecutionId, that.workflowExecutionId) &&
-                Objects.equals(id, that.id) &&
-                Objects.equals(s3Bucket, that.s3Bucket) &&
-                Objects.equals(creationDateMillis, that.creationDateMillis);
+        CrawlMetadata metadata = (CrawlMetadata) o;
+        return creationDateMillis == metadata.creationDateMillis &&
+                Objects.equals(workflowExecutionId, metadata.workflowExecutionId) &&
+                Objects.equals(id, metadata.id) &&
+                Objects.equals(s3Link, metadata.s3Link);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(workflowExecutionId, id, s3Bucket, creationDateMillis);
+        return Objects.hash(workflowExecutionId, id, s3Link, creationDateMillis);
     }
 
     @Override
@@ -100,8 +99,40 @@ public class CrawlMetadata {
         return "CrawlMetadata{" +
                 "workflowExecutionId='" + workflowExecutionId + '\'' +
                 ", id='" + id + '\'' +
-                ", s3Bucket='" + s3Bucket + '\'' +
-                ", creationDateMillis='" + creationDateMillis + '\'' +
+                ", s3Bucket='" + s3Link + '\'' +
+                ", creationDateMillis=" + creationDateMillis +
                 '}';
+    }
+
+    public enum CategoryName {
+        CSSSelectors("css-selectors"),
+        TextSelectors("text-selectors");
+
+        private final String name;
+
+        CategoryName(@Nonnull final String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public static CategoryName fromName(@Nonnull final String name) {
+            for (final CategoryName categoryName : CategoryName.values()) {
+                if (categoryName.getName().equals(name)) {
+                    return categoryName;
+                }
+            }
+
+            throw new IllegalArgumentException("There is no associated CategoryName for the supplied value!");
+        }
+
+        @Override
+        public String toString() {
+            return "CategoryName{" +
+                    "name='" + name + '\'' +
+                    '}';
+        }
     }
 }

@@ -9,7 +9,8 @@ public enum Status {
     Active("Active"),
     Failed("Failed"),
     Cancelled("Cancelled"),
-    Completed("Completed"),;
+    Completed("Completed"),
+    TimedOut("TimedOut");
 
     private final String name;
 

@@ -1,19 +1,19 @@
 package handlers;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import utils.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ListCoreWorkersHandler implements RequestHandler<ListCoreWorkersHandler.Input, ListCoreWorkersHandler.Output> {
 
-    private LambdaLogger LOG;
+    private Logger LOG;
 
     public ListCoreWorkersHandler.Output handleRequest(final ListCoreWorkersHandler.Input input, final Context context) {
-        LOG = context.getLogger();
-        LOG.log(input.toString());
+        LOG = new Logger(context.getLogger());
+        LOG.info("Input='%s'", input.toString());
 
         final Output output = new Output();
         output.setCoreWorkersArns(new ArrayList<>());

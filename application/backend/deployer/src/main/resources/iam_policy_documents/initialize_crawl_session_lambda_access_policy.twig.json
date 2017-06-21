@@ -32,6 +32,14 @@
     },
     {
       "Sid": "4",
+      "Action": [
+        "sns:Publish"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:sns:*:*:*"
+    },
+    {
+      "Sid": "5",
       "Effect": "Allow",
       "Action": [
         "iam:PassRole"

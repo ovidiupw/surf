@@ -7,8 +7,8 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import models.Validateable;
-import models.workflow.Workflow;
 import models.config.LambdaConfigurationConstants;
+import models.workflow.Workflow;
 import utils.*;
 import utils.aws.dynamo.DynamoDBClientHelper;
 import utils.aws.dynamo.DynamoDBOperationsHelper;
@@ -20,10 +20,9 @@ public class ListWorkflowsHandler implements
         RequestHandler<ListWorkflowsHandler.Input, ListWorkflowsHandler.Output>,
         WrappableRequestHandler<ListWorkflowsHandler.Input, ListWorkflowsHandler.Output> {
 
-    private LambdaConfigurationConstants config;
-    private AmazonDynamoDB dynamoClient;
     private DynamoDBOperationsHelper dynamoOperationsHelper;
     private ListWorkflowsInputValidator inputValidator;
+    private Logger LOG;
 
     public ListWorkflowsHandler.Output handleRequest(final ListWorkflowsHandler.Input input, final Context context) {
         ExceptionWrapper<Input, Output> exceptionWrapper = new ExceptionWrapper<>(input, context);
@@ -32,8 +31,8 @@ public class ListWorkflowsHandler implements
 
     @Override
     public Output doHandleRequest(final Input input, final Context context) {
-        Logger.log(context.getLogger(), "input=%s", input.toString());
-        initializeInstance(context, input.getUserArn());
+        initializeInstance(context);
+        LOG.info("input=%s", input.toString());
 
         inputValidator.validate(input);
 
@@ -44,7 +43,7 @@ public class ListWorkflowsHandler implements
                 input.getResultsPerPage());
 
         for (final Workflow wf : workflowsByOwnerPage.getResults()) {
-            Logger.log(context.getLogger(), "Found workflow='%s' that is owned by '%s'", wf, wf.getOwnerId());
+            LOG.info("Found workflow='%s' that is owned by '%s'", wf, wf.getOwnerId());
         }
 
         final ListWorkflowsHandler.Output output = new ListWorkflowsHandler.Output();
@@ -53,12 +52,15 @@ public class ListWorkflowsHandler implements
         return output;
     }
 
-    private void initializeInstance(final Context context, final String userArn) {
-        config = FileReader.readObjectFromFile(Constants.CONFIG_FILE_PATH, LambdaConfigurationConstants.class);
-        Logger.log(context.getLogger(), "Using lambda config '%s'", config);
+    private void initializeInstance(final Context context) {
+        LOG = new Logger(context.getLogger());
 
-        dynamoClient = new DynamoDBClientHelper(context.getLogger()).getDynamoDBClient(config);
-        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient, context.getLogger());
+        final LambdaConfigurationConstants config
+                = FileReader.readObjectFromFile(Constants.CONFIG_FILE_PATH, LambdaConfigurationConstants.class);
+        LOG.info("Using lambda config '%s'", config);
+
+        AmazonDynamoDB dynamoClient = new DynamoDBClientHelper(LOG).getDynamoDBClient(config);
+        dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient, LOG);
         inputValidator = new ListWorkflowsInputValidator(context);
     }
 

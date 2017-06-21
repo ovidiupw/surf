@@ -8,16 +8,16 @@ import javax.annotation.Nonnull;
 
 public class CreateWorkflowInputValidator implements Validator<CreateWorkflowHandler.Input> {
 
-    private final Context context;
+    private final Logger LOG;
 
     public CreateWorkflowInputValidator(@Nonnull final Context context) {
-        this.context = context;
+        this.LOG = new Logger(context.getLogger());
     }
 
     @Override
     public void validate(@Nonnull final CreateWorkflowHandler.Input input) {
-        Logger.log(context.getLogger(), "Validating CreateWorkflow input '%s'...", input);
+        LOG.info("Validating CreateWorkflow input '%s'...", input);
         input.validate();
-        Logger.log(context.getLogger(), "CreateWorkflow input successfully passed the validation tests!");
+        LOG.info("CreateWorkflow input successfully passed the validation tests!");
     }
 }

@@ -3,6 +3,7 @@ package models.config;
 import com.google.common.base.Preconditions;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 public class LambdaConfigurationConstants {
 
@@ -12,6 +13,7 @@ public class LambdaConfigurationConstants {
     private String stepFunctionsInvokeLambdaRoleArn;
     private String crawlWebPageLambdaArn;
     private String finalizeCrawlSessionLambdaArn;
+    private String applicationS3BucketName;
 
     public String getInitializeCrawlSessionSNSTopicArn() {
         return initializeCrawlSessionSNSTopicArn;
@@ -37,6 +39,10 @@ public class LambdaConfigurationConstants {
         return finalizeCrawlSessionLambdaArn;
     }
 
+    public String getApplicationS3BucketName() {
+        return applicationS3BucketName;
+    }
+
     public static class Builder {
         private String initializeCrawlSessionSNSTopicArn;
         private String awsClientRegion;
@@ -44,6 +50,7 @@ public class LambdaConfigurationConstants {
         private String stepFunctionsInvokeLambdaRoleArn;
         private String crawlWebPageLambdaArn;
         private String finalizeCrawlSessionLambdaArn;
+        private String applicationS3BucketName;
 
         public LambdaConfigurationConstants build() {
             Preconditions.checkNotNull(initializeCrawlSessionSNSTopicArn);
@@ -52,6 +59,7 @@ public class LambdaConfigurationConstants {
             Preconditions.checkNotNull(stepFunctionsInvokeLambdaRoleArn);
             Preconditions.checkNotNull(crawlWebPageLambdaArn);
             Preconditions.checkNotNull(finalizeCrawlSessionLambdaArn);
+            Preconditions.checkNotNull(applicationS3BucketName);
 
             final LambdaConfigurationConstants clientConstants = new LambdaConfigurationConstants();
             clientConstants.setInitializeCrawlSessionSNSTopicArn(initializeCrawlSessionSNSTopicArn);
@@ -60,6 +68,7 @@ public class LambdaConfigurationConstants {
             clientConstants.setStepFunctionsInvokeLambdaRoleArn(stepFunctionsInvokeLambdaRoleArn);
             clientConstants.setCrawlWebPageLambdaArn(crawlWebPageLambdaArn);
             clientConstants.setFinalizeCrawlSessionLambdaArn(finalizeCrawlSessionLambdaArn);
+            clientConstants.setApplicationS3BucketName(applicationS3BucketName);
 
             return clientConstants;
         }
@@ -99,6 +108,12 @@ public class LambdaConfigurationConstants {
             this.finalizeCrawlSessionLambdaArn = arn;
             return this;
         }
+
+        public Builder withApplicationS3BucketName(@Nonnull final String name) {
+            Preconditions.checkNotNull(name);
+            this.applicationS3BucketName = name;
+            return this;
+        }
     }
 
     private void setInitializeCrawlSessionSNSTopicArn(@Nonnull final String arn) {
@@ -117,12 +132,35 @@ public class LambdaConfigurationConstants {
         this.stepFunctionsInvokeLambdaRoleArn = stepFunctionsInvokeLambdaRoleArn;
     }
 
-    public void setCrawlWebPageLambdaArn(String crawlWebPageLambdaArn) {
+    private void setCrawlWebPageLambdaArn(String crawlWebPageLambdaArn) {
         this.crawlWebPageLambdaArn = crawlWebPageLambdaArn;
     }
 
-    public void setFinalizeCrawlSessionLambdaArn(String finalizeCrawlSessionLambdaArn) {
+    private void setFinalizeCrawlSessionLambdaArn(String finalizeCrawlSessionLambdaArn) {
         this.finalizeCrawlSessionLambdaArn = finalizeCrawlSessionLambdaArn;
+    }
+
+    private void setApplicationS3BucketName(String applicationS3BucketName) {
+        this.applicationS3BucketName = applicationS3BucketName;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LambdaConfigurationConstants that = (LambdaConfigurationConstants) o;
+        return awsClientExecutionTimeoutSeconds == that.awsClientExecutionTimeoutSeconds &&
+                Objects.equals(initializeCrawlSessionSNSTopicArn, that.initializeCrawlSessionSNSTopicArn) &&
+                Objects.equals(awsClientRegion, that.awsClientRegion) &&
+                Objects.equals(stepFunctionsInvokeLambdaRoleArn, that.stepFunctionsInvokeLambdaRoleArn) &&
+                Objects.equals(crawlWebPageLambdaArn, that.crawlWebPageLambdaArn) &&
+                Objects.equals(finalizeCrawlSessionLambdaArn, that.finalizeCrawlSessionLambdaArn) &&
+                Objects.equals(applicationS3BucketName, that.applicationS3BucketName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(initializeCrawlSessionSNSTopicArn, awsClientRegion, awsClientExecutionTimeoutSeconds, stepFunctionsInvokeLambdaRoleArn, crawlWebPageLambdaArn, finalizeCrawlSessionLambdaArn, applicationS3BucketName);
     }
 
     @Override
@@ -134,6 +172,7 @@ public class LambdaConfigurationConstants {
                 ", stepFunctionsInvokeLambdaRoleArn='" + stepFunctionsInvokeLambdaRoleArn + '\'' +
                 ", crawlWebPageLambdaArn='" + crawlWebPageLambdaArn + '\'' +
                 ", finalizeCrawlSessionLambdaArn='" + finalizeCrawlSessionLambdaArn + '\'' +
+                ", applicationS3BucketName='" + applicationS3BucketName + '\'' +
                 '}';
     }
 }

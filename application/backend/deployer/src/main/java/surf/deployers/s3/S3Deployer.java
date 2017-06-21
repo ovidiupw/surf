@@ -4,7 +4,6 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.google.common.base.Preconditions;
@@ -31,7 +30,7 @@ public class S3Deployer implements Deployer {
     private static final String MAVEN_LAMBDA_POM_PATH = "../lambda/pom.xml";
     public static final String MAVEN_HOME = "/usr/local/";
 
-    private static final String S3_APPLICATION_BUCKET_NAME = "surf-web-crawler";
+    public static final String S3_APPLICATION_BUCKET_NAME = "surf-web-crawler";
     private static final String S3_LAMBDA_CODE_ZIP_KEY = "config/lambda_code.zip";
 
     private final DeployerConfiguration deployerConfiguration;

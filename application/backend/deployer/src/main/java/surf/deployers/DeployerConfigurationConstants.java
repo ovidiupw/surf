@@ -34,6 +34,10 @@ public class DeployerConfigurationConstants {
     private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits;
     private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits;
     private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
+    private long dynamoDBVisitedPagesTableReadCapacityUnits;
+    private long dynamoDBVisitedPagesTableWriteCapacityUnits;
+    private long dynamoDBPagesToBeVisitedTableReadCapacityUnits;
+    private long dynamoDBPagesToBeVisitedTableWriteCapacityUnits;
 
     public String getClientConfigFilePath() {
         return clientConfigFilePath;
@@ -299,5 +303,37 @@ public class DeployerConfigurationConstants {
 
     public void setDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits(long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits) {
         this.dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits = dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
+    }
+
+    public long getDynamoDBVisitedPagesTableReadCapacityUnits() {
+        return dynamoDBVisitedPagesTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBVisitedPagesTableWriteCapacityUnits() {
+        return dynamoDBVisitedPagesTableWriteCapacityUnits;
+    }
+
+    public void setDynamoDBVisitedPagesTableReadCapacityUnits(long dynamoDBVisitedPagesTableReadCapacityUnits) {
+        this.dynamoDBVisitedPagesTableReadCapacityUnits = dynamoDBVisitedPagesTableReadCapacityUnits;
+    }
+
+    public void setDynamoDBVisitedPagesTableWriteCapacityUnits(long dynamoDBVisitedPagesTableWriteCapacityUnits) {
+        this.dynamoDBVisitedPagesTableWriteCapacityUnits = dynamoDBVisitedPagesTableWriteCapacityUnits;
+    }
+
+    public long getDynamoDBPagesToBeVisitedTableReadCapacityUnits() {
+        return dynamoDBPagesToBeVisitedTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBPagesToBeVisitedTableWriteCapacityUnits() {
+        return dynamoDBPagesToBeVisitedTableWriteCapacityUnits;
+    }
+
+    public void setDynamoDBPagesToBeVisitedTableReadCapacityUnits(long dynamoDBPagesToBeVisitedTableReadCapacityUnits) {
+        this.dynamoDBPagesToBeVisitedTableReadCapacityUnits = dynamoDBPagesToBeVisitedTableReadCapacityUnits;
+    }
+
+    public void setDynamoDBPagesToBeVisitedTableWriteCapacityUnits(long dynamoDBPagesToBeVisitedTableWriteCapacityUnits) {
+        this.dynamoDBPagesToBeVisitedTableWriteCapacityUnits = dynamoDBPagesToBeVisitedTableWriteCapacityUnits;
     }
 }

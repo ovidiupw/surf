@@ -37,7 +37,7 @@ public class StepFunctionsErrorCauseDeserializer extends StdDeserializer<StepFun
         final CollectionType stringCollectionType = TypeFactory
                 .defaultInstance()
                 .constructCollectionType(List.class, String.class);
-        final List<String> stackTraces = objectMapper.reader(stringCollectionType).readValue(stackTraceNode);
+        final List<String> stackTraces = objectMapper.readerFor(stringCollectionType).readValue(stackTraceNode);
 
         for (final String stackTrace : stackTraces) {
             stackTraceBuilder.append(stackTrace);

@@ -51,6 +51,10 @@ public class DeployerConfiguration {
     private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits;
     private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits;
     private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
+    private long dynamoDBVisitedPagesTableReadCapacityUnits;
+    private long dynamoDBVisitedPagesTableWriteCapacityUnits;
+    private long dynamoDBPagesToBeVisitedTableReadCapacityUnits;
+    private long dynamoDBPagesToBeVisitedTableWriteCapacityUnits;
 
     public static DeployerConfiguration fromFile(@Nonnull final String configFilePath) {
         try {
@@ -110,6 +114,10 @@ public class DeployerConfiguration {
                 .withDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits(config.getDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits())
                 .withDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits(config.getDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits())
                 .withDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits(config.getDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits())
+                .withDynamoDBVisitedPagesTableReadCapacityUnits(config.getDynamoDBVisitedPagesTableReadCapacityUnits())
+                .withDynamoDBVisitedPagesTableWriteCapacityUnits(config.getDynamoDBVisitedPagesTableWriteCapacityUnits())
+                .withDynamoDBPagesToBeVisitedTableReadCapacityUnits(config.getDynamoDBPagesToBeVisitedTableReadCapacityUnits())
+                .withDynamoDBPagesToBeVisitedTableWriteCapacityUnits(config.getDynamoDBPagesToBeVisitedTableWriteCapacityUnits())
                 .build();
     }
 
@@ -393,6 +401,38 @@ public class DeployerConfiguration {
         this.dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits = dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
     }
 
+    public long getDynamoDBVisitedPagesTableReadCapacityUnits() {
+        return dynamoDBVisitedPagesTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBVisitedPagesTableWriteCapacityUnits() {
+        return dynamoDBVisitedPagesTableWriteCapacityUnits;
+    }
+
+    private void setDynamoDBVisitedPagesTableReadCapacityUnits(long dynamoDBVisitedPagesTableReadCapacityUnits) {
+        this.dynamoDBVisitedPagesTableReadCapacityUnits = dynamoDBVisitedPagesTableReadCapacityUnits;
+    }
+
+    private void setDynamoDBVisitedPagesTableWriteCapacityUnits(long dynamoDBVisitedPagesTableWriteCapacityUnits) {
+        this.dynamoDBVisitedPagesTableWriteCapacityUnits = dynamoDBVisitedPagesTableWriteCapacityUnits;
+    }
+
+    private void setDynamoDBPagesToBeVisitedTableReadCapacityUnits(long dynamoDBPagesToBeVisitedTableReadCapacityUnits) {
+        this.dynamoDBPagesToBeVisitedTableReadCapacityUnits = dynamoDBPagesToBeVisitedTableReadCapacityUnits;
+    }
+
+    private void setDynamoDBPagesToBeVisitedTableWriteCapacityUnits(long dynamoDBPagesToBeVisitedTableWriteCapacityUnits) {
+        this.dynamoDBPagesToBeVisitedTableWriteCapacityUnits = dynamoDBPagesToBeVisitedTableWriteCapacityUnits;
+    }
+
+    public long getDynamoDBPagesToBeVisitedTableReadCapacityUnits() {
+        return dynamoDBPagesToBeVisitedTableReadCapacityUnits;
+    }
+
+    public long getDynamoDBPagesToBeVisitedTableWriteCapacityUnits() {
+        return dynamoDBPagesToBeVisitedTableWriteCapacityUnits;
+    }
+
     public static class Builder {
         private ClientConfiguration clientConfiguration;
         private Regions region;
@@ -428,6 +468,10 @@ public class DeployerConfiguration {
         private long dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits;
         private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits;
         private long dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits;
+        private long dynamoDBVisitedPagesTableReadCapacityUnits;
+        private long dynamoDBVisitedPagesTableWriteCapacityUnits;
+        private long dynamoDBPagesToBeVisitedTableReadCapacityUnits;
+        private long dynamoDBPagesToBeVisitedTableWriteCapacityUnits;
 
         public DeployerConfiguration build() {
             Preconditions.checkNotNull(clientConfiguration);
@@ -463,6 +507,10 @@ public class DeployerConfiguration {
             Preconditions.checkArgument(dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits >= 0);
             Preconditions.checkArgument(dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits >= 0);
             Preconditions.checkArgument(dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBVisitedPagesTableReadCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBVisitedPagesTableWriteCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBPagesToBeVisitedTableReadCapacityUnits >= 0);
+            Preconditions.checkArgument(dynamoDBPagesToBeVisitedTableWriteCapacityUnits >= 0);
 
             final DeployerConfiguration deployerConfiguration = new DeployerConfiguration();
             deployerConfiguration.setClientConfiguration(clientConfiguration);
@@ -499,6 +547,10 @@ public class DeployerConfiguration {
             deployerConfiguration.setDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits(dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits);
             deployerConfiguration.setDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits(dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits);
             deployerConfiguration.setDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits(dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits);
+            deployerConfiguration.setDynamoDBVisitedPagesTableReadCapacityUnits(dynamoDBVisitedPagesTableReadCapacityUnits);
+            deployerConfiguration.setDynamoDBVisitedPagesTableWriteCapacityUnits(dynamoDBVisitedPagesTableWriteCapacityUnits);
+            deployerConfiguration.setDynamoDBPagesToBeVisitedTableReadCapacityUnits(dynamoDBPagesToBeVisitedTableReadCapacityUnits);
+            deployerConfiguration.setDynamoDBPagesToBeVisitedTableWriteCapacityUnits(dynamoDBPagesToBeVisitedTableWriteCapacityUnits);
 
             return deployerConfiguration;
         }
@@ -621,87 +673,111 @@ public class DeployerConfiguration {
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableReadCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableReadCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowsTableReadCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableWriteCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableWriteCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowsTableWriteCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableOwnerGSIReadCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableOwnerGSIReadCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowsTableOwnerGSIReadCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowsTableOwnerGSIWriteCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableReadCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableReadCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowExecutionsTableReadCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableWriteCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableWriteCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowExecutionsTableWriteCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableReadCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableReadCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowExecutionTasksTableReadCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableWriteCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowExecutionTasksTableWriteCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBCrawlMetadataTableReadCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBCrawlMetadataTableReadCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBCrawlMetadataTableReadCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBCrawlMetadataTableWriteCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBCrawlMetadataTableWriteCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBCrawlMetadataTableWriteCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowExecutionsTableWorkflowIdGSIReadCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowExecutionsTableWorkflowIdGSIWriteCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowExecutionTasksTableStatusDepthGSIReadCapacityUnits = units;
             return this;
         }
 
-        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits(@Nonnull final long units) {
+        public DeployerConfiguration.Builder withDynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits(final long units) {
             Preconditions.checkArgument(units > 0);
             this.dynamoDBWorkflowExecutionTasksTableStatusDepthGSIWriteCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBVisitedPagesTableReadCapacityUnits(final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBVisitedPagesTableReadCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBVisitedPagesTableWriteCapacityUnits(final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBVisitedPagesTableWriteCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBPagesToBeVisitedTableReadCapacityUnits(final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBPagesToBeVisitedTableReadCapacityUnits = units;
+            return this;
+        }
+
+        public DeployerConfiguration.Builder withDynamoDBPagesToBeVisitedTableWriteCapacityUnits(final long units) {
+            Preconditions.checkArgument(units > 0);
+            this.dynamoDBPagesToBeVisitedTableWriteCapacityUnits = units;
             return this;
         }
     }

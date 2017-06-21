@@ -1,16 +1,17 @@
 package handlers;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import utils.Logger;
 
 public class GetWorkflowHandler implements RequestHandler<GetWorkflowHandler.Input, GetWorkflowHandler.Output> {
 
-    private LambdaLogger LOG;
+    private Logger LOG;
 
     public GetWorkflowHandler.Output handleRequest(final GetWorkflowHandler.Input input, final Context context) {
-        LOG = context.getLogger();
-        LOG.log(input.toString());
+        LOG = new Logger(context.getLogger());
+        LOG.info("Input='%s'", input.toString());
+        
         return null;
     }
 

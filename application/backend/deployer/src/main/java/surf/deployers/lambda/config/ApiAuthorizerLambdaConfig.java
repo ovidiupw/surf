@@ -2,7 +2,6 @@ package surf.deployers.lambda.config;
 
 import com.amazonaws.services.identitymanagement.model.Role;
 import com.google.common.base.Preconditions;
-import surf.deployers.lambda.config.LambdaFunctionConfig;
 import surf.deployment.Context;
 
 import javax.annotation.Nonnull;

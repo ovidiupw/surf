@@ -1,18 +1,12 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import models.Workflow;
-import models.WorkflowMetadata;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class Test {
     @org.junit.Test
-    public void test() throws JsonProcessingException {
-        WorkflowMetadata metadata = new WorkflowMetadata();
-        metadata.setRootAddress("ftp://google.ro");
-
-        Workflow workflow = new Workflow();
-        workflow.setMetadata(metadata);
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println("workflow = " + objectMapper.writeValueAsString(workflow));
+    public void test() throws JsonProcessingException, URISyntaxException {
+        URI uri = new URI("https://console.aws.amazon.com/s3/buckets/surf-web-crawler/?region=eu-west-1&tab=overview");
+        System.out.println("uri.getPath() = " + uri.getPath());
     }
 }

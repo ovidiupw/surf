@@ -1,8 +1,5 @@
 package surf.utility;
 
-import com.google.common.base.Preconditions;
-import org.apache.logging.log4j.util.Strings;
-
 import javax.annotation.Nonnull;
 
 public enum AuthorizationType {

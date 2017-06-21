@@ -6,6 +6,7 @@ import models.config.LambdaConfigurationConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import surf.deployers.DeployerConfiguration;
+import surf.deployers.s3.S3Deployer;
 import surf.utility.ClientConfigurationConstants;
 
 import javax.annotation.Nonnull;
@@ -44,6 +45,7 @@ public class DeploymentFinalizer {
                 .withInitializeCrawlSessionSNSTopicArn(deployment.getContext().getInitializeCrawlSessionSNSTopicArn())
                 .withFinalizeCrawlSessionLambdaArn(deployment.getContext().getLambdaFunctionsData().getFinalizeCrawlSessionData().getFunctionArn())
                 .withCrawlWebPageLambdaArn(deployment.getContext().getLambdaFunctionsData().getCrawlWebPageData().getFunctionArn())
+                .withApplicationS3BucketName(S3Deployer.S3_APPLICATION_BUCKET_NAME)
                 .build();
 
         dumpObjectToFile(clientConstants, lambdaConfigFilePath);

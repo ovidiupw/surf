@@ -8,6 +8,9 @@ import models.workflow.*;
 import javax.annotation.Nonnull;
 
 public class SurfObjectMother {
+
+    public static final String S3_CRAWL_DATA_ROOT_FOLDER_NAME = "crawl-data";
+
     private SurfObjectMother() {
         throw new UnsupportedOperationException("This class is not instantiable. Use the static methods instead.");
     }
@@ -34,8 +37,8 @@ public class SurfObjectMother {
                 "The userArn must not be null or empty in order to build ownerId with authProvider!"
         );
 
-        return String.join(
-                "@",
+        return String.format(
+                "urn:%s@%s",
                 ArnHelper.getOwnerIdFromUserArn(userArn),
                 ArnHelper.getAuthProviderFromUserArn(userArn));
     }
@@ -62,7 +65,9 @@ public class SurfObjectMother {
     public static WorkflowTask createWorkflowTask(
             @Nonnull final String workflowExecutionId,
             @Nonnull final String ownerId,
-            @Nonnull final WorkflowMetadata workflowMetadata,
+            @Nonnull final long maxWebPageSizeBytes,
+            @Nonnull final SelectionPolicy selectionPolicy,
+            @Nonnull final String urlMatcher,
             @Nonnull final String urlToVisit,
             final int taskDepthLevel) {
         Preconditions.checkArgument(
@@ -77,13 +82,21 @@ public class SurfObjectMother {
                 !Strings.isNullOrEmpty(urlToVisit),
                 "The 'urlToVisit' cannot be null or empty when trying to create a new WorkflowTask!"
         );
-        Preconditions.checkNotNull(
-                workflowMetadata,
-                "The 'workflowMetadata' cannot be null when trying to create a new WorkflowTask!"
+        Preconditions.checkArgument(
+                !Strings.isNullOrEmpty(urlMatcher),
+                "The 'urlMatcher' cannot be null or empty when trying to create a new WorkflowTask!"
         );
         Preconditions.checkArgument(
                 taskDepthLevel >= 0,
                 "The 'taskDepthLevel' must be an integer >= 0 when trying to create a new WorkflowTask!"
+        );
+        Preconditions.checkArgument(
+                maxWebPageSizeBytes > 0,
+                "The 'maxWebPageSizeBytes' must be an integer >= 0 when trying to create a new WorkflowTask!"
+        );
+        Preconditions.checkNotNull(
+                selectionPolicy,
+                "The 'selectionPolicy' must be non-null when trying to create a new WorkflowTask!"
         );
 
         final WorkflowTask workflowTask = new WorkflowTask();
@@ -93,12 +106,85 @@ public class SurfObjectMother {
         workflowTask.setOwnerId(ownerId);
         workflowTask.setStatus(Status.Pending);
         workflowTask.setDepth(taskDepthLevel);
-        workflowTask.setFailures(null);
-        workflowTask.setMaxWebPageSizeBytes(workflowMetadata.getMaxWebPageSizeBytes());
-        workflowTask.setSelectionPolicy(workflowMetadata.getSelectionPolicy());
-        workflowTask.setUrlMatcher(workflowMetadata.getUrlMatcher());
+        workflowTask.setExecutionFailures(null);
+        workflowTask.setMaxWebPageSizeBytes(maxWebPageSizeBytes);
+        workflowTask.setSelectionPolicy(selectionPolicy);
+        workflowTask.setUrlMatcher(urlMatcher);
         workflowTask.setUrl(urlToVisit);
 
         return workflowTask;
+    }
+
+    public static WorkflowExecutionFailure getWorkflowExecutionFailure(
+            @Nonnull final CrawlWebPageError error) {
+        Preconditions.checkNotNull(error);
+
+        final WorkflowExecutionFailure failure = new WorkflowExecutionFailure();
+        failure.setError(error.getError());
+        failure.setCause(error.getCause());
+        failure.setTimeStamp(System.currentTimeMillis());
+        return failure;
+    }
+
+    public static VisitedPage createVisitedPage(
+            @Nonnull final String workflowExecutionId,
+            @Nonnull final String url,
+            final long pageVisitDepth) {
+        Preconditions.checkNotNull(workflowExecutionId);
+        Preconditions.checkNotNull(url);
+        Preconditions.checkArgument(pageVisitDepth >= 0);
+
+        final VisitedPage visitedPage = new VisitedPage();
+        visitedPage.setWorkflowExecutionId(workflowExecutionId);
+        visitedPage.setPageVisitDepth(pageVisitDepth);
+        visitedPage.setUrl(url);
+        return visitedPage;
+    }
+
+    public static PageToBeVisited createPageToBeVisited(
+            @Nonnull final String workflowExecutionId,
+            @Nonnull final String url) {
+        Preconditions.checkNotNull(workflowExecutionId);
+        Preconditions.checkNotNull(url);
+
+        final PageToBeVisited pageToBeVisited = new PageToBeVisited();
+        pageToBeVisited.setWorkflowExecutionId(workflowExecutionId);
+        pageToBeVisited.setUrl(url);
+        return pageToBeVisited;
+    }
+
+    public static String getS3CrawlDataKey(
+            @Nonnull final String ownerId,
+            @Nonnull final String workflowExecutionId,
+            @Nonnull final String url,
+            @Nonnull final String category) {
+        Preconditions.checkNotNull(ownerId);
+        Preconditions.checkNotNull(workflowExecutionId);
+        Preconditions.checkNotNull(url);
+
+        if (category == null || category.isEmpty()) {
+            return String.format(
+                    "%s/%s/%s/%s", S3_CRAWL_DATA_ROOT_FOLDER_NAME, ownerId, workflowExecutionId, url);
+        } else {
+            return String.format(
+                    "%s/%s/%s/%s/%s", S3_CRAWL_DATA_ROOT_FOLDER_NAME, ownerId, workflowExecutionId, url, category);
+        }
+    }
+
+    public static CrawlMetadata createCrawlMetadata(
+            @Nonnull final String workflowExecutionId,
+            @Nonnull final String bucketName,
+            @Nonnull final String objectKey) {
+        Preconditions.checkNotNull(workflowExecutionId);
+        Preconditions.checkNotNull(bucketName);
+        Preconditions.checkNotNull(objectKey);
+
+        final CrawlMetadata metadata = new CrawlMetadata();
+        metadata.setWorkflowExecutionId(workflowExecutionId);
+        metadata.setId(RandomGenerator.randomUUIDWithTimestamp());
+        metadata.setCreationDateMillis(System.currentTimeMillis());
+        metadata.setS3Bucket(String.format("https://%s.s3.amazonaws.com/%s", bucketName, objectKey));
+
+        return metadata;
     }
 }

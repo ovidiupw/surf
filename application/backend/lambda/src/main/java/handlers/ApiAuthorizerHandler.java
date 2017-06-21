@@ -1,7 +1,6 @@
 package handlers;
 
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
@@ -21,13 +20,13 @@ public class ApiAuthorizerHandler implements RequestHandler<ApiAuthorizerHandler
     //TODO use custom authorizer to check user identity again on integration with lambda.
     //TODO track progress of https://stackoverflow.com/questions/36913196/401-return-from-an-api-gateway-custom-authorizer-is-missing-access-control-allo
 
-    private LambdaLogger lambdaLogger;
+    private Logger LOG;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public String handleRequest(final ApiAuthorizerHandler.Input input, final Context context) {
-        lambdaLogger = context.getLogger();
-        lambdaLogger.log(input.toString());
+        LOG = new Logger(context.getLogger());
 
+        LOG.info("Input='%s'", input.toString());
         tryAuthorizeWithFacebook(input);
 
         // Allow access on all APIs and routes
@@ -56,7 +55,7 @@ public class ApiAuthorizerHandler implements RequestHandler<ApiAuthorizerHandler
                     input.accessToken));
 
         } catch (MalformedURLException e) {
-            final String log = Logger.log(lambdaLogger, "Error while trying to construct facebook URL: '%s'", e.getMessage());
+            final String log = LOG.error("Error while trying to construct facebook URL: '%s'", e.getMessage());
             throw new InternalServerException(log);
         }
 
@@ -64,7 +63,7 @@ public class ApiAuthorizerHandler implements RequestHandler<ApiAuthorizerHandler
         try {
             connection = (HttpURLConnection) facebookAuthValidatorURL.openConnection();
         } catch (IOException e) {
-            final String log = Logger.log(lambdaLogger, "Error while trying to open connection with facebook: '%s'", e.getMessage());
+            final String log = LOG.error("Error while trying to open connection with facebook: '%s'", e.getMessage());
             throw new InternalServerException(log);
         }
 
@@ -74,24 +73,24 @@ public class ApiAuthorizerHandler implements RequestHandler<ApiAuthorizerHandler
             response = new String(ByteStreams.toByteArray(connection.getInputStream()), Charsets.UTF_8.name());
             fbSuccessResponse = objectMapper.readValue(response, FBSuccessResponse.class);
         } catch (IOException e) {
-            Logger.log(lambdaLogger, "Could not map response '%s' to FBSuccessResponse: '%s'",
+            LOG.error("Could not map response '%s' to FBSuccessResponse: '%s'",
                     Strings.nullToEmpty(response),
                     e.getMessage());
             throw new BadRequestException("Unauthorized!");
         }
 
         if (fbSuccessResponse.getData() == null) {
-            final String log = Logger.log(lambdaLogger, "fbSuccessResponse.getData() was null!");
+            final String log = LOG.error("fbSuccessResponse.getData() was null!");
             throw new InternalServerException(log);
         }
 
         if (fbSuccessResponse.getData().getUserId() == null) {
-            final String log = Logger.log(lambdaLogger, "fbSuccessResponse.getData().getUserId() was null!");
+            final String log = LOG.error("fbSuccessResponse.getData().getUserId() was null!");
             throw new InternalServerException(log);
         }
 
         if (!fbSuccessResponse.getData().getUserId().equals(input.userId)) {
-            final String log = Logger.log(lambdaLogger, "Supplied fbId='%s' did not equal to fbQueriedId='%s'",
+            LOG.error("Supplied fbId='%s' did not equal to fbQueriedId='%s'",
                     fbSuccessResponse.getData().getUserId(),
                     input.userId);
             throw new BadRequestException("Unauthorized!");

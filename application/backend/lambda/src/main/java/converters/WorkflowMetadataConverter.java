@@ -3,9 +3,9 @@ package converters;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import models.workflow.WorkflowMetadata;
 import models.exceptions.BadRequestException;
 import models.exceptions.InternalServerException;
+import models.workflow.WorkflowMetadata;
 
 import java.io.IOException;
 
