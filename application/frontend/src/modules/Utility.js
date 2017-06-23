@@ -1,8 +1,36 @@
 import LocalStorageHelper from 'modules/LocalStorageHelper';
-import {initializeApiGatewayClient, addUserDataToState} from 'redux/actions/auth';
+import {initializeApiGatewayClient, addUserDataToState} from 'redux/actions/Auth';
 import Routes from 'constants/Routes';
+import React from 'react';
+import * as AWSStepFunctions from 'constants/AWSStepFunctions';
 
 let Utility = {
+
+  getStepFunctionsErrorsForSelect() {
+    console.log(AWSStepFunctions);
+    return ([
+      { label: 'All errors',    value: AWSStepFunctions.STATES_ALL },
+      { label: 'Timeouts',  value: AWSStepFunctions.STATES_TIMEOUT },
+      { label: 'Failed Tasks', value: AWSStepFunctions.STATES_TASK_FAILED },
+      { label: 'Permissions errors',    value: AWSStepFunctions.STATES_PERMISSIONS}
+    ]);
+  },
+
+  getPrettyErrorComponent(errorResponse, errorCode) {
+    return (
+      <div>
+        <h4>Error message</h4>
+        <p>{errorResponse.errorMessage}</p>
+        <h4>Error type</h4>
+        <p>{errorResponse.errorType}</p>
+        <h4>Error code</h4>
+        <p>{errorCode}</p>
+        <h4>Error stack trace</h4>
+        <p>{errorResponse.stackTrace.toString()}</p>
+      </div>
+    );
+  },
+
   initFacebook: function() {
     FB.init({appId: '1964336457119734', xfbml: true, version: 'v2.9'});
     FB.AppEvents.logPageView();
@@ -37,13 +65,15 @@ let Utility = {
     require('bootstrap/dist/css/bootstrap.css');
     require('bootstrap/dist/css/bootstrap-theme.css');
     require('elemental/less/elemental.less');
+    require('react-table/react-table.css');
+    require('styles/docco.css');
   },
 
   requireGlobalErrorHandler: function() {
     require('global_scripts/GlobalErrorsHandler.js');
   },
 
-  initializeApigClientFromLocalStorage: function(dispatch, routerHistory) {
+  initializeApigClientFromLocalStorage: function(dispatch, routerHistory, redirectLocation) {
     console.log("Entering componentDidMount()...");
 
     console.log("ApigClient was null. Trying to recreate it using localStorage credentials...");
@@ -51,15 +81,13 @@ let Utility = {
     let awsCredentials = LocalStorageHelper.loadAWSCredentialsFromLocalStorage();
     let fbCredentials = LocalStorageHelper.loadFBCredentialsFromLocalStorage();
 
-    if (awsCredentials.hasAllFieldsSet()
-      && awsCredentials.willNotExpireInTheNextFiveMinutes()
-      && fbCredentials.haveUserIdAndUserName()) {
+    if (awsCredentials.hasAllFieldsSet() && awsCredentials.willNotExpireInTheNextFiveMinutes() && fbCredentials.haveUserIdAndUserName()) {
       console.log("Found AWS credentials in localStorage that don't expire in the next ~5 mintues.");
       dispatch(initializeApiGatewayClient(awsCredentials));
       dispatch(addUserDataToState(fbCredentials.userId, fbCredentials.userName));
 
-      console.log("Redirecting to " + Routes.DASHBOARD);
-      routerHistory.push(Routes.DASHBOARD);
+      console.log("Redirecting to " + redirectLocation);
+      routerHistory.push(redirectLocation);
     }
   },
 

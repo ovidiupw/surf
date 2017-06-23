@@ -1,7 +1,7 @@
 import {connect} from 'react-redux';
 import NavBarTop from 'components/NavBarTop';
 import Utility from 'modules/Utility';
-import {deleteAuthDataFromState} from 'redux/actions/auth';
+import {deleteAuthDataFromState} from 'redux/actions/Auth';
 
 function mapStateToProps(state, ownProps) {
   return {
@@ -22,6 +22,7 @@ function mapDispatchToProps(dispatch, ownProps) {
 
     handleLogout: function() {
       Utility.clearLocalStorageAuthData();
+      FB.logout();
       dispatch(deleteAuthDataFromState());
     }
   };

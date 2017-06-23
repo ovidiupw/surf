@@ -5,9 +5,13 @@ import {HashRouter as Router, Route, Redirect, Switch} from 'react-router-dom';
 import configureStore from 'redux/store';
 import Home from 'containers/Home';
 import Dashboard from 'containers/Dashboard';
-import App from 'components/App';
+import App from 'containers/App';
+import Workflows from 'containers/Workflows';
+import NewWorkflow from 'containers/NewWorkflow';
+import WorkflowExecutions from 'containers/WorkflowExecutions';
 import Utility from 'modules/Utility';
 import Routes from 'constants/Routes';
+import NavBarTop from 'containers/NavBarTop';
 
 Utility.requireGlobalErrorHandler();
 Utility.requireStyles();
@@ -21,13 +25,20 @@ const store = configureStore(initialState);
 ReactDOM.render((
   <Provider store={store}>
     <Router>
-      <App>
-        <Switch>
-          <Route exact path={Routes.HOME} component={Home}/>
-          <Route path={Routes.DASHBOARD} component={Dashboard}/>
-          <Route path={Routes.ANY} component={Home}/>
-        </Switch>
-      </App>
+      <div>
+        <NavBarTop/>
+        <Route exact path={Routes.HOME} component={Home}/>
+        <App>
+          <Router>
+            <div>
+              <Route exact path={Routes.DASHBOARD} component={Dashboard}/>
+              <Route exact path={Routes.WORKFLOWS} component={Workflows}/>
+              <Route exact path={Routes.NEW_WORKFLOW} component={NewWorkflow}/>
+              <Route exact path={Routes.WORKFLOW_EXECUTIONS} component={WorkflowExecutions}/>
+            </div>
+          </Router>
+        </App>
+      </div>
     </Router>
   </Provider>
 ), document.getElementById('app'));

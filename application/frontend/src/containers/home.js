@@ -5,8 +5,8 @@ import Home from 'components/Home';
 import FBLoginHelper from 'modules/FBLoginHelper';
 import AWSCredentials from 'modules/entities/AWSCredentials';
 import LocalStorageHelper from 'modules/LocalStorageHelper';
-import {initializeApiGatewayClient, addUserDataToState} from 'redux/actions/auth';
-import {showAuthSpinner, hideAuthSpinner} from 'redux/actions/spinner';
+import {initializeApiGatewayClient, addUserDataToState} from 'redux/actions/Auth';
+import {showAuthSpinner, hideAuthSpinner} from 'redux/actions/Spinner';
 import AWSConfig from 'config/aws-config.json';
 import Utility from 'modules/Utility';
 import Routes from 'constants/Routes';
@@ -20,8 +20,10 @@ function mapDispatchToProps(dispatch, ownProps) {
 
   return {
     lifecycleMethods: {
-      componentDidMount: () => {
-        Utility.initializeApigClientFromLocalStorage(dispatch, routerHistory);
+      componentDidMount: (apigClient) => {
+        if (apigClient == null) {
+          Utility.initializeApigClientFromLocalStorage(dispatch, routerHistory, Routes.DASHBOARD);
+        }
       }
     },
 
@@ -57,10 +59,10 @@ function mapDispatchToProps(dispatch, ownProps) {
           console.log("Credentials from localStorage cannot be used because they will expire shortly or are already expired");
           var stsAssumeRoleArgs = {
             RoleArn: AWSConfig['facebookWebIdentityBasicRoleArn'],
-            RoleSessionName: fbCredentials.userId,
+            RoleSessionName: fbCredentials.userId + "@facebook",
             WebIdentityToken: fbCredentials.accessToken,
             DurationSeconds: 3600,
-            ProviderId: 'graph.facebook.com'
+            ProviderId: 'graph.facebook.com' //AROAJ57EHN3TOJH4VW5LA
           };
           var sts = new AWS.STS();
           sts.assumeRoleWithWebIdentity(stsAssumeRoleArgs, function(err, data) {

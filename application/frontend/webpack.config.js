@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const path = require('path');
 const merge = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+var CompressionPlugin = require("compression-webpack-plugin");
 
 const PATHS = {
   app: path.join(__dirname, 'src'),
@@ -38,7 +39,7 @@ const common = {
         loaders: ['style-loader', 'css-loader']
       }, {
         test: /\.less$/,
-        loaders: [ "style-loader", "css-loader","less-loader"]
+        loaders: ["style-loader", "css-loader", "less-loader"]
       }, {
         test: /\.jsx?$/,
         // Enable caching for improved performance during development
@@ -96,7 +97,16 @@ const environments = {
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
       new HtmlWebpackPlugin({title: 'Surf - Crawling in the cloud', template: 'static/index.ejs'}),
-      new webpack.optimize.UglifyJsPlugin({minimize: true})
+      new webpack.optimize.UglifyJsPlugin({
+        minimize: true,
+        output: {
+          comments: false
+        }
+      }),
+      new CompressionPlugin({asset: "[path].gz[query]", algorithm: "gzip", test: /\.(js|html)$/, threshold: 10240, minRatio: 0.8}),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
+      })
     ]
   })
 };

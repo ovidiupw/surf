@@ -35,9 +35,9 @@ class NavBarTop extends React.Component {
             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul className="nav navbar-nav">
                 <li>
-                  <a href="#" onClick={e => console.log("dashboard button pressed!")} style={this.loggedInElementsVisible}>
-                    Dashboard
-                  </a>
+                  <Link to={Routes.DASHBOARD} style={this.loggedInElementsVisible}>
+                      Dashboard
+                  </Link>
                 </li>
               </ul>
               <ul className="nav navbar-nav navbar-right">
@@ -47,9 +47,9 @@ class NavBarTop extends React.Component {
                   </a>
                 </li>
                 <li>
-                  <a href="#" onClick={e => this.handleLogout()} style={this.loggedInElementsVisible}>
+                  <Link to={Routes.HOME} onClick={e => this.handleLogout()} style={this.loggedInElementsVisible}>
                     Logout
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a href="" target="_blank">
