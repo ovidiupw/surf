@@ -178,7 +178,7 @@ public class PostMethodCreator {
                 .withResourceId(resource.getId())
                 .withHttpMethod(HttpMethod.POST.getName())
                 .withStatusCode("400")
-                .withSelectionPattern("Error\\.400.*")
+                .withSelectionPattern("(Error\\.400.*)|(.*[eE][rR][rR][oO][rR].*)")
                 .withResponseParameters(ApiMethodsHelper.buildCrossOriginIntegrationResponseParameters())
                 .withResponseTemplates(dataPassThroughTemplate)));
 

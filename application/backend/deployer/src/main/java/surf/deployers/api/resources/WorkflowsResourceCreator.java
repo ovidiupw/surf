@@ -14,6 +14,8 @@ import surf.utility.ObjectConverter;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WorkflowsResourceCreator extends SkeletalResourceCreator {
 
@@ -53,13 +55,21 @@ public class WorkflowsResourceCreator extends SkeletalResourceCreator {
 
         // Use the skeletal implementation of createOptionsMethod in order to add CORS support to this resource
         this.createOptionsMethod(resource, Arrays.asList(HttpMethod.GET, HttpMethod.POST));
+
+        final Map<String, Boolean> parametersRequiredForGet = new HashMap<>();
+        parametersRequiredForGet.put("method.request.querystring.resultsPerPage", true);
+        parametersRequiredForGet.put("method.request.querystring.createdBefore", false);
+        parametersRequiredForGet.put("method.request.querystring.startingWorkflowId", false);
+
+
         this.createGetMethod(
                 deployerConfiguration,
                 resource,
                 GET_INTEGRATION_TEMPLATE_FILE_PATH,
                 GET_METHOD_FRIENDLY_NAME,
                 context.getLambdaFunctionsData().getListWorkflowsData(),
-                context.getApiAuthorizer().getId());
+                context.getApiAuthorizer().getId(),
+                parametersRequiredForGet);
         this.createPostMethod(deployerConfiguration,
                 resource,
                 POST_INTEGRATION_TEMPLATE_FILE_PATH,

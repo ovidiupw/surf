@@ -14,6 +14,7 @@ import surf.utility.ObjectConverter;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class WorkersResourceCreator extends SkeletalResourceCreator {
 
@@ -51,7 +52,8 @@ public class WorkersResourceCreator extends SkeletalResourceCreator {
                 GET_INTEGRATION_TEMPLATE_FILE_PATH,
                 GET_METHOD_FRIENDLY_NAME,
                 context.getLambdaFunctionsData().getListCoreWorkersData(),
-                context.getApiAuthorizer().getId());
+                context.getApiAuthorizer().getId(),
+                new HashMap<>());
 
         return resource;
     }

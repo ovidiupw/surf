@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import interpolators.ListWorkflowsInputInterpolator;
 import models.Validateable;
 import models.config.LambdaConfigurationConstants;
 import models.workflow.Workflow;
@@ -22,6 +23,7 @@ public class ListWorkflowsHandler implements
 
     private DynamoDBOperationsHelper dynamoOperationsHelper;
     private ListWorkflowsInputValidator inputValidator;
+    private ListWorkflowsInputInterpolator inputInterpolator;
     private Logger LOG;
 
     public ListWorkflowsHandler.Output handleRequest(final ListWorkflowsHandler.Input input, final Context context) {
@@ -30,10 +32,11 @@ public class ListWorkflowsHandler implements
     }
 
     @Override
-    public Output doHandleRequest(final Input input, final Context context) {
+    public Output doHandleRequest(Input input, final Context context) {
         initializeInstance(context);
         LOG.info("input=%s", input.toString());
 
+        input = inputInterpolator.interpolate(input);
         inputValidator.validate(input);
 
         final QueryResultPage<Workflow> workflowsByOwnerPage = dynamoOperationsHelper.getWorkflowsByOwner(
@@ -62,6 +65,7 @@ public class ListWorkflowsHandler implements
         AmazonDynamoDB dynamoClient = new DynamoDBClientHelper(LOG).getDynamoDBClient(config);
         dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient, LOG);
         inputValidator = new ListWorkflowsInputValidator(context);
+        inputInterpolator = new ListWorkflowsInputInterpolator(context);
     }
 
     public static class Input implements Validateable {
@@ -129,13 +133,11 @@ public class ListWorkflowsHandler implements
             if (createdBefore != null || startingWorkflowId != null) {
                 Preconditions.checkNotNull(
                         createdBefore,
-                        "If either of 'createdBefore' or 'startingWorkflowId' is set, " +
-                                "then all the others ones must be set! 'createdBefore' was not set!"
+                        "If either of 'startingWorkflowId' is set, then 'createdBefore' must be set as well!"
                 );
                 Preconditions.checkNotNull(
                         startingWorkflowId,
-                        "If either of 'createdBefore' or 'startingWorkflowId' is set, " +
-                                "then all the others ones must be set! 'startingWorkflowId' was not set!"
+                        "If either of 'createdBefore' is set, then 'startingWorkflowId' must be set as well!"
                 );
             }
         }

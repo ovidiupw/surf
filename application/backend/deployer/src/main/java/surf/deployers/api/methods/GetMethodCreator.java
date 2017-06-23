@@ -32,16 +32,18 @@ public class GetMethodCreator {
                                   @Nonnull final LambdaData functionData,
                                   @Nonnull final String integrationTemplateFilePath,
                                   @Nonnull final String methodFriendlyName,
-                                  @Nonnull final String customAuthorizerArn) {
+                                  @Nonnull final String customAuthorizerArn,
+                                  @Nonnull final Map<String, Boolean> requestParameters) {
         Preconditions.checkNotNull(resource);
         Preconditions.checkNotNull(lambdaFunctionsPath);
         Preconditions.checkNotNull(functionData);
         Preconditions.checkNotNull(integrationTemplateFilePath);
         Preconditions.checkNotNull(methodFriendlyName);
         Preconditions.checkNotNull(customAuthorizerArn);
+        Preconditions.checkNotNull(requestParameters);
 
         try {
-            putMethod(resource, methodFriendlyName, customAuthorizerArn);
+            putMethod(resource, methodFriendlyName, customAuthorizerArn, requestParameters);
             putMethodIntegration(resource, lambdaFunctionsPath, functionData, integrationTemplateFilePath);
             putMethodResponses(resource);
             putMethodIntegrationResponses(resource);
@@ -66,7 +68,8 @@ public class GetMethodCreator {
     private PutMethodResult putMethod(
             @Nonnull final Resource resource,
             @Nonnull final String methodFriendlyName,
-            @Nonnull final String customAuthorizerArn) {
+            @Nonnull final String customAuthorizerArn,
+            @Nonnull final Map<String, Boolean> requestParameters) {
         LOG.info("Trying to create GET method for the '{}' api resource...", resource.getPath());
         LOG.info("Will use authorizerId={}", customAuthorizerArn);
 
@@ -78,7 +81,7 @@ public class GetMethodCreator {
                 .withApiKeyRequired(true)
                 .withAuthorizationType(AuthorizationType.AWS_IAM.getName())
                 // .withAuthorizerId(customAuthorizerArn) // only for AuthorizationType.CUSTOM
-                .withRequestParameters(getRequestParameters()));
+                .withRequestParameters(requestParameters));
 
         LOG.info("Successfully created GET method for resource with path='{}', authType='{}'",
                 resource.getPath(), putMethodResult.getAuthorizationType());
@@ -180,7 +183,7 @@ public class GetMethodCreator {
                 .withResourceId(resource.getId())
                 .withHttpMethod(HttpMethod.GET.getName())
                 .withStatusCode("400")
-                .withSelectionPattern("Error\\.400.*")
+                .withSelectionPattern("(Error\\.400.*)|(.*[eE][rR][rR][oO][rR].*)")
                 .withResponseParameters(ApiMethodsHelper.buildCrossOriginIntegrationResponseParameters())
                 .withResponseTemplates(dataPassThroughTemplate)));
 
@@ -201,11 +204,6 @@ public class GetMethodCreator {
 
         return results;
 
-    }
-
-    private Map<String, Boolean> getRequestParameters() {
-        final Map<String, Boolean> requestParameters = new HashMap<>();
-        return requestParameters;
     }
 
     private String readIntegrationTemplateFromFile(@Nonnull final String integrationTemplateFilePath) {

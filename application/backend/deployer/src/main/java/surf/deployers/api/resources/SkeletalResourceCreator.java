@@ -15,6 +15,7 @@ import surf.utility.HttpMethod;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Map;
 
 public abstract class SkeletalResourceCreator implements ResourceCreator {
 
@@ -63,7 +64,8 @@ public abstract class SkeletalResourceCreator implements ResourceCreator {
             @Nonnull final String integrationTemplateFilePath,
             @Nonnull final String methodFriendlyName,
             @Nonnull final LambdaData lambdaData,
-            @Nonnull final String customAuthorizerArn) {
+            @Nonnull final String customAuthorizerArn,
+            @Nonnull final Map<String, Boolean> requestParameters) {
         LOG.info("Trying to create GET method for the '{}' api resource...", resource.getPath());
 
         final GetMethodCreator getMethodCreator = new GetMethodCreator(restApi, apiClient);
@@ -73,7 +75,8 @@ public abstract class SkeletalResourceCreator implements ResourceCreator {
                 lambdaData,
                 integrationTemplateFilePath,
                 methodFriendlyName,
-                customAuthorizerArn);
+                customAuthorizerArn,
+                requestParameters);
 
         LOG.info("Successfully created GET method for the '{}' api resource!", resource.getPath());
         return getMethodResult;

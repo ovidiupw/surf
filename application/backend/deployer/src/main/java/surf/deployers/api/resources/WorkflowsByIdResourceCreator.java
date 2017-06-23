@@ -47,13 +47,15 @@ public class WorkflowsByIdResourceCreator extends SkeletalResourceCreator {
 
         // Use the skeletal implementation of createOptionsMethod in order to add CORS support to this resource
         this.createOptionsMethod(resource, Collections.singletonList(HttpMethod.GET));
+
         this.createGetMethod(
                 deployerConfiguration,
                 resource,
                 GET_INTEGRATION_TEMPLATE_FILE_PATH,
                 GET_METHOD_FRIENDLY_NAME,
                 context.getLambdaFunctionsData().getGetWorkflowData(),
-                context.getApiAuthorizer().getId());
+                context.getApiAuthorizer().getId(),
+                Collections.singletonMap("method.request.querystring.workflowId", true));
 
         return resource;
     }

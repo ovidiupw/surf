@@ -2,6 +2,7 @@ package utils;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import models.exceptions.BadRequestException;
+import models.exceptions.InternalServerException;
 
 import javax.annotation.Nonnull;
 
@@ -31,24 +32,22 @@ public class ExceptionWrapper<I, O> {
             final String log = LOG.info(
                     "Exception while trying to handle request: '%s'!", e.getMessage());
 
-            //TODO uncomment
-           /* if (e.getMessage() == null) {
+
+            if (e.getMessage() == null) {
                 throw new InternalServerException("Internal server error!");
             }
-            throw new BadRequestException(log);*/
+            throw new BadRequestException(log);
 
         } catch (RuntimeException e) {
             e.printStackTrace();
             final String log = LOG.info(
                     "Exception while trying to handle request: '%s'!", e.getMessage());
 
-            //TODO uncomment
-           /* if (e.getMessage() == null) {
+
+            if (e.getMessage() == null) {
                 throw new InternalServerException("Internal server error!");
             }
-            throw new InternalServerException(log);*/
+            throw new InternalServerException(log);
         }
-
-        return null;
     }
 }

@@ -70,7 +70,7 @@ public class Main {
         final Deployer dynamoDeployer = injector.getInstance(DynamoDeployer.class);
         final Deployer snsDeployer = injector.getInstance(SNSDeployer.class);
         // TODO the sleep deployer should really be set to something between 15 and 30 seconds
-        final Deployer sleepDeployer = new SleepDeployer(60, TimeUnit.SECONDS);
+        final Deployer sleepDeployer = new SleepDeployer(1, TimeUnit.SECONDS);
 
         /* The order of chaining the deployers matters. */
         deployment
