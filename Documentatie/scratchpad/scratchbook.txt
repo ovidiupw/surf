@@ -164,5 +164,3 @@ Roadmap #5 - Pipelined scraping:
 Roadmap #6 - Scrap data analysis (semantic analysis via google search API?):
 ----------------------------------------------------------------------------
 // TODO
-
-

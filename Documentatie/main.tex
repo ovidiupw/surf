@@ -11,7 +11,8 @@
 \usepackage{mdframed}
 \definecolor{bg-grey}{rgb}{0.95,0.95,0.95}
 \usepackage{float}
-\renewcommand{\figurename}{Cuprins}
+\renewcommand{\figurename}{Figura}
+\setlength{\belowcaptionskip}{-10pt}
 
 
 % Document table of contents configuration
@@ -34,32 +35,61 @@
 
 \newenvironment{bottompar}{\par\vspace*{\fill}}{\clearpage}
 
-\newcommand{\GLOBALDATE}{2 Octombrie 2016}
+\newcommand{\GLOBALDATE}{3 Iulie 2017}
 \newcommand{\chaptertitle}[1]{\LARGE{#1}}
 
 \renewcommand{\bibname}{\LARGE{Bibliografie}}
 \renewcommand{\thesection}{\arabic{section}}
 
-% Pagina titlu
-
 \begin{document}
-\title{
-	\large{Universitatea \enquote{Alexandru Ioan Cuza}, Ia\c{s}i} \\
+
+% Pagina coperta
+
+\titlepage{
+	\begin{center}
+	\large{UNIVERSITATEA \enquote{ALEXANDRU IOAN CUZA} DIN IA\c{S}I} \\
 	\vspace{0.5cm}
-	\large{\textbf{Facultatea de informatic\u{a}}} \\
-      \vspace{2cm}
+	\large{\textbf{FACULTATEA DE INFORMATIC\u{A}}} \\
+      \vspace{1cm}
+    \includegraphics[width=2cm,height=3cm,keepaspectratio]{sigla-fii.png}\\
+	\vspace{1cm}
+	\large{\textbf{LUCRARE DE LICEN\c{T}\u{A}}}\\
+	\vspace{1cm}
 	\LARGE{Surf} \\
+	\vspace{0.5cm}
+	\large{\textit{Parcurgere \c{s}i procesare distribuit\u{a} a paginilor web \^{i}n cloud pentru extragerea informa\c{t}iilor}} \\
 	\vspace{1cm}
-	\large{Parcurgere \c{s}i procesare distribuit\u{a} a paginilor web \^{i}n cloud pentru extragerea informa\c{t}iilor} \\
-	\vspace{1cm}
-	\vspace{1cm}
-	\includegraphics[width=2cm,height=3cm,keepaspectratio]{uaic_sigla.png}
+	\large\textbf{{propus\u{a} de}}\\ 
+	\vspace{0.5cm}
+	\large{\textbf{\textit{Ovidiu Pricop}}}\\
+	\vspace{2cm}
+	\large{\textbf{Sesiunea:} Iulie, 2017}\\
+	\vspace{2cm}
+	\large{\textbf{Coordonator \c{s}tiin\c{t}ific}}\\
+	\vspace{0.5cm}
+	\large{\textbf{Conf. dr. Sabin Corneliu Buraga}}
+	\end{center}
 }
 
-\author{Ovidiu Pricop}
-\date{\GLOBALDATE}
+% Pagina titlu
 
-\maketitle
+\titlepage{
+	\begin{center}
+	\large{UNIVERSITATEA \enquote{ALEXANDRU IOAN CUZA} DIN IA\c{S}I} \\
+	\vspace{0.5cm}
+	\large{\textbf{FACULTATEA DE INFORMATIC\u{A}}} \\
+    \vspace{4cm}
+	\LARGE{Surf} \\
+	\vspace{3cm}
+	\large{\textbf{\textit{Ovidiu Pricop}}}\\
+	\vspace{2cm}
+	\large{\textbf{Sesiunea:} Iulie, 2017}\\
+	\vspace{3cm}
+	\large{\textbf{Coordonator \c{s}tiin\c{t}ific}}\\
+	\vspace{0.5cm}
+	\large{\textbf{Conf. dr. Sabin Corneliu Buraga}}
+	\end{center}
+}
 
 % Declaratie originalitate
 
@@ -106,54 +136,71 @@
 }
 \clearpage
 
-% Crawling-ul paginilor web
-\section{Crawling-ul paginilor web}
+% Crawler-ul Surf
+\section{Crawler-ul Surf}
 \input{
-	chapters/web_crawling.tex
+	chapters/surf_web_crawling.tex
 }
 
 \subsection{Puncte de pornire}
 \input{
-	chapters/web_crawling/puncte_de_pornire.tex
+	chapters/surf_web_crawling/puncte_de_pornire.tex
 }
 
 \subsection{Parcurgere}
 \input{
-	chapters/web_crawling/parcurgere_recursiva.tex
+	chapters/surf_web_crawling/parcurgere_recursiva.tex
 }
 
 \subsection{Selectia informatiilor}
 \input{
-	chapters/web_crawling/selectia_informatiilor.tex
+	chapters/surf_web_crawling/selectia_informatiilor.tex
 }
 
 \subsection{Viteza, politici de respingere si drepturi de autor}
 \input{
-	chapters/web_crawling/viteza.tex
+	chapters/surf_web_crawling/viteza.tex
 }
 
 \subsection{Paralelizare}
 \input{
-	chapters/web_crawling/paralelizare.tex
+	chapters/surf_web_crawling/paralelizare.tex
 }
 
 \subsection{Logarea actiunilor si retentia datelor}
 \input{
-	chapters/web_crawling/logare_retentie.tex
+	chapters/surf_web_crawling/logare_retentie.tex
 }
 \clearpage
 
-% Crawling in cloud
-\section{Crawling in cloud}
+\chapter*{\chaptertitle{Crawling in cloud}}
+\addcontentsline{toc}{chapter}{Crawling in cloud}
 \input{
 	chapters/crawling_in_aws.tex
 }
 \clearpage
 
-\subsection{Infrastructura}
+\setcounter{section}{0}
+
+\section{Infrastructura}
 \input{
 	chapters/crawling_in_aws/infrastructura.tex
 }
+\clearpage
+
+% Generarea infrastructurii
+\section{Generarea infrastructurii}
+\input {
+	chapters/crawling_in_aws/generarea_infrastructurii.tex
+}
+\clearpage
+
+% Executia procesului de crawling
+\section{Executia procesului de crawling}
+\input {
+	chapters/crawling_in_aws/executia_procesului_de_crawling.tex
+}
+\clearpage
 
 % Bibliografie
 \input{
