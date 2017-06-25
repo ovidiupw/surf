@@ -1,0 +1,25 @@
+Aceasta sectiune prezinta, in detaliu, modul in care aplicatia "Surf" indeplineste procesul de parcurgere a siturilor web. Mai exact, se descriu mecanismele logice prin care, avand la dispozitie infrastructura creata cu ajutorul generatorului de resurse, utilizatorul poate beneficia de rezultatele extrase din paginile web parcurse de catre crawler. Pentru simplitate, ne vom referi la ansamblul acestor mecanisme logice drept un \textit{workflow}\footnote{Din engl. "workflow", care se traduce, in acest context, drept un flux de lucru, sau un proces in cadrul caruia se desfasoara o serie bine definita de activitati (i.e. executii de programe)}.
+\\
+
+Un \textit{workflow} reprezinta unitatea de baza pe care crawler-ul web "Surf" o poate interpreta. Dintr-un \textit{workflow} se pot genera oricate executii. Vom numi o executie a unui \textit{workflow} drept un \textit{workflow execution}. Inceperea executiei unui \textit{workflow} trebuie sa fie precedata de crearea acestuia. O executie a unui \textit{workflow} intreprinde urmatoarele actiuni, cu scopul parcurgerii paginilor web pentru extragerea informatiilor:
+
+\begin{enumerate}
+
+	\item{Preluarea, validarea si interpretarea datelor de configurare a procesului de crawling;}
+	
+	\item{Stocarea persistenta a definitiei unei executii a unui \textit{workflow} in baza de date cu scopul accesarii datelor necesare in contextul rularii crawler-ului;}
+	
+	\item{Initializarea unui automat finit si determinist in vederea modelarii parcurgerii recursive a siturilor web in maniera \textit{breadth-first}\footnote{Parcurgea in maniera \textit{breadth-first} asigura vizitarea fiecarui nod dintr-un arbore de la adancimea curenta, inainte de a trece la parcurgerea nodurilor de la urmatorul nivel de adancime}, prin "AWS Step Functions";}
+	
+	\item{Crearea sarcinilor pentru parcurgerea paginilor web (\textit{taskuri}\footnote{In contextul executiei unui \textit{workflow}, un \textit{task} reprezinta o unitate de lucru sub forma unei inregistrari in baza de date, ce poate fi preluata si executata de catre un program aflat in executie (e.g. o functie Lambda)}), inregistrarea datelor si metadatelor rezultate in urma parcurgerii, precum si a datelor ce modeleaza executia procesului de crawling (e.g. timpi maximi de raspus, adrese URL vizitate deja);}
+	
+	\item{Distribuirea \textit{taskurilor} catre functiile Lambda (\textit{workers}\footnote{Un \textit{worker} reprezinta un program executabil. In aplicatia "Surf", functiile Lambda reprezinta \textit{worker-ii}}) ce le vor prelua si executa;}
+	
+	\item{Executarea functiilor Lambda si stocarea/intoarcerea rezultatelor;}
+	
+	\item{Sincronizarea executiilor paralele ale functiilor Lambda si centralizarea rezultatelor in urma executiei \textit{task-urilor};}
+	
+	\item{Pornirea recursiva a unui nou \textit{workflow} cu scopul de a parcurge un nou nivel de adancime in procesul de crawling si de a gestiona gradul de incarcare a sistemului distribuit (e.g. limitarile impuse de serviciile AWS precum numarul maxim de executii concurente a functiilor Lambda in cadrul executiei unui automat "AWS Step Functions").}
+	
+\end{enumerate} 
+

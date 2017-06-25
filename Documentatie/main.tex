@@ -5,6 +5,9 @@
 \usepackage{csquotes}
 \usepackage{lipsum}
 \usepackage{microtype}
+\usepackage{array}
+\newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
 
 % Packages for code style
 \usepackage{minted}
@@ -12,6 +15,7 @@
 \definecolor{bg-grey}{rgb}{0.95,0.95,0.95}
 \usepackage{float}
 \renewcommand{\figurename}{Figura}
+\renewcommand{\tablename}{Tabelul}
 \setlength{\belowcaptionskip}{-10pt}
 
 
@@ -136,6 +140,33 @@
 }
 \clearpage
 
+% Descrierea unui crawler web
+\section{Descrierea unui crawler web}
+\input{
+	chapters/descrierea_unui_crawler.tex
+}
+
+\section{Design-ul unui crawler web}
+\input{
+	chapters/descrierea_unui_crawler/design_general.tex
+}
+
+\subsection{Frontiera}
+\input{
+	chapters/descrierea_unui_crawler/frontiera.tex
+}
+
+\subsection{Descarcarea paginilor web}
+\input{
+	chapters/descrierea_unui_crawler/descarcarea_paginilor.tex
+}
+
+\subsection{Stocarea datelor}
+\input{
+	chapters/descrierea_unui_crawler/stocarea_datelor.tex
+}
+\clearpage
+
 % Crawler-ul Surf
 \section{Crawler-ul Surf}
 \input{
@@ -200,7 +231,34 @@
 \input {
 	chapters/crawling_in_aws/executia_procesului_de_crawling.tex
 }
+
+\subsection{Configurare}
+\input{
+	chapters/crawling_in_aws/executie_crawling/configurare.tex
+}
 \clearpage
+
+\subsection{Initializare}
+\input{
+	chapters/crawling_in_aws/executie_crawling/initializare.tex
+}
+
+\subsection{Parcurgere}
+\input{
+	chapters/crawling_in_aws/executie_crawling/parcurgere.tex
+}
+
+\subsection{Finalizare}
+\input{
+	chapters/crawling_in_aws/executie_crawling/finalizare.tex
+}
+\clearpage
+
+% Interfata
+\section{Interfata}
+\input {
+	chapters/crawling_in_aws/interfata.tex
+}
 
 % Bibliografie
 \input{
