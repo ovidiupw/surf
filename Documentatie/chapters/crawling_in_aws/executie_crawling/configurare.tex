@@ -1,4 +1,4 @@
-Pentru inceperea executiei unui workflow, este necesara, in prealabil, crearea workflow-ului. \textit{Tabelul 1} de la pagina 22 descrie datele necesare crearii unui workflow, date dintre care o parte sunt configurabile de catre utilizator (i.e. campul "Config."\footnote{prescurtare de la substantivul \textit{Configurabil}} are valoarea \textit{DA}), iar o parte sunt memorate in mod implicit odata ce workflow-ul este creat. Suita de configurari descrisa in \textit{Tabelul 1} coexista cu seria de configurari generate de creatorul de resurse. Diferenta intre cele doua consta in faptul ca generatorul de resurse defineste configurari la nivel de cont AWS. Impartirea configurarilor in doua de nivele de abstractizare (i.e. scazut pentru cele de la nivelul resurselor din contul AWS si ridicat pentru cele oferite in etapa de creare a unui workflow) confera flexibilitate in utilizarea crawler-ului "Surf". Pentru a evidentia contrastul intre cele doua configurari vom enumera, in continuare, cateva elemente esentiale ale configurarii la nivel de resurse din contul AWS:
+Pentru inceperea executiei unui workflow, este necesara, in prealabil, crearea acestuia. \textit{"Tabelul 1"} descrie datele necesare crearii unui workflow, date dintre care o parte sunt configurabile de catre utilizator (i.e. campul "Config."\footnote{prescurtare de la substantivul \textit{Configurabil}} are valoarea \textit{DA}), iar o parte sunt memorate in mod implicit odata ce workflow-ul este creat. Suita de configurari descrisa in \textit{"Tabelul 1"} coexista cu seria de configurari generate de creatorul de resurse. Diferenta intre cele doua consta in faptul ca generatorul de resurse defineste configurari la nivel de cont AWS. Impartirea configurarilor in doua nivele de abstractizare (i.e. scazut pentru cele de la nivelul resurselor din contul AWS si ridicat pentru cele oferite in etapa de creare a unui workflow) confera flexibilitate in utilizarea crawler-ului "Surf". Pentru a evidentia contrastul intre cele doua configurari, vom enumera, in continuare, cateva elemente esentiale ale configurarii la nivel de resurse din contul AWS:
 
 \begin{itemize}
 	\item{timpul maxim de asteptare pentru ca o cerere cloud sa fie satisfacuta;}
@@ -32,7 +32,7 @@ Pentru inceperea executiei unui workflow, este necesara, in prealabil, crearea w
     
     Pagini pe nivel & Numeric & DA & Numarul maxim de pagini ce vor fi parcurse de catre crawler pe un anumit nivel de adancime (i.e. in arborele de parcurgere recursiva) \\ \hline
     
-    Dimensiune maxima pagina & Numeric & DA & Dimensiunea maxima admisa (in octeti) pentru un sit web sa fie parcurs \\ \hline
+    Dimensiune maxima pagina & Numeric & DA & Dimensiunea maxima admisa (in octeti) pentru ca un sit web sa fie parcurs \\ \hline
     
     Grad de paralelizare & Numeric & DA & Numarul maxim de crawleri concurenti dintr-un workflow \\ \hline
     

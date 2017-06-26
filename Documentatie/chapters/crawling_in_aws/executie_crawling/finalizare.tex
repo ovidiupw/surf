@@ -2,8 +2,8 @@ Procesul de finalizare a unei sesiuni de crawling are drept obiective centraliza
 
 \begin{enumerate}
 	\item{Finalizarea unei executii indeplinite cu succes, caz in care nu au intervenit erori extraordinare (i.e. netratate) in cadrul cel putin unuia dintre task-urile executate in paralel;}
-	\item{Finalizarea unei executii in care au existat erori in cadrul executiei cel putin unuia dintre task-urile executate in paralel, caz in care functia de finalizare va indeplini toate sarcinile ce au ramas neindeplinite in urma terminarii bruste a executiei sarcinilor paralele de crawling.}
+	\item{Finalizarea unei sesiuni de parcurgere in care au existat erori in cadrul executiei cel putin unuia dintre task-urile executate in paralel, caz in care functia de finalizare va indeplini toate sarcinile ce au ramas neindeplinite in urma terminarii bruste a executiei sarcinilor paralele de crawling.}
 \end{enumerate} 
 
-Indiferent de situatia in care se afla executia worfklow-ului, functia de finalizare a sesiunii de crawling are in vedere inregistrarea metadatelor cu privire la progresul workflow-ului (e.g. metrici Cloudwatch) si luarea deciziei conform careia invocarea recursiva a urmatoarei sesiuni de crawling se face incepand cu acelasi nivel de adancime sau cu unul superior (i.e. mai mare), in concordanta cu numarul maxim de pagini ce poate fi vizitat pe un anumit nivel de adancime, de catre crawler).
+Indiferent de situatia in care se afla executia worfklow-ului, functia de finalizare a sesiunii de crawling are in vedere inregistrarea metadatelor cu privire la progresul workflow-ului (e.g. metrici Cloudwatch) si luarea deciziei conform careia invocarea recursiva a urmatoarei sesiuni de crawling se face incepand cu acelasi nivel de adancime sau cu unul superior (i.e. mai mare), in concordanta cu numarul maxim de pagini ce poate fi vizitat pe un anumit nivel de adancime, de catre crawler.
 

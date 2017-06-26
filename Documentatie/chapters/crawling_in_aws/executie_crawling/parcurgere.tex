@@ -1,4 +1,4 @@
-Functiile ce au ca scop vizitarea paginilor web sunt grupate ca stagii de executii paralele in automatul finit configurat in "AWS Step Functions". Acestea reprezinta executii ale definitiilor formale ale task-urilor de crawling. O parte dintre datele asociate unui task reprezinta metadatele configurate in pasul de creare a workflow-ului. \textit{Tabelul 2} prezinta structura unui task, cu mentiunile necesare acolo unde definitia unui camp este exact aceeasi cu definitia campului respectiv din structura unui workflow.
+Functiile ce au ca scop vizitarea paginilor web sunt grupate, ca stagii de executii paralele, in automatul finit configurat in "AWS Step Functions". Acestea reprezinta executii ale definitiilor formale ale task-urilor de crawling. O parte dintre datele asociate unui task reprezinta metadatele configurate in pasul de creare a workflow-ului. \textit{"Tabelul 2"} prezinta structura unui task, cu mentiunile necesare acolo unde definitia unui camp este exact aceeasi cu definitia campului respectiv din structura unui workflow.
 
 \begin{table}[h]
 	\centering
@@ -22,11 +22,11 @@ Functiile ce au ca scop vizitarea paginilor web sunt grupate ca stagii de execut
     	
     	Erori & Lista & Esecurile inregistrate in decursul executiei task-ului (ca structuri JSON) \\ \hline
     	
-    	Politica de selectie & JSON & \textit{vezi Tabelul 1, pag. 22} \\ \hline
+    	Politica de selectie & JSON & \textit{vezi Tabelul 1} \\ \hline
     	
-    	Dimensiune maxima pagina & Numeric & \textit{vezi Tabelul 1, pag. 22} \\ \hline
+    	Dimensiune maxima pagina & Numeric & \textit{vezi Tabelul 1} \\ \hline
     	
-    	Selector URL & Text & \textit{vezi Tabelul 1, pag. 22} \\ \hline
+    	Selector URL & Text & \textit{vezi Tabelul 1} \\ \hline
     	
     \end{tabular}
 \end{table}
@@ -47,7 +47,7 @@ Procesul de parcurgere a unei pagini web presupune urmatoarele etape:
 		
 		\item{Selectarea tuturor legaturilor de tip URL catre alte situri web din cadrul paginii vizitate, conform politicii de urmarire a legaturilor catre alte pagini web, definita in pasul de creare a workflow-ului;}
 		
-		\item{Crearea de noi task-uri in starea \textit{Programat}, configurate cu un nivel de adancime superior celui pe care se afla URL-ul curent parcurs de catre crawler si salvarea acestora in baza de date, doar daca respecta configurarile declarate ca date de intrare ale executiei workflow-ului (e.g. dimensiunea maxima a unei pagini web parcurse); acest pas mai poarta denumirea de \textit{task scheduling\footnote{engl. \textit{task scheduling} = programare temporala a executiei unui task}};}
+		\item{Crearea de noi task-uri in starea \textit{"Programat"}, configurate cu un nivel de adancime superior celui pe care se afla URL-ul curent parcurs de catre crawler si salvarea acestora in baza de date, doar daca respecta configurarile declarate ca date de intrare ale executiei workflow-ului (e.g. dimensiunea maxima a unei pagini web parcurse); acest pas mai poarta denumirea de \textit{task scheduling\footnote{engl. \textit{task scheduling} = programare temporala a executiei unui task}};}
 		
 	\end{enumerate}
 	
