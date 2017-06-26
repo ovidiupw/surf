@@ -1,4 +1,4 @@
-Modalitatea prin care componentele crawler-ului web "Surf" pot fi accesate, modificate si executate este reprezentata de o interfata\cite{iterface-definition} structurata sub forma unui API RESTful\footnote{engl. \textit{RESTful} = adjectiv de la abrevierea \textit{REST}; un API este \textit{RESTful} daca adopta stilul arhitectural \textit{REST\cite{rest-definition}}}. API-ul adopta stilul arhitectural REST\cite{rest-definition} deoarece acesta ajuta la decuplarea arhitecturii si simplificarea urmaririi executiei aplicatiei, prin faptul ca nu permite memorarea starilor intermediare in cadrul unei sesiuni de comunicare intre utilizator si crawler. De asemenea, API-ul RESTful confera extensibilitate si flexibilitate la nivel de interfata, intrucat permite gruparea resurselor in mod ierarhic si identificarea usoara a resurselor si a consecintelor aplicarii anumitor actiuni, prin verbe HTTP, asupra starii sistemului. \textit{"Figura 8"} prezinta secventa mimima de operatii ce trebuie efectuate, la nivel de API, pentru a putea obtine rezultate in urma procesului de parcurgere a paginilor web de catre crawler, modelate printr-o diagrama de secventa.
+Modalitatea prin care componentele crawler-ului web "Surf" pot fi accesate, modificate si executate este reprezentata de o interfata\cite{iterface-definition} structurata sub forma unui API RESTful\footnote{engl. \textit{RESTful} = adjectiv de la abrevierea \textit{REST}; un API este \textit{RESTful} daca adopta stilul arhitectural \textit{REST\cite{rest-definition}}}. API-ul adopta stilul arhitectural REST\cite{rest-definition} deoarece acesta ajuta la decuplarea arhitecturii si simplificarea urmaririi executiei aplicatiei prin faptul ca nu permite memorarea starilor intermediare in cadrul unei sesiuni de comunicare intre utilizator si crawler. De asemenea, API-ul RESTful confera extensibilitate si flexibilitate la nivel de interfata, intrucat permite gruparea resurselor in mod ierarhic si identificarea usoara a resurselor si a consecintelor aplicarii anumitor actiuni, prin verbe HTTP, asupra starii sistemului. \textit{Figura 8} prezinta secventa mimima de operatii ce trebuie efectuate, la nivel de API, pentru a putea obtine rezultate in urma procesului de parcurgere a paginilor web de catre crawler, modelate printr-o diagrama de secventa.
 
 % Locatie creare diagrama secventa: http://gojs.net/latest/samples/sequenceDiagram.html
 % Script creare diagrama secventa:
@@ -44,7 +44,16 @@ Modalitatea prin care componentele crawler-ului web "Surf" pot fi accesate, modi
 \begin{figure}[ht]
 \begin{center}
 	\includegraphics[keepaspectratio, width=0.9\textwidth]{diagrama-utilizator-api.png}
-	\caption{Interactiunea utilizator - API \cite{diagram-icons-sources, aws-icons-source, gojs-location}}\par\medskip 
+	\caption{Interactiunea utilizator - API \cite{diagram-icons-sources, aws-icons-source}}\par\medskip 
 
 \end{center}
 \end{figure}
+
+API-ul construit este securizat suplimentar, in afara drepturilor de acces stabilite prin rolurile IAM, prin necesitatea detinerii unei chei de acces de catre utilizatorul acestuia. Cheile de acces se creaza programatic, de catre generatorul de resurse, si au, fiecare, asociate, politici de restrictie a utilizarii API-ului. Politicile de restrictie constau in limitari impuse de catre sistemul cloud asupra ratei la care se acceseaza API-ul, folosind o anumita cheie de acces. Exista doua categorii de limitari in ceea ce priveste controlul traficului autentificat asupra API-ului "Surf", conform algoritmului \textit{token bucket}:
+
+\begin{itemize}
+	\item{\textit{Limitarea ratei de acces regulat:} se refera la controlarea numarului maxim de cereri pe secunda pe care un utilizator autentificat le poate face in mod normal;}
+	
+	\item{\textit{Limitarea ratei de acces in cascada\footnote{engl. \textit{burst limit}}:} se refera la controlarea cantitatii extraordinare de cereri care pot surveni ca raspuns la un anumit eveniment extern (e.g. mai multe workflow-uri sunt pornite la o anumita ora din zi).}
+	
+\end{itemize}
