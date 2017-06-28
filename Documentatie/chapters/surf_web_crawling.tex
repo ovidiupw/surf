@@ -1,21 +1,21 @@
 \newcommand{\robotsTxtDescription}{http://www.robotstxt.org/robotstxt.html}
 
-Ca sens general, un crawler web reprezinta un program care parcurge, prin cereri succesive, situri web. Programatic, vom considera urmatoarele aspecte cheie in proiectarea unui crawler distribuit:
+Ca sens general, un crawler web reprezintă un program care parcurge, prin cereri succesive, situri web. Programatic, vom considera următoarele aspecte cheie în proiectarea unui crawler distribuit:
 
 \begin{enumerate}
 
-	\item{Punctele de pornire in parcurgerea siturilor web;}
+	\item{Punctele de pornire în parcurgerea siturilor web;}
 	
-	\item{Adancimea maxima a parcurgerii recursive a siturilor (i.e. cea mai indepartata pagina la care se poate ajunge, de la punctul de pornire, prin accesarea succesiva a legaturilor de tipul hyperlink;}
+	\item{Adâncimea maximă a parcurgerii recursive a siturilor (i.e. cea mai îndepărtată pagină la care se poate ajunge, de la punctul de pornire, prin accesarea succesivă a legaturilor de tipul hyperlink;}
 	
-	\item{Politica de selectie a informatiilor din paginile parcurse\cite{web-crawler-selection-policy};}
+	\item{Politica de selecție a informațiilor din paginile parcurse\cite{web-crawler-selection-policy};}
 	
-	\item{Viteza de crawling, fisierul \emph{robots.txt}\footnote{\robotsTxtDescription} si respectarea drepturilor de autor;}
+	\item{Viteza de crawling, fișierul \emph{robots.txt}\footnote{\robotsTxtDescription} și respectarea drepturilor de autor;}
 	
 	\item{Politica de paralelizare a procesului de web crawling;}
 	
-	\item{Politica de retentie temporara a rezultatelor parcurgerii siturilor web si logare a actiunilor serviciului de crawling;}
+	\item{Politica de retenție temporară a rezultatelor parcurgerii siturilor web și jurnalizare a acțiunilor serviciului de crawling;}
 	
 \end{enumerate}
 
-In cele ce urmeaza, se va descrie particularizarea aspectelor generale enumerate mai sus in cadrul serviciului web "Surf". Se va crea, astfel, contextul dezvoltarii aplicatiei si se vor puncta principalele componente functionale implicate.
+În cele ce urmează, se va descrie particularizarea aspectelor generale enumerate mai sus în cadrul serviciului web "Surf". Se va crea, astfel, contextul dezvoltării aplicației și se vor puncta principalele componente funcționale implicate.

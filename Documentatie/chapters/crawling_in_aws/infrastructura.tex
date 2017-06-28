@@ -1,16 +1,15 @@
-\newcommand{\AWSSTS}{Serviciu web ce permite unui utilizator sa solicite credentiale temporare pentru autentificarea in cadrul platformei Amazon Web Services}
+\newcommand{\AWSSTS}{Serviciu web ce permite unui utilizator să solicite credențiale temporare pentru autentificarea în cadrul platformei Amazon Web Services}
 \newcommand{\openIDDefinition}{http://openid.net/what-is-openid/}
 
 \usemintedstyle{rrt}
 
-Esenta aplicatiei "Surf" se afla in codul executat de serviciul web AWS Lambda, care preia componentele dezvoltate pentru crawling web si le executa, drept programe autonome, folosind infrastructura AWS. AWS Lambda executa acest cod doar cand este nevoie (e.g. la cererea utilizatorului care doreste sa demareze operatiunea de crawling). Se minimizeaza, astfel, atat costurile utilizatorului in ceea ce priveste rularea crawler-ului web (nu necesita hardware dedicat pentru procesarea paginilor web), cat si costurile dezvoltatorilor crawler-ului, care nu trebuie sa rezerve hardware in cloud (e.g. masini virtuale Amazon EC2, inchiriere de hosturi), ca, mai apoi, cand nu exista cereri suficiente, aceste masini de calcul sa ramana nefolosite. De asemenea, se renunta la necesitatea de a avea un load-balancer care sa distribuie sarcinile de crawling pe capacitatea hardware disponibila, deoarece acest lucru este administrat, in fundal, de catre AWS Lambda.
+Esența aplicației "Surf" se află în codul executat de serviciul web AWS Lambda, care preia componentele dezvoltate pentru crawling web și le execută, drept programe autonome, folosind infrastructura AWS. AWS Lambda execută acest cod doar când este nevoie (e.g. la cererea utilizatorului care dorește să demareze operațiunea de crawling). Se minimizează, astfel, atât costurile utilizatorului în ceea ce privește rularea crawler-ului web (nu necesită hardware dedicat pentru procesarea paginilor web), cât și costurile dezvoltatorilor crawler-ului, care nu trebuie să rezerve hardware în cloud (e.g. mașini virtuale Amazon EC2, închiriere de mașini gazdă), ca, mai apoi, când nu există cereri suficiente, aceste mașini de calcul să ramână nefolosite. De asemenea, se renunță la necesitatea de a avea un load-balancer care să distribuie sarcinile de crawling pe capacitatea hardware disponibilă, deoarece acest lucru este administrat, în fundal, de catre AWS Lambda.
 \\
 \\
-Functiile programatice disponibile prin serviciul AWS Lambda pot fi accesate de catre utilizatori printr-un API Restful, gazduit de AWS API Gateway. Aceasta platforma permite integrarea cererilor HTTP externe cu mecanismul de autentificare si autorizare a utilizatorilor si codul executat de instantele functiilor Lambda. De asemenea, aplicatia utilizeaza functionalitati de management, monitorizare si analiza a traficului din cadrul API-ului "Surf" care permit, printre altele, inregistrarea si monetizarea functionalitatilor oferite de serviciul web pentru fiecare utilizator in parte. 
+Funcțiile programatice disponibile prin serviciul AWS Lambda pot fi accesate de către utilizatori printr-un API Restful, găzduit de AWS API Gateway. Această platformă permite integrarea cererilor HTTP externe cu mecanismul de autentificare și autorizare a utilizatorilor și codul executat de insțantele funcțiilor Lambda. De asemenea, aplicația utilizează funcționalități de management, monitorizare și analiză a traficului din cadrul API-ului "Surf" care permit, printre altele, înregistrarea și monetizarea funcționalitatilor oferite de serviciul web pentru fiecare utilizator în parte. 
 \\
 \\
-Pentru a putea accesa functionalitatile oferite de API-ul "Surf", utilizatorii trebuie sa se autentifice cu un furnizor tert de identitati ce suporta OpenID\footnote{\openIDDefinition}. Credentialele obtinute sunt impachetate intr-o cerere catre AWS Security Token Service\footnote{\AWSSTS}, unde sunt validate. In cazul in care validarea este indeplinita cu succes, Security Token Service returneaza utilizatorului credentiale temporare pentru a accesa servicii din cadrul AWS. Utilizatorul trebuie sa includa aceste credentiale in fiecare cerere catre API-ul "Surf" (autentificare). Odata autentificat, utilizatorul poate interactiona doar cu acele resurse ale API-ului pentru care are drepturi de acces. 
-\newpage
+Pentru a putea accesa funcționalitățile oferite de API-ul "Surf", utilizatorii trebuie să se autentifice cu un furnizor terț de identități OpenID\footnote{\openIDDefinition}. Credențialele obținute sunt împachetate într-o cerere catre AWS Security Token Service\footnote{\AWSSTS}, unde sunt validate. În cazul în care validarea este îndeplinită cu succes, Security Token Service returnează utilizatorului credențiale temporare pentru a accesa servicii din cadrul AWS. Utilizatorul trebuie să includă aceste credențiale în fiecare cerere catre API-ul "Surf" (autentificare). Odată autentificat, utilizatorul poate interacționa doar cu acele resurse ale API-ului pentru care are drepturi de acces. 
 
 \begin{figure}[ht]
 \begin{center}
@@ -24,13 +23,12 @@ Pentru a putea accesa functionalitatile oferite de API-ul "Surf", utilizatorii t
 \end{figure}
 
 \noindent
-Prin AWS Identity Access Management (IAM) se vor stabili restrictiile de acces asupra API-ului. Mecanismul de asignare a permisiunilor va fi sustinut prin definirea unor roluri. Utilizatorii vor fi grupati, din punct de vedere al drepturilor de acces, in mai multe categorii. Spre exemplu, un utilizator poate avea rolul "administrator" (prescurtat \emph{Ad}), iar un alt utilizator poate avea atat rolul "administrator" (\emph{Ad}) cat si "utilizator de baza" (prescurtat \emph{Ub}). Atat \emph{Ad}, cat si \emph{Ub} vor avea asignate politici de acces asupra datelor AWS. O astfel de politica este urmatoarea:
-\newpage
+Prin AWS Identity Access Management (IAM) se vor stabili restricțiile de acces asupra API-ului. Mecanismul de asignare a permisiunilor va fi susținut prin definirea unor roluri. Utilizatorii vor fi grupați, din punct de vedere al drepturilor de acces, în mai multe categorii. Spre exemplu, un utilizator poate avea rolul "administrator" (prescurtat \emph{Ad}), iar un alt utilizator poate avea atât rolul "administrator" (\emph{Ad}), cât și "utilizator de bază" (prescurtat \emph{Ub}). Atât \emph{Ad}, cât și \emph{Ub} vor avea asignate politici de acces asupra datelor AWS. O astfel de politică este următoarea:
 
 \begin{figure}[ht]
-\begin{minted}{json}
+\begin{minted}[fontsize=\footnotesize]{json}
 {
-  "Version": "2012-10-17",
+  "Version": "2012-10-17", // Stabilită de către furnizor
   "Statement": [
     {
       "Effect": "Allow",
@@ -45,34 +43,34 @@ Prin AWS Identity Access Management (IAM) se vor stabili restrictiile de acces a
 }
 \end{minted}
 \begin{center}
-	\caption{Politica de acces IAM}\par\medskip
+	\caption{Politică de acces IAM}\par\medskip
 \end{center}
 \end{figure}
 
 \noindent
-Politica de acces de mai sus ii permite utilizatorului ce ii este asignata accesul la toate resursele API-ului "Surf". Aceasta politica este potrivita pentru un administrator, dar foarte periculoasa pentru un utilizator ce acceseaza pentru prima data serviciul "Surf". De aceea, se vor defini drepturi de acces granulare care sa aiba in vedere restrictionarea la nivel "need-to-know"\footnote{http://dictionary.cambridge.org/dictionary/english/on-a-need-to-know-basis} pentru fiecare entitate ce trimite cereri catre API (autorizare).
+Politica de acces de mai sus îi permite utilizatorului ce îi este asignată accesul la toate resursele API-ului "Surf". Această politică este potrivită pentru un administrator, dar periculoasă pentru un utilizator ce accesează pentru prima data serviciul "Surf". De aceea, se vor defini drepturi de acces granulare care să aibă în vedere restricționarea la nivel "need-to-know"\footnote{http://dictionary.cambridge.org/dictionary/english/on-a-need-to-know-basis} pentru fiecare entitate ce trimite cereri către API (autorizare).
 \\
 \\
-Procesul de asignare a rolurilor pentru utilizatori este coordonat atat manual (pe baza de ierarhie: administrator - utilziator premium - utilizator standard), cat si automat (i.e. printre altele, toti utilizatorii abia inregistrati sunt utilizatori standard). Asignarea manuala are prioritate asupra asignarii automate. Datele despre rolul fiecarui utilizator vor fi pastrate in baza de date.
+Procesul de asignare a rolurilor pentru utilizatori este coordonat atât manual (pe bază de ierarhie: administrator - utilizator de baza), cât și automat (i.e. printre altele, toți utilizatorii abia înregistrați sunt utilizatori standard). Asignarea manuală a permisiunilor are prioritate asupra asignării automate. Datele despre rolul fiecărui utilizator vor fi păstrate în baza de date.
 \\
 
 \noindent
-Crawler-ul "Surf" utilizeaza AWS DynamoDB ca suport pentru baza de date. DynamoDB reprezinta un serviciu cloud scalabil pentru baze de date no-sql. Datele dintr-o baza de date non-relationala (no-sql) pot fi modelate fara constrangerile unei baze de date relationale (e.g. tabularitate). Acest lucru atrage, in cadrul aplicatiei "Surf", elemente operationale cheie pentru beneficiul carora s-a renuntat la o abordare sql (e.g. Oracle), printre care:
+Crawler-ul "Surf" utilizează AWS DynamoDB ca suport pentru baza de date. DynamoDB reprezintă un serviciu cloud scalabil pentru baze de date NoSQL. Datele dintr-o bază de date non-relațională NoSQL) pot fi modelate fără constrângerile unei baze de date relaționale (e.g. tabularitate). Acest lucru atrage, în cadrul aplicației "Surf", elemente operaționale cheie, pentru beneficiul cărora s-a renunțat la o abordare relațională, de tip SQL (e.g. Oracle), printre care:
 
 
 \begin{itemize}
 
-	\item{\emph{data sharding}\footnote{https://docs.microsoft.com/en-us/azure/architecture/patterns/sharding} - este necesar un sistem distribuit de baze de date care sa poata scala orizontal odata cu dimensiunea datelor din baza de date si odata cu cresterea numarului de utilizatori;}
-	\item{\emph{scheme de date dinamice}\footnote{https://www.mongodb.com/scale/dynamic-schema-design} - se doreste posibilitatea schimbarii structurii datelor din baza de date fara a recrea tabelele corespunzatoare; acest lucru trebuie avut in vedere deoarece crawler-ul stocheaza in baza de date metadate obtinute prin parcurgerea paginilor web; poate aparea oricand necesitatea introducerii unor noi metadate sau schimbarii structurii celor existente, cu scopul satisfacerii nevoilor utilizatorilor.}
+	\item{\emph{data sharding}\footnote{https://docs.microsoft.com/en-us/azure/architecture/patterns/sharding} - este necesar un sistem distribuit de baze de date care să poată scala orizontal odată cu dimensiunea datelor din baza de date și odată cu creșterea numărului de utilizatori;}
+	\item{\emph{scheme de date dinamice}\footnote{https://www.mongodb.com/scale/dynamic-schema-design} - se dorește posibilitatea schimbării structurii datelor din baza de date fără a recrea tabelele corespunzătoare; acest lucru trebuie avut în vedere deoarece crawler-ul stochează în baza de date metadate obținute prin parcurgerea paginilor web; poate apărea oricând necesitatea introducerii unor noi metadate sau schimbării structurii celor existente, cu scopul satisfacerii nevoilor utilizatorilor.}
 	
 \end{itemize}
 
 \noindent
-Cateva dintre cele mai importante roluri ale bazei de date sunt gazduirea metadatelor asociate rezultatelor procesuli de crawling, persistarea asignarilor intre identitatile utilizatorilor si rolurile lor, mentinerea istoricului evenimentelor de crawling cu scopul reconstruirii starii procesului de parcurgere a paginilor web, in cazul unei erori, si stocarea datelor asociate volumului de trafic, generat de fiecare utilizator, in cadrul infrastructurii AWS.
+Câteva dintre cele mai importante roluri ale bazei de date sunt găzduirea metadatelor asociate rezultatelor procesului de crawling, păstrarea asignărilor între identitățile utilizatorilor și rolurile lor, menținerea istoricului evenimentelor de crawling cu scopul reconstruirii stării procesului de parcurgere a paginilor web, în cazul unei erori, și stocarea datelor asociate volumului de trafic generat de fiecare utilizator în cadrul infrastructurii AWS.
 \\
 \\
-Pentru a obtine un serviciu web distribuit pentru crawling este necesara coordonarea activitatilor independente din cadrul sistemului, sincronizarea pasilor necesari procesului de crawling si, in final, integrarea rezultatelor. Pentru acest lucru aplicatia "Surf" foloseste serviciul web AWS Step Functions (SFN). SFN  are capacitati de coordonare a activitatilor ce se doresc indeplinite (i.e. executia functiilor Lambda, sau \emph{Lambda Tasks}) si management al starii aplicatiei (i.e. se porneste un proces de agregare a datelor provenite de la crawlerii care au rulat in paralel, doar dupa ce acestia si-au terminat executia).
+Pentru a obține un serviciu web distribuit pentru crawling este necesară coordonarea activităților independente din cadrul sistemului, sincronizarea pașilor necesari procesului de crawling și, în final, integrarea rezultatelor. Pentru acest lucru, aplicația "Surf" folosește serviciul web AWS Step Functions (SFN). SFN  are capacități de coordonare a activităților ce se doresc îndeplinite (i.e. execuția funcțiilor Lambda, sau \emph{Lambda Tasks}) și management al stării aplicației (i.e. se pornește un proces de agregare a datelor provenite de la crawlerii care au rulat în paralel doar după ce aceștia și-au terminat execuția).
 \\
 \\
-Datele obtinute in urma procesului de crawling sunt stocate utilizand serviciul web Amazon S3. Fiecare rulare a unei instante a crawler-ului distribuit genereaza un \emph{bucket}\footnote{Unitate in cloud (AWS S3) ce stocheaza date si careia ii pot fi atribuite permisiuni de acces si metadate corespunzatoare} S3. Datele din bucket-uri sunt disponibile, pentru utilizatori, prin plasarea de metadate, precum numele bucket-ului, intr-o tabela DinamoDB, pe care utilizatorii o pot accesa prin intermediul API-ului.
+Datele obținute în urma procesului de crawling sunt stocate utilizând serviciul web Amazon S3. Fiecare rulare a unei instanțe a crawler-ului distribuit generează un \emph{bucket}\footnote{Unitate, în cloud (AWS S3), ce stochează date și căreia îi pot fi atribuite permisiuni de acces și metadate corespunzatoare} S3. Datele din bucket-uri sunt disponibile, pentru utilizatori, prin plasarea de metadate, precum numele bucket-ului, într-o tabelă DynamoDB, pe care utilizatorii o pot accesa prin intermediul API-ului.
 

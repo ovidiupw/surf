@@ -1,0 +1,15 @@
+Crawler-ul web "Surf" prezintă următoarele caracteristici cheie în ceea ce priveşte dezvoltarea, rularea şi mentenanţa unui crawler web distribuit:
+
+\begin{itemize}
+
+	\item{Are capacitatea de a-şi genera fiecare resursă necesară, utilizând programul definit ca \textit{"Generator de resurse"}. Această funcţionalitate permite crawler-ului să fie construit în cadrul oricărui cont "Amazon Web Services", într-o regiune globală pe care utilizatorul o poate configura. Totodată, se permite administratorului financiar al contului AWS să aibă un control fin asupra costurilor generate de către crawler, deoarece limitele rezervate serviciilor web folosite de către crawler pot fi configurate în mod individual;}
+
+	\item{Permite integrarea cu un sistem de autentificare sigur, bazat pe federearea identității web în raport cu un furnizor terţ de identităţi de încredere. În urma autentificării, crawler-ul web "Surf" asigură autorizarea cererilor într-o manieră flexibilă, bazată pe documente ce definesc politici de securitate. Odată autorizaţi, utilizatorilor le sunt alocate chei de acces asupra API-ului, care stabilesc limite configurabile asupra numărului de cereri pe secundă pe care aceştia le pot efectua;}
+
+	\item{Oferă scalabilitate orizontală şi verticală, atât în sus cât şi în jos, în ceea ce priveşte mecanismul de parcurgere concurentă a paginilor web, prin stabilirea, în cadrul fiecărui workflow, a unui grad de paralelizare menit să se adapteze cerinţelor de timp şi cost ale fiecărui utilizator;}
+
+	\item{Poate fi distribuit drept un executabil care să creeze, având definit, în prealabil, un fişier de configurare, într-un interval de aproximativ două minute, toată infrastructura AWS necesară utilizării aplicaţiei cu scopul de a parcurge paginile web pentru a extrage informaţii;}
+
+	\item{Oferă, pentru dezvoltatori, o interfaţă de programare flexibilă şi prietenoasă, ce respectă stilul arhitectural REST; De asemenea, permite dezvoltatorilor posibilitatea de a integra alte servicii cloud din cadrul AWS pentru a extinde funcţionalităţile crawler-ului.}
+
+\end{itemize}

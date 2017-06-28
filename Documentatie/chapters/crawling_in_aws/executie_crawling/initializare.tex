@@ -1,4 +1,4 @@
-Odata ce o cerere de incepere a unei executii a unui workflow este primita de catre crawler, functia Lambda corespunzatoare inceperii executiei (i.e. \textit{"Pornire workflow"}) este invocata. Aceasta creaza si salveaza metadatele necesare in baza de date (e.g. timpul la care a inceput workflow-ul, cu scopul de a putea contoriza cat a durat executia), apoi invoca functia Lambda responsabila pentru initializarea mecanismului de distributie si sincronizare a executiei in paralel a functiilor ce parcurg paginile web. \textit{"Figura 7"} descrie modul in care functia de initializare a unui workflow este utilizata, precum si rolul pe care aceasta il indeplineste in procesul recursiv de crawling.
+Odata ce o cerere de incepere a unei executii a unui workflow este primita de catre crawler, functia Lambda corespunzatoare inceperii executiei (i.e. \textit{"Pornire workflow"}) este invocata. Aceasta creeaza si salveaza metadatele necesare in baza de date (e.g. timpul la care a inceput workflow-ul, cu scopul de a putea contoriza cat a durat executia), apoi invoca functia Lambda responsabila pentru initializarea mecanismului de distributie si sincronizare a executiei in paralel a functiilor ce parcurg paginile web. \textit{"Figura 7"} descrie modul in care functia de initializare a unui workflow este utilizata, precum si rolul pe care aceasta il indeplineste in procesul recursiv de crawling.
 
 \begin{figure}[ht]
 \begin{center}
@@ -8,6 +8,7 @@ Odata ce o cerere de incepere a unei executii a unui workflow este primita de ca
 \end{center}
 \end{figure}
 
+\noindent
 Responsabilitatile functiei de initializare a workflow-ului sunt urmatoarele:
 
 \begin{itemize}

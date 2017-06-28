@@ -1,8 +1,8 @@
 \hyphenation{statica}
-"Surf" implementeaza un mecanism de crawling distribuit. Mai exact, exista posibilitatea de a imparti sarcinile de parcurgere a paginilor web prin rularea concurenta a mai multor instante de functii Lambda\footnote{Amazon Web Services Lambda Functions}.
+"Surf" implementează un mecanism de crawling distribuit. Mai exact, există posibilitatea de a împărți sarcinile de parcurgere a paginilor web prin rularea concurentă a mai multor instanțe de funcții Lambda\footnote{\textit{Amazon Web Services Lambda Functions}:Pe baza principiilor programării funcționale, se garantează că funcțiile \textit{Lambda} nu au efecte colaterale, deci nu pot schimba starea globală a sistemului. Din acest motiv, funcțiile \textit{Lambda} se pretează la paralelizare}.
 \\
 \\
-Exista doua moduri bine cunoscute de alocare a sarcinilor de web crawling: statica si dinamica\cite{distribution-of-crawling-tasks}. Aplicatia "Surf" implementeaza un mecanism de distribuire statica a sarcinilor:
+Există doua moduri bine cunoscute de alocare a sarcinilor de web crawling: statică și dinamică\cite{distribution-of-crawling-tasks}. Aplicația "Surf" implementează un mecanism de distribuire statică a sarcinilor:
 \begin{quote}
-	Fie \emph{n}, \emph{gradul de paralelizare}\footnote{Numarul maxim de executii simultane de sarcini de crawling} configurat pentru executia curenta a web crawler-ului. Alocarea statica va asocia fiecarui URL candidat pentru crawling un numar intreg in intervalul [1,\emph{n}] reprezentand identificatorul uneia dintre cele \emph{n} instante paralele ale web crawler-ului. Sarcina va fi distribuita pe acea instanta si va fi executata.
+	Fie \emph{n}, \emph{gradul de paralelizare}\footnote{Numărul maxim de execuții simultane de sarcini de crawling} configurat pentru execuția curentă a web crawler-ului. Alocarea statică va asocia fiecărui URL candidat pentru crawling un număr întreg în intervalul [1,\emph{n}] reprezentând identificatorul uneia dintre cele \emph{n} instanțe paralele ale web crawler-ului. Sarcina va fi distribuită pe acea instanță și va fi executată.
 \end{quote}

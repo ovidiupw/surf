@@ -1,0 +1,13 @@
+Odată ce crawler-ul web "Surf" extrage datele din paginile web vizitate, acesta creează și o serie de metadate, cu scopul indexării locației datelor în S3. Deși acest sistem funcționează, el este limitat la accesarea datelor despre localizarea informațiilor salvate. O îmbunătățire a funcționalității aplicației "Surf" ar reprezenta crearea unui sistem de indexare periodică a informațiilor. Un astfel de sistem ar asigura mecanisme complexe de localizare și extragere a datelor, atât în funcție de sintaxă, cât și de semantică, îndeplinind următoarele funcții:
+
+\begin{itemize}
+	\item{indexare periodică, prin mecanismul de generare de evenimente oferit de "AWS CloudWatch Events", a datelor generate în procesul de parcurgere a siturilor web;}
+	
+	\item{Utilizarea unui framework pentru procesarea limbajului natural}
+	
+	\item{Utilizarea funcțiilor de procesare a web-ului semantic pentru a extrage, pe baza unui algoritm de clusterizare, structuri semantice definitorii din paginile web vizitate\footnote{http://schema.org/}.}	
+	
+\end{itemize}
+
+\noindent
+Odată grupate și generate, datele ce alcătuiesc mecanismul de indexare pot fi clasificate utilizând algoritmi probabiliști de clasificare, pentru a restrânge spațiul de căutare atunci când se recurge la cuvinte cheie.

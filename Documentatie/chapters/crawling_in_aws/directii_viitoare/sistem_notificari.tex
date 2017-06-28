@@ -1,0 +1,10 @@
+În funcție de preferințele utilizatorilor, aplicația "Surf" poate fi dezvoltată în direcția configurării execuțiilor periodice pe bază de evenimente generate în cloud (e.g. expresii CRON\footnote{https://docs.oracle.com/cd/E12058\_01/doc/doc.1014/e12030/cron\_expressions.htm} în cadrul CloudWatch Events). În acest caz, este necesar un sistem de notificări asincrone care să îi înștiințeze pe utilizatori despre progresul pe care crawler-ul îl face în decursul execuției unui workflow. Flexibilitatea sistemului cloud din cadrul "Amazon Web Services" permite utilizarea de mecanisme multiple pentru a transmite notificări precum:
+
+\begin{itemize}
+
+	\item{\textit{Simple Notification Service:} permite transmiterea de notificări prin mecanismul publisher-subscriber\footnote{https://docs.oracle.com/cd/B10501\_01/appdev.920/a96590/adg15pub.htm}; notificările pot fi configurate pentru o gamă largă de destinații, de la adrese de e-mail, până la notificări \textit{push} adresate sistemelor de operare mobile;}
+	
+	\item{\textit{Simple Email Service:} permite trimiterea de e-mailuri către utilizatori; e-mailurile pot fi configurate astfel încât să accepte limbaj de markup avansat, redând o experiență mai bogată utilizatorilor.}
+	
+\end{itemize}
+

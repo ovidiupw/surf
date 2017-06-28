@@ -1,12 +1,12 @@
 \newcommand{\blacklistingDefinition}{http://dictionary.cambridge.org/dictionary/english/blacklist}
 \newcommand{\tosDefinition}{http://www.pcmag.com/encyclopedia/term/62682/terms-of-service}
 
-Siturile web pot implementa variate modalitati de contracarare a incercarilor de crawling. Aplicatia "Surf" incearca sa minimizeze riscul de respingere a cererilor de accesare a anumitor resurse web printr-o implementare neintruziva a procesului de crawling. Un aspect esential care este luat in considerare in ceea ce priveste o astfel de implementare este minimizarea volumului de date preluat de pe un anumit domeniu prin diferite metode de filtrare a linkurilor urmarite (e.g. o anumita structura a URL-ului, un anumit tip de date care se gaseste la URL-ul respectiv).
+Siturile web pot implementa variate modalităţi de contracarare a încercărilor de crawling. Aplicaţia "Surf" încearcă să minimizeze riscul de respingere a cererilor de accesare a anumitor resurse web printr-o implementare neintruzivă a procesului de crawling. Un aspect esenţial care este luat în considerare în ceea ce priveşte o astfel de implementare este minimizarea volumului de date preluat de pe un anumit domeniu prin diferite metode de filtrare a linkurilor urmărite (e.g. o anumită structură a URL-ului, un anumit tip de date care se găseşte la URL-ul respectiv).
 	
-	%\item{Introducerea pauzelor temporale aleatoare intre accesari succesive a datelor apartinand aceluiasi domeniu.}
+	%\item{Introducerea pauzelor temporale aleatoare între accesări succesive a datelor aparţinând aceluiaşi domeniu.}
 
 \noindent
-Crawler-ul web "Surf" poate satisface numeroase cerinte ale utilizatorilor. O parte dintre aceste cerinte poate veni din partea sistemelor anti-malware. In acest caz, nu se doreste respectarea fisierului \emph{robots.txt} (utilizat drept referinta, pentru crawleri, asupra URL-urilor accesibile ale domeniului vizitat), deoarece exista pericolul ca un sit malitios sa blocheze o eventuala scanare. De aceea, aplicatia "Surf" va putea fi configurata in ceea ce priveste ignorarea fisierului \emph{robots.txt} in procesul de parcurgere a unui domeniu.
+Crawler-ul web "Surf" poate satisface numeroase cerinţe ale utilizatorilor. O parte dintre aceste cerinţe poate veni din partea sistemelor anti-malware. În acest caz, nu se doreşte respectarea fişierului \emph{robots.txt} (utilizat drept referinţă, pentru crawleri, asupra URL-urilor accesibile ale domeniului vizitat), deoarece există pericolul ca un sit maliţios să blocheze o eventuală scanare. De aceea, aplicaţia "Surf" va putea fi configurată în ceea ce priveşte ignorarea fişierului \emph{robots.txt} în procesul de parcurgere a unui domeniu.
 \\
 \\
-Crawler-ul "Surf" implementeaza un mecanism de \emph{blacklisting}\footnote{\blacklistingDefinition}. Siturile web sau domeniile care interzic procesul de crawling (e.g. prin ToS\footnote{\tosDefinition}) vor fi adaugate unei liste de excluziune din procesul de parcurgere executat de crawler.
+Crawler-ul "Surf" implementează un mecanism de \emph{blacklisting}\footnote{\blacklistingDefinition}. Siturile web sau domeniile care interzic procesul de crawling (e.g. prin Terms of Service\footnote{\tosDefinition}) vor fi adăugate unei liste de excluziune din procesul de parcurgere executat de crawler.

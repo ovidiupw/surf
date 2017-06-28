@@ -1,4 +1,4 @@
-Modalitatea prin care componentele crawler-ului web "Surf" pot fi accesate, modificate si executate este reprezentata de o interfata\cite{iterface-definition} structurata sub forma unui API RESTful\footnote{engl. \textit{RESTful} = adjectiv de la abrevierea \textit{REST}; un API este \textit{RESTful} daca adopta stilul arhitectural \textit{REST\cite{rest-definition}}}. API-ul adopta stilul arhitectural REST\cite{rest-definition} deoarece acesta ajuta la decuplarea arhitecturii si simplificarea urmaririi executiei aplicatiei prin faptul ca nu permite memorarea starilor intermediare in cadrul unei sesiuni de comunicare intre utilizator si crawler. De asemenea, API-ul RESTful confera extensibilitate si flexibilitate la nivel de interfata, intrucat permite gruparea resurselor in mod ierarhic si identificarea usoara a resurselor si a consecintelor aplicarii anumitor actiuni, prin verbe HTTP, asupra starii sistemului. \textit{Figura 8} prezinta secventa mimima de operatii ce trebuie efectuate, la nivel de API, pentru a putea obtine rezultate in urma procesului de parcurgere a paginilor web de catre crawler, modelate printr-o diagrama de secventa.
+Modalitatea prin care componentele crawler-ului web "Surf" pot fi accesate, modificate și executate este reprezentată de o interfață\cite{iterface-definition} structurată sub forma unui API RESTful\footnote{engl. \textit{RESTful} = adjectiv de la abrevierea \textit{REST}; un API este \textit{RESTful} dacă adoptă stilul arhitectural \textit{REST\cite{rest-definition}}}. API-ul adoptă stilul arhitectural REST\cite{rest-definition} deoarece acesta ajută la decuplarea arhitecturii și simplificarea urmăririi executiei aplicației, prin faptul că nu permite memorarea stărilor intermediare în cadrul unei sesiuni de comunicare între utilizator ți crawler. De asemenea, API-ul RESTful conferă extensibilitate și flexibilitate la nivel de interfață, întrucât permite gruparea resurselor în mod ierarhic și identificarea ușoară a resurselor și a consecințelor aplicării anumitor acțiuni, prin verbe HTTP, asupra stării sistemului. \textit{Figura 8} prezintă secvența mimimă de operații ce trebuie efectuate, la nivel de API, pentru a putea obține rezultate în urma procesului de parcurgere a paginilor web de catre crawler, modelate printr-o diagramă de secvență.
 
 % Locatie creare diagrama secventa: http://gojs.net/latest/samples/sequenceDiagram.html
 % Script creare diagrama secventa:
@@ -23,19 +23,19 @@ Modalitatea prin care componentele crawler-ului web "Surf" pot fi accesate, modi
  ],
   "linkDataArray": [
 {"from":"User", "to":"Api", "text":"POST /workflows", "time":1},
-{"from":"Api", "to":"Backend", "text":"Validare & inregistrare workflow", "time":2},
+{"from":"Api", "to":"Backend", "text":"Validare & înregistrare workflow", "time":2},
 {"from":"Backend", "to":"Api", "text":"Workflow din baza de date :id_workflow", "time":3},
 {"from":"Api", "to":"User", "text":"Workflow din baza de date :id_workflow", "time":4},
 {"from":"User", "to":"Api", "text":"POST /workflows/executions :id_workflow", "time":6},
-{"from":"Api", "to":"Backend", "text":"Porneste workflow", "time":7},
-{"from":"Backend", "to":"Api", "text":"Executie cu id :id_executie", "time":8},
-{"from":"Api", "to":"User", "text":"Executie cu id :id_executie", "time":9},
+{"from":"Api", "to":"Backend", "text":"Pornește workflow", "time":7},
+{"from":"Backend", "to":"Api", "text":"Execuție cu id :id_executie", "time":8},
+{"from":"Api", "to":"User", "text":"Execuție cu id :id_executie", "time":9},
 {"from":"User", "to":"Api", "text":"GET /workflows/executions/:id_executie", "time":11},
-{"from":"Api", "to":"Backend", "text":"Listeaza executie", "time":12},
-{"from":"Backend", "to":"Api", "text":"Detalii executie", "time":13},
-{"from":"Api", "to":"User", "text":"Detalii executie", "time":14},
+{"from":"Api", "to":"Backend", "text":"Listează execuție", "time":12},
+{"from":"Backend", "to":"Api", "text":"Detalii execuție", "time":13},
+{"from":"Api", "to":"User", "text":"Detalii execuție", "time":14},
 {"from":"User", "to":"Api", "text":"GET /workflows/executions/:id_executie/metadata", "time":16},
-{"from":"Api", "to":"Backend", "text":"Listeaza metadatele asociate executiei :id_executie", "time":17},
+{"from":"Api", "to":"Backend", "text":"Listează metadatele asociate execuției :id_executie", "time":17},
 {"from":"Backend", "to":"Api", "text":"Metadate asociate cu :id_executie", "time":18},
 {"from":"Api", "to":"User", "text":"Metadate asociate cu :id_executie", "time":19}
  ]}
@@ -44,16 +44,17 @@ Modalitatea prin care componentele crawler-ului web "Surf" pot fi accesate, modi
 \begin{figure}[ht]
 \begin{center}
 	\includegraphics[keepaspectratio, width=0.9\textwidth]{diagrama-utilizator-api.png}
-	\caption{Interactiunea utilizator - API \cite{diagram-icons-sources, aws-icons-source}}\par\medskip 
+	\caption{Interacțiunea utilizator - API \cite{diagram-icons-sources, aws-icons-source}}\par\medskip 
 
 \end{center}
 \end{figure}
 
-API-ul construit este securizat suplimentar, in afara drepturilor de acces stabilite prin rolurile IAM, prin necesitatea detinerii unei chei de acces de catre utilizatorul acestuia. Cheile de acces se creaza programatic, de catre generatorul de resurse, si au, fiecare, asociate, politici de restrictie a utilizarii API-ului. Politicile de restrictie constau in limitari impuse de catre sistemul cloud asupra ratei la care se acceseaza API-ul, folosind o anumita cheie de acces. Exista doua categorii de limitari in ceea ce priveste controlul traficului autentificat asupra API-ului "Surf", conform algoritmului \textit{token bucket}:
+\noindent
+API-ul construit este securizat suplimentar, în afara drepturilor de acces stabilite prin rolurile IAM, prin necesitatea deținerii unei chei de acces de către utilizatorul acestuia. Cheile de acces se creează programatic, de către generatorul de resurse, și au, fiecare, asociate, politici de restricție a utilizării API-ului. Politicile de restricție constau în limitări impuse de către sistemul cloud asupra ratei la care se accesează API-ul, folosind o anumită cheie de acces. Există doua categorii de limitări în ceea ce privește controlul traficului autentificat asupra API-ului "Surf", conform algoritmului \textit{token bucket}:
 
 \begin{itemize}
-	\item{\textit{Limitarea ratei de acces regulat:} se refera la controlarea numarului maxim de cereri pe secunda pe care un utilizator autentificat le poate face in mod normal;}
+	\item{\textit{Limitarea ratei de acces regulat:} se referă la controlarea numărului maxim de cereri pe secundă pe care un utilizator autentificat le poate face în mod normal;}
 	
-	\item{\textit{Limitarea ratei de acces in cascada\footnote{engl. \textit{burst limit}}:} se refera la controlarea cantitatii extraordinare de cereri care pot surveni ca raspuns la un anumit eveniment extern (e.g. mai multe workflow-uri sunt pornite la o anumita ora din zi).}
+	\item{\textit{Limitarea ratei de acces în cascadă\footnote{engl. \textit{burst limit}}:} se referă la controlarea cantității extraordinare de cereri care pot surveni ca răspuns la un anumit eveniment extern (e.g. mai multe workflow-uri sunt pornite la o anumită oră din zi).}
 	
 \end{itemize}
