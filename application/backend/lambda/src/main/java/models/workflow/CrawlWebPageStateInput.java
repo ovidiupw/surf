@@ -21,6 +21,7 @@ public class CrawlWebPageStateInput implements Validateable {
     private long maxPagesPerDepthLevel;
     private long crawlerTimeoutSeconds;
     private long maxDepthLevel;
+    private boolean followRobotsTxt;
 
     public long getMaxDepthLevel() {
         return maxDepthLevel;
@@ -110,6 +111,14 @@ public class CrawlWebPageStateInput implements Validateable {
         this.crawlerTimeoutSeconds = crawlerTimeoutSeconds;
     }
 
+    public boolean getFollowRobotsTxt() {
+        return followRobotsTxt;
+    }
+
+    public void setFollowRobotsTxt(boolean followRobotsTxt) {
+        this.followRobotsTxt = followRobotsTxt;
+    }
+
     @Override
     public void validate() {
         Preconditions.checkArgument(
@@ -176,6 +185,7 @@ public class CrawlWebPageStateInput implements Validateable {
                 ", maxPagesPerDepthLevel=" + maxPagesPerDepthLevel +
                 ", crawlerTimeoutSeconds=" + crawlerTimeoutSeconds +
                 ", maxDepthLevel=" + maxDepthLevel +
+                ", followRobotsTxt=" + followRobotsTxt +
                 '}';
     }
 
@@ -189,6 +199,7 @@ public class CrawlWebPageStateInput implements Validateable {
                 maxPagesPerDepthLevel == that.maxPagesPerDepthLevel &&
                 crawlerTimeoutSeconds == that.crawlerTimeoutSeconds &&
                 maxDepthLevel == that.maxDepthLevel &&
+                followRobotsTxt == that.followRobotsTxt &&
                 Objects.equals(workflowExecutionId, that.workflowExecutionId) &&
                 Objects.equals(workflowTaskId, that.workflowTaskId) &&
                 Objects.equals(url, that.url) &&
@@ -199,6 +210,6 @@ public class CrawlWebPageStateInput implements Validateable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(workflowExecutionId, workflowTaskId, url, urlMatcher, selectionPolicy, depthLevel, maxWebPageSizeBytes, ownerId, maxPagesPerDepthLevel, crawlerTimeoutSeconds, maxDepthLevel);
+        return Objects.hash(workflowExecutionId, workflowTaskId, url, urlMatcher, selectionPolicy, depthLevel, maxWebPageSizeBytes, ownerId, maxPagesPerDepthLevel, crawlerTimeoutSeconds, maxDepthLevel, followRobotsTxt);
     }
 }

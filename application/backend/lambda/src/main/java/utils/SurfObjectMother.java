@@ -173,17 +173,20 @@ public class SurfObjectMother {
 
     public static CrawlMetadata createCrawlMetadata(
             @Nonnull final String workflowExecutionId,
+            @Nonnull final String workflowTaskId,
             @Nonnull final String bucketName,
             @Nonnull final String objectKey) {
         Preconditions.checkNotNull(workflowExecutionId);
+        Preconditions.checkNotNull(workflowTaskId);
         Preconditions.checkNotNull(bucketName);
         Preconditions.checkNotNull(objectKey);
 
         final CrawlMetadata metadata = new CrawlMetadata();
         metadata.setWorkflowExecutionId(workflowExecutionId);
+        metadata.setWorkflowTaskId(workflowTaskId);
         metadata.setId(RandomGenerator.randomUUIDWithTimestamp());
         metadata.setCreationDateMillis(System.currentTimeMillis());
-        metadata.setS3Bucket(String.format("https://%s.s3.amazonaws.com/%s", bucketName, objectKey));
+        metadata.setS3Link(String.format("https://%s.s3.amazonaws.com/%s", bucketName, objectKey));
 
         return metadata;
     }

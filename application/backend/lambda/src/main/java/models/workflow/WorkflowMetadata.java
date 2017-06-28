@@ -57,6 +57,14 @@ public class WorkflowMetadata implements Validateable {
     private long maxConcurrentCrawlers;
 
     /**
+     * Flag indicating if the crawler should abide by the information presented in the
+     * robots.txt file or robots-related html headers (e.g. meta tags), which indicate
+     * if the crawler is allowed, by the owner, to parse the website it wants to.
+     * For safety reasons, this field must be set, by default, to "true".s
+     */
+    private boolean followRobotsTxt = true;
+
+    /**
      * The maximum time, in seconds, that an instance of a web page crawler is allowed to run.
      */
     private long crawlerTimeoutSeconds;
@@ -184,6 +192,14 @@ public class WorkflowMetadata implements Validateable {
         this.orchestratorRetryPolicy = orchestratorRetryPolicy;
     }
 
+    public boolean getFollowRobotsTxt() {
+        return followRobotsTxt;
+    }
+
+    public void setFollowRobotsTxt(boolean followRobotsTxt) {
+        this.followRobotsTxt = followRobotsTxt;
+    }
+
     @Override
     public void validate() throws RuntimeException {
         Preconditions.checkNotNull(
@@ -263,6 +279,7 @@ public class WorkflowMetadata implements Validateable {
                 maxPagesPerDepthLevel == that.maxPagesPerDepthLevel &&
                 maxWebPageSizeBytes == that.maxWebPageSizeBytes &&
                 maxConcurrentCrawlers == that.maxConcurrentCrawlers &&
+                followRobotsTxt == that.followRobotsTxt &&
                 crawlerTimeoutSeconds == that.crawlerTimeoutSeconds &&
                 Objects.equals(rootAddress, that.rootAddress) &&
                 Objects.equals(urlMatcher, that.urlMatcher) &&
@@ -275,7 +292,7 @@ public class WorkflowMetadata implements Validateable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(rootAddress, urlMatcher, maxRecursionDepth, maxPagesPerDepthLevel, maxWebPageSizeBytes, maxConcurrentCrawlers, crawlerTimeoutSeconds, selectionPolicy, crawlerRetryPolicy, workerRetryPolicy, orchestratorRetryPolicy, finalizerRetryPolicy);
+        return Objects.hash(rootAddress, urlMatcher, maxRecursionDepth, maxPagesPerDepthLevel, maxWebPageSizeBytes, maxConcurrentCrawlers, followRobotsTxt, crawlerTimeoutSeconds, selectionPolicy, crawlerRetryPolicy, workerRetryPolicy, orchestratorRetryPolicy, finalizerRetryPolicy);
     }
 
     @Override
@@ -287,6 +304,7 @@ public class WorkflowMetadata implements Validateable {
                 ", maxPagesPerDepthLevel=" + maxPagesPerDepthLevel +
                 ", maxWebPageSizeBytes=" + maxWebPageSizeBytes +
                 ", maxConcurrentCrawlers=" + maxConcurrentCrawlers +
+                ", followRobotsTxt=" + followRobotsTxt +
                 ", crawlerTimeoutSeconds=" + crawlerTimeoutSeconds +
                 ", selectionPolicy=" + selectionPolicy +
                 ", crawlerRetryPolicy=" + crawlerRetryPolicy +

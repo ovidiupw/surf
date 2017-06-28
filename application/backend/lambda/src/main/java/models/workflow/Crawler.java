@@ -5,6 +5,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.ConditionalCheckFailedException;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.s3.AmazonS3;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.panforge.robotstxt.RobotsTxt;
 import models.config.LambdaConfigurationConstants;
@@ -29,11 +30,15 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import static models.workflow.Status.*;
 
 public class Crawler {
 
@@ -75,17 +80,17 @@ public class Crawler {
         final WorkflowTask workflowTask = dynamoOperationsHelper.getWorkflowTask(input.getWorkflowTaskId());
 
         try {
-            changeCrawlTaskStatus(workflowTask, Status.Active);
+            changeCrawlTaskStatus(workflowTask, Active);
             doCrawl(input, workflowTask);
-            changeCrawlTaskStatus(workflowTask, Status.Completed);
+            changeCrawlTaskStatus(workflowTask, Completed);
             return getCrawlOutput(input);
 
         } catch (CrawlingTimeExceeded e) {
-            changeCrawlTaskStatus(workflowTask, Status.TimedOut);
+            changeCrawlTaskStatus(workflowTask, TimedOut, e);
             final CrawlWebPageError error = getCrawlWebPageError(e);
             return getCrawlOutput(input, error);
         } catch (IOException | URISyntaxException | RuntimeException e) {
-            changeCrawlTaskStatus(workflowTask, Status.Failed);
+            changeCrawlTaskStatus(workflowTask, Failed, e);
             final CrawlWebPageError error = getCrawlWebPageError(e);
             return getCrawlOutput(input, error);
         } finally {
@@ -110,12 +115,19 @@ public class Crawler {
             @Nonnull final WorkflowTask workflowTask) throws IOException, URISyntaxException {
         final URI uriToCrawl = new URI(input.getUrl());
 
-        if (!hasRobotAccess(uriToCrawl)) {
-            throw new UnsupportedOperationException(
-                    String.format("RobotsTxtAccessDeniedUri:'%s':TaskId:'%s'", uriToCrawl, input.getWorkflowTaskId()));
+        if (!input.getFollowRobotsTxt()) {
+            LOG.warn("Will not adhere to robots.txt exclusion standard!");
+        }
+
+        if (input.getFollowRobotsTxt() && !hasRobotAccess(uriToCrawl)) {
+            throw new UnsupportedOperationException(String.format("RobotsTxtAccessDeniedUri:'%s'", uriToCrawl));
         }
 
         final Document crawledDocument = Jsoup.connect(uriToCrawl.toString()).get();
+
+        if (input.getFollowRobotsTxt() && !hasRobotAccess(crawledDocument.head())) {
+            throw new UnsupportedOperationException(String.format("MetaNoFollowAccessDeniedUri:'%s'", uriToCrawl));
+        }
 
         final String cssSelectorsData = getCSSSelectorsData(input, crawledDocument);
         saveCrawlData(input, workflowTask, cssSelectorsData, CrawlMetadata.CategoryName.CSSSelectors);
@@ -133,6 +145,34 @@ public class Crawler {
             }
         } catch (PageVisitLimitExceededException ignored) {
         }
+    }
+
+    private boolean hasRobotAccess(final Element head) {
+        if (head == null) {
+            return true;
+        }
+
+        final Elements metaTags = head.getElementsByTag("meta");
+        if (metaTags == null || metaTags.isEmpty()) {
+            return true;
+        }
+
+        for (final Element metaTag : metaTags) {
+            if (metaTag.attributes() == null || metaTag.attributes().size() == 0) {
+                return true;
+            }
+            final String nameAttributeValue = metaTag.attributes().getIgnoreCase("name");
+            final String contentAttributeValue = metaTag.attributes().getIgnoreCase("content");
+            if (nameAttributeValue == null || contentAttributeValue == null) {
+                return true;
+            }
+            if (nameAttributeValue.equalsIgnoreCase("robots")
+                    && contentAttributeValue.equalsIgnoreCase("nofollow")) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private String getCSSSelectorsData(@Nonnull CrawlWebPageStateInput input, Document crawledDocument) {
@@ -191,6 +231,7 @@ public class Crawler {
                     data);
             final CrawlMetadata crawlMetadata = SurfObjectMother.createCrawlMetadata(
                     workflowTask.getWorkflowExecutionId(),
+                    workflowTask.getId(),
                     config.getApplicationS3BucketName(),
                     s3CrawlDataKey);
             dynamoOperationsHelper.saveCrawlMetadata(crawlMetadata);
@@ -202,8 +243,19 @@ public class Crawler {
         }
     }
 
-    private void generateCrawlTasks(@Nonnull CrawlWebPageStateInput input, Document crawledDocument) throws IOException {
+    private void generateCrawlTasks(
+            @Nonnull CrawlWebPageStateInput input, Document crawledDocument) throws IOException, URISyntaxException {
         final Elements links = crawledDocument.select("a[href]");
+
+        final List<VisitedPage> visitedPageList = dynamoOperationsHelper.listVisitedPages(
+                input.getWorkflowExecutionId(),
+                input.getDepthLevel());
+
+        if (visitedPageList.size() > input.getMaxPagesPerDepthLevel()) {
+            LOG.warn("The pages visited for depthLevel='%s' exceeded the maximum value!", input.getDepthLevel());
+            LOG.warn("Will terminate this crawler's execution...");
+            throw new PageVisitLimitExceededException();
+        }
 
         for (final Element link : links) {
             long crawlingTimeElapsedSeconds = getCrawlingTimeElapsedSeconds();
@@ -214,21 +266,15 @@ public class Crawler {
                         crawlingTimeElapsedSeconds,
                         input.getCrawlerTimeoutSeconds());
                 LOG.error("Cannot generate any more crawling tasks because crawler would exceed the timeout seconds!");
-                throw new CrawlingTimeExceeded(String.format("TaskTimeout:TaskId:'%s'", input.getWorkflowTaskId()));
+                throw new CrawlingTimeExceeded("TaskTimeout");
             }
 
-            final String linkURL = link.attr("abs:href");
+            String linkURL = link.attr("abs:href");
+            LOG.info("Link url before normalizing: '%s'", linkURL);
+            linkURL = new URI(linkURL).normalize().toString();
+            LOG.info("Link url after normalizing: '%s'", linkURL);
+
             LOG.info("Identified link='%s' on crawled webpage.", linkURL);
-
-            final List<VisitedPage> visitedPageList = dynamoOperationsHelper.listVisitedPages(
-                    input.getWorkflowExecutionId(),
-                    input.getDepthLevel());
-
-            if (visitedPageList.size() > input.getMaxPagesPerDepthLevel()) {
-                LOG.warn("The pages visited for depthLevel='%s' exceeded the maximum value!", input.getDepthLevel());
-                LOG.warn("Will terminate this crawler's execution...");
-                throw new PageVisitLimitExceededException();
-            }
 
             if (!CrawlDataValidator.isValidUrl(linkURL)) {
                 LOG.info("Link is not a valid url: '%s'! Skipping link.", linkURL);
@@ -249,17 +295,20 @@ public class Crawler {
                 continue;
             }
 
-            final PageToBeVisited pageToBeVisited
-                    = dynamoOperationsHelper.getPageToBeVisited(input.getWorkflowExecutionId(), linkURL);
-            if (pageToBeVisited != null) {
-                LOG.warn("Link was already scheduled by another crawler to be visited! Skipping");
-                continue;
-            }
-
             final VisitedPage visitedPage
                     = dynamoOperationsHelper.getVisitedPage(input.getWorkflowExecutionId(), linkURL);
             if (visitedPage == null) {
                 LOG.info("Link seems to have not been previously visited. Adding it to pages to be visited.");
+
+                try {
+                    dynamoOperationsHelper.savePageToBeVisited(SurfObjectMother.createPageToBeVisited(
+                            input.getWorkflowExecutionId(),
+                            linkURL));
+                } catch (ConditionalCheckFailedException e) {
+                    LOG.error(e.getMessage());
+                    LOG.error("Page to be visited was already added to database!");
+                }
+
                 final WorkflowTask workflowTask = SurfObjectMother.createWorkflowTask(
                         input.getWorkflowExecutionId(),
                         input.getOwnerId(),
@@ -270,15 +319,6 @@ public class Crawler {
                         (int) (input.getDepthLevel() + 1));
 
                 dynamoOperationsHelper.saveWorkflowTask(workflowTask);
-
-                try {
-                    dynamoOperationsHelper.savePageToBeVisited(SurfObjectMother.createPageToBeVisited(
-                            input.getWorkflowExecutionId(),
-                            linkURL));
-                } catch (ConditionalCheckFailedException e) {
-                    LOG.error(e.getMessage());
-                    LOG.error("Page to be visited was already added to database!");
-                }
             } else {
                 LOG.info("Link was already visited: '%s'!", linkURL);
             }
@@ -347,9 +387,29 @@ public class Crawler {
         return false;
     }
 
-    private void changeCrawlTaskStatus(@Nonnull final WorkflowTask task, @Nonnull final Status status) {
+    private void changeCrawlTaskStatus(
+            @Nonnull final WorkflowTask task,
+            @Nonnull final Status status,
+            final Exception e) {
         LOG.info("Changing task status to '%s' for taskId='%s'", status.getName(), task.getId());
         long currentTimeMillis = System.currentTimeMillis();
+
+        if (e != null) {
+            final CrawlWebPageError.Cause errorCause = new CrawlWebPageError.Cause();
+            errorCause.setErrorType(e.getClass().getName());
+            errorCause.setStackTrace(ExceptionUtils.getStackTrace(e));
+            errorCause.setErrorMessage(e.getMessage());
+
+            final WorkflowExecutionFailure failure = new WorkflowExecutionFailure();
+            failure.setTimeStamp(System.currentTimeMillis());
+            failure.setError(e.getMessage());
+            failure.setCause(errorCause);
+
+            final Set<WorkflowExecutionFailure> executionFailures =
+                    MoreObjects.firstNonNull(task.getExecutionFailures(), new HashSet<>());
+            executionFailures.add(failure);
+            task.setExecutionFailures(executionFailures);
+        }
 
         task.setStatus(status);
         switch (status) {
@@ -373,6 +433,10 @@ public class Crawler {
         LOG.info("Trying to update workflow taskId='%s'", task.getId());
         dynamoOperationsHelper.saveWorkflowTask(task);
         LOG.info("Successfully updated workflow task with taskId='%s'", task.getId());
+    }
+
+    private void changeCrawlTaskStatus(@Nonnull final WorkflowTask task, @Nonnull final Status status) {
+        changeCrawlTaskStatus(task, status, null);
     }
 
     private CrawlWebPageStateOutput getCrawlOutput(@Nonnull final CrawlWebPageStateInput input) {

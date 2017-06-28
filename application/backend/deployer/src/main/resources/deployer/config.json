@@ -1,7 +1,7 @@
 {
   "awsAccountId": "011759591962",
   "awsAccessKey": "AKIAIZEM4QPLGEJVGO2Q",
-  "awsClientRequestTimeoutSeconds": "60",
+  "awsClientRequestTimeoutSeconds": "45",
   "awsClientRegion": "eu-west-1",
   "lambdaCodePath": "../lambda/target/surf-lambda-backend-1.0-SNAPSHOT.jar",
   "lambdaRuntime": "java8",

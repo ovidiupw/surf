@@ -116,18 +116,6 @@ public class FinalizeCrawlSessionHandler implements RequestStreamHandler {
         final Map<Status, List<WorkflowTask>> tasksByStatus
                 = dynamoOperationsHelper.getTasksForEachStatus(workflowExecution.getId(), currentDepthLevel);
 
-        for (final CrawlWebPageStateOutput crawlWebPageStateOutput : crawlWebPageStateOutputs) {
-            LOG.info("Inspecting crawlWebPageStateOutput='%s'", crawlWebPageStateOutput);
-
-            final CrawlWebPageError crawlWebPageError = crawlWebPageStateOutput.getError();
-            if (crawlWebPageError != null) {
-                LOG.info("Found error in state output! error='%s'", crawlWebPageError);
-                dynamoOperationsHelper.addErrorToWorkflowExecution(workflowExecution, crawlWebPageError);
-            } else {
-                LOG.info("Found no error in crawlWebPageStateOutput.");
-            }
-        }
-
         performCommonFinalizingActions(workflow, workflowExecution, currentDepthLevel, tasksByStatus);
     }
 
