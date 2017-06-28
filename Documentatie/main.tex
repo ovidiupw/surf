@@ -5,6 +5,7 @@
 \usepackage{csquotes}
 \usepackage{lipsum}
 \usepackage{microtype}
+\usepackage{adjustbox}
 \usepackage{array}
 \newcolumntype{P}[1]{>{\centering\arraybackslash}p{#1}}
 \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
@@ -25,6 +26,9 @@
 \cftsetindents{subsection}{0em}{4em}
 \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
 \renewcommand{\contentsname}{Cuprins}
+\renewcommand\cftchapafterpnum{\vskip10pt}
+\renewcommand\cftsecafterpnum{\vskip2pt}
+\renewcommand\cftsubsecafterpnum{\vskip2pt}
   
 % Document geometry configuration
 \usepackage[
@@ -51,25 +55,25 @@
 
 \titlepage{
 	\begin{center}
-	\large{UNIVERSITATEA \enquote{ALEXANDRU IOAN CUZA} DIN IA\c{S}I} \\
+	\large{UNIVERSITATEA \enquote{ALEXANDRU IOAN CUZA} DIN IAȘI} \\
 	\vspace{0.5cm}
-	\large{\textbf{FACULTATEA DE INFORMATIC\u{A}}} \\
+	\large{\textbf{FACULTATEA DE INFORMATICĂ}} \\
       \vspace{1cm}
     \includegraphics[width=2cm,height=3cm,keepaspectratio]{sigla-fii.png}\\
 	\vspace{1cm}
-	\large{\textbf{LUCRARE DE LICEN\c{T}\u{A}}}\\
+	\large{\textbf{LUCRARE DE LICENȚĂ}}\\
 	\vspace{1cm}
 	\LARGE{Surf} \\
 	\vspace{0.5cm}
-	\large{\textit{Parcurgere \c{s}i procesare distribuit\u{a} a paginilor web \^{i}n cloud pentru extragerea informa\c{t}iilor}} \\
+	\large{\textit{Parcurgere și procesare distribuită a paginilor web în cloud pentru extragerea informațiilor}} \\
 	\vspace{1cm}
-	\large\textbf{{propus\u{a} de}}\\ 
+	\large\textbf{{propusă de}}\\ 
 	\vspace{0.5cm}
 	\large{\textbf{\textit{Ovidiu Pricop}}}\\
 	\vspace{2cm}
 	\large{\textbf{Sesiunea:} Iulie, 2017}\\
 	\vspace{2cm}
-	\large{\textbf{Coordonator \c{s}tiin\c{t}ific}}\\
+	\large{\textbf{Coordonator științific}}\\
 	\vspace{0.5cm}
 	\large{\textbf{Conf. dr. Sabin Corneliu Buraga}}
 	\end{center}
@@ -79,9 +83,9 @@
 
 \titlepage{
 	\begin{center}
-	\large{UNIVERSITATEA \enquote{ALEXANDRU IOAN CUZA} DIN IA\c{S}I} \\
+	\large{UNIVERSITATEA \enquote{ALEXANDRU IOAN CUZA} DIN IAȘI} \\
 	\vspace{0.5cm}
-	\large{\textbf{FACULTATEA DE INFORMATIC\u{A}}} \\
+	\large{\textbf{FACULTATEA DE INFORMATICĂ}} \\
     \vspace{4cm}
 	\LARGE{Surf} \\
 	\vspace{3cm}
@@ -89,7 +93,7 @@
 	\vspace{2cm}
 	\large{\textbf{Sesiunea:} Iulie, 2017}\\
 	\vspace{3cm}
-	\large{\textbf{Coordonator \c{s}tiin\c{t}ific}}\\
+	\large{\textbf{Coordonator științific}}\\
 	\vspace{0.5cm}
 	\large{\textbf{Conf. dr. Sabin Corneliu Buraga}}
 	\end{center}
@@ -99,7 +103,7 @@
 
 \chapter*{
 	\large{
-		Declara\c{t}ie privind originalitate \c{s}i respectarea drepturilor de autor
+		Declarație privind originalitate și respectarea drepturilor de autor
 	}
 }
 \input{
@@ -110,7 +114,7 @@
 
 \chapter*{
 	\large{
-		Declara\c{t}ie de consim\c{t}\u{a}m\^{a}nt
+		Declarație de consimțământ
 	}
 }
 \input{
@@ -156,7 +160,7 @@
 	chapters/descrierea_unui_crawler/frontiera.tex
 }
 
-\subsection{Descarcarea paginilor web}
+\subsection{Descărcarea paginilor web}
 \input{
 	chapters/descrierea_unui_crawler/descarcarea_paginilor.tex
 }
@@ -183,12 +187,12 @@
 	chapters/surf_web_crawling/parcurgere_recursiva.tex
 }
 
-\subsection{Selectia informatiilor}
+\subsection{Selecția informațiilor}
 \input{
 	chapters/surf_web_crawling/selectia_informatiilor.tex
 }
 
-\subsection{Viteza, politici de respingere si drepturi de autor}
+\subsection{Viteză, politici de respingere și drepturi de autor}
 \input{
 	chapters/surf_web_crawling/viteza.tex
 }
@@ -198,20 +202,18 @@
 	chapters/surf_web_crawling/paralelizare.tex
 }
 
-\subsection{Logarea actiunilor si retentia datelor}
+\subsection{Logarea acțiunilor și retenția datelor}
 \input{
 	chapters/surf_web_crawling/logare_retentie.tex
 }
 \clearpage
 
-\chapter*{\chaptertitle{Crawling in cloud}}
-\addcontentsline{toc}{chapter}{Crawling in cloud}
+\setcounter{section}{0}
+\chapter*{\chaptertitle{Crawling în cloud}}
+\addcontentsline{toc}{chapter}{Crawling în cloud}
 \input{
 	chapters/crawling_in_aws.tex
 }
-\clearpage
-
-\setcounter{section}{0}
 
 \section{Infrastructura}
 \input{
@@ -227,7 +229,7 @@
 \clearpage
 
 % Executia procesului de crawling
-\section{Executia procesului de crawling}
+\section{Execuția procesului de crawling}
 \input {
 	chapters/crawling_in_aws/executia_procesului_de_crawling.tex
 }
@@ -238,7 +240,7 @@
 }
 \clearpage
 
-\subsection{Initializare}
+\subsection{Inițializare}
 \input{
 	chapters/crawling_in_aws/executie_crawling/initializare.tex
 }
@@ -254,55 +256,58 @@
 }
 \clearpage
 
-% Interfata
-\section{Interfata}
+% Interfata de programare
+\section{Interfața de programare}
 \input {
 	chapters/crawling_in_aws/interfata.tex
 }
-\clearpage
 
-\setcounter{section}{0}
-\chapter*{\chaptertitle{Concluzii}}
-\addcontentsline{toc}{chapter}{Concluzii}
-\input{
-	chapters/concluzii.tex
-}
-
-\section{Importanta crawlerilor web}
+\section{Performanță și scalabilitate}
 \input {
-	chapters/concluzii/importanta_crawleri.tex
-}
-
-\section{Performanta si scalabilitate}
-\input {
-	chapters/concluzii/performanta_scalabilitate.tex
+	chapters/crawling_in_aws/performanta_scalabilitate.tex
 }
 \clearpage
 
 \section{Extensibiliate}
 \input {
-	chapters/concluzii/extensibilitate.tex
+	chapters/crawling_in_aws/extensibilitate.tex
 }
 
-\section{Directii viitoare}
+\section{Direcții viitoare}
 \input {
-	chapters/concluzii/directii_viitoare.tex
+	chapters/crawling_in_aws/directii_viitoare.tex
 }
 
 \subsection{Sistemul de plugin-uri}
 \input {
-	chapters/concluzii/directii_viitoare/pluginuri.tex
+	chapters/crawling_in_aws/directii_viitoare/pluginuri.tex
 }
 
-\subsection{Indexare periodica}
+\subsection{Indexare periodică}
 \input {
-	chapters/concluzii/directii_viitoare/indexare.tex
+	chapters/crawling_in_aws/directii_viitoare/indexare.tex
 }
 
-\subsection{Sistemul de notificari}
+\subsection{Sistemul de notificări}
 \input {
-	chapters/concluzii/directii_viitoare/sistem_notificari.tex
+	chapters/crawling_in_aws/directii_viitoare/sistem_notificari.tex
 }
+\clearpage
+
+\setcounter{section}{0}
+\chapter*{\chaptertitle{Contribuții personale}}
+\addcontentsline{toc}{chapter}{Contribuții personale}
+\input {
+	chapters/contributii_personale.tex
+}
+
+\setcounter{section}{0}
+\chapter*{\chaptertitle{Concluzii}}
+\addcontentsline{toc}{chapter}{Concluzii}
+\input {
+	chapters/concluzii.tex
+}
+
 
 \clearpage
 
