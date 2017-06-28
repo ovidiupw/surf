@@ -29,7 +29,7 @@ public class ExceptionWrapper<I, O> {
             return handler.doHandleRequest(input, context);
         } catch (IllegalArgumentException | NullPointerException | BadRequestException e) {
             e.printStackTrace();
-            final String log = LOG.info(
+            final String log = LOG.error(
                     "Exception while trying to handle request: '%s'!", e.getMessage());
 
 
@@ -40,7 +40,7 @@ public class ExceptionWrapper<I, O> {
 
         } catch (RuntimeException e) {
             e.printStackTrace();
-            final String log = LOG.info(
+            final String log = LOG.error(
                     "Exception while trying to handle request: '%s'!", e.getMessage());
 
 

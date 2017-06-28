@@ -20,6 +20,10 @@ import utils.aws.sns.SNSClientHelper;
 import utils.aws.sns.SNSOperationsHelper;
 import validators.StartWorkflowInputValidator;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class StartWorkflowHandler implements
         RequestHandler<StartWorkflowHandler.Input, StartWorkflowHandler.Output>,
         WrappableRequestHandler<StartWorkflowHandler.Input, StartWorkflowHandler.Output> {
@@ -53,14 +57,22 @@ public class StartWorkflowHandler implements
         final WorkflowExecution workflowExecution = SurfObjectMother.createWorkflowExecution(workflow, input.getUserArn());
         final WorkflowExecution savedWorkflowExecution = dynamoOperationsHelper.saveWorkflowExecution(workflowExecution);
 
-        final WorkflowTask workflowTask = SurfObjectMother.createWorkflowTask(
-                workflowExecution.getId(),
-                workflowExecution.getOwnerId(),
-                workflow.getMetadata().getMaxWebPageSizeBytes(),
-                workflow.getMetadata().getSelectionPolicy(),
-                workflow.getMetadata().getUrlMatcher(),
-                workflow.getMetadata().getRootAddress(),
-                STARTING_DEPTH_LEVEL);
+        String taskUrl;
+        try {
+            taskUrl = new URI(workflow.getMetadata().getRootAddress()).normalize().toString();
+        } catch (URISyntaxException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+
+        final WorkflowTask workflowTask;
+            workflowTask = SurfObjectMother.createWorkflowTask(
+                    workflowExecution.getId(),
+                    workflowExecution.getOwnerId(),
+                    workflow.getMetadata().getMaxWebPageSizeBytes(),
+                    workflow.getMetadata().getSelectionPolicy(),
+                    workflow.getMetadata().getUrlMatcher(),
+                    taskUrl,
+                    STARTING_DEPTH_LEVEL);
         dynamoOperationsHelper.saveWorkflowTask(workflowTask);
 
         final PageToBeVisited pageToBeVisited = SurfObjectMother.createPageToBeVisited(

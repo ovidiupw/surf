@@ -15,6 +15,11 @@ public class CrawlMetadata {
     private String workflowExecutionId;
 
     /**
+     * The workflow task id that generated this metadata entry.
+     */
+    private String workflowTaskId;
+
+    /**
      * The unique id associated with the this crawl metadata.
      */
     private String id;
@@ -30,8 +35,9 @@ public class CrawlMetadata {
     private long creationDateMillis;
 
     static final String DDB_WORKFLOW_EXECUTION_ID = "WorkflowExecutionId";
+    static final String DDB_WORKFLOW_TASK_ID = "WorkflowTaskId";
     static final String DDB_ID = "Id";
-    static final String DDB_S3_BUCKET = "S3Link";
+    static final String DDB_S3_LINK = "S3Link";
     static final String DDB_CREATION_DATE_MILLIS = "CreationDateMillis";
 
     @DynamoDBHashKey(attributeName = DDB_WORKFLOW_EXECUTION_ID)
@@ -52,12 +58,12 @@ public class CrawlMetadata {
         this.id = id;
     }
 
-    @DynamoDBAttribute(attributeName = DDB_S3_BUCKET)
-    public String getS3Bucket() {
+    @DynamoDBAttribute(attributeName = DDB_S3_LINK)
+    public String getS3Link() {
         return s3Link;
     }
 
-    public void setS3Bucket(String s3Bucket) {
+    public void setS3Link(String s3Bucket) {
         this.s3Link = s3Bucket;
     }
 
@@ -68,6 +74,15 @@ public class CrawlMetadata {
 
     public void setCreationDateMillis(long creationDateMillis) {
         this.creationDateMillis = creationDateMillis;
+    }
+
+    @DynamoDBAttribute(attributeName = DDB_WORKFLOW_TASK_ID)
+    public String getWorkflowTaskId() {
+        return workflowTaskId;
+    }
+
+    public void setWorkflowTaskId(String workflowTaskId) {
+        this.workflowTaskId = workflowTaskId;
     }
 
     /**
@@ -85,21 +100,23 @@ public class CrawlMetadata {
         CrawlMetadata metadata = (CrawlMetadata) o;
         return creationDateMillis == metadata.creationDateMillis &&
                 Objects.equals(workflowExecutionId, metadata.workflowExecutionId) &&
+                Objects.equals(workflowTaskId, metadata.workflowTaskId) &&
                 Objects.equals(id, metadata.id) &&
                 Objects.equals(s3Link, metadata.s3Link);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(workflowExecutionId, id, s3Link, creationDateMillis);
+        return Objects.hash(workflowExecutionId, workflowTaskId, id, s3Link, creationDateMillis);
     }
 
     @Override
     public String toString() {
         return "CrawlMetadata{" +
                 "workflowExecutionId='" + workflowExecutionId + '\'' +
+                ", workflowTaskId='" + workflowTaskId + '\'' +
                 ", id='" + id + '\'' +
-                ", s3Bucket='" + s3Link + '\'' +
+                ", s3Link='" + s3Link + '\'' +
                 ", creationDateMillis=" + creationDateMillis +
                 '}';
     }

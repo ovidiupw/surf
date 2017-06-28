@@ -51,9 +51,13 @@ public class StateMachineExecutionDefinition {
             input.setUrlMatcher(workflowTask.getUrlMatcher());
             input.setSelectionPolicy(workflowTask.getSelectionPolicy());
             input.setOwnerId(workflowTask.getOwnerId());
-            input.setMaxPagesPerDepthLevel(stateMachineDefinition.getWorkflow().getMetadata().getMaxPagesPerDepthLevel());
-            input.setCrawlerTimeoutSeconds(stateMachineDefinition.getWorkflow().getMetadata().getCrawlerTimeoutSeconds());
-            input.setMaxDepthLevel(stateMachineDefinition.getWorkflow().getMetadata().getMaxRecursionDepth());
+
+            final WorkflowMetadata workflowMetadata = stateMachineDefinition.getWorkflow().getMetadata();
+            input.setMaxPagesPerDepthLevel(workflowMetadata.getMaxPagesPerDepthLevel());
+            input.setCrawlerTimeoutSeconds(workflowMetadata.getCrawlerTimeoutSeconds());
+            input.setMaxDepthLevel(workflowMetadata.getMaxRecursionDepth());
+            input.setFollowRobotsTxt(workflowMetadata.getFollowRobotsTxt());
+
 
             crawlWebPageStateInputs.add(input);
         }
