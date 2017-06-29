@@ -1,30 +1,30 @@
-Functiile ce au ca scop vizitarea paginilor web sunt grupate, ca stagii de executii paralele, in automatul finit configurat in "AWS Step Functions". Acestea reprezinta executii ale definitiilor formale ale task-urilor de crawling. O parte dintre datele asociate unui task reprezinta metadatele configurate in pasul de creare a workflow-ului. \textit{"Tabelul 2"} prezinta structura unui task, cu mentiunile necesare acolo unde definitia unui camp este exact aceeasi cu definitia campului respectiv din structura unui workflow.
+Funcțiile ce au ca scop vizitarea paginilor web sunt grupate, ca stagii de execuții paralele, în automatul finit configurat in "AWS Step Functions". Acestea reprezintă execuții ale definițiilor formale ale task-urilor de crawling. O parte dintre datele asociate unui task reprezintă metadatele configurate în pasul de creare a workflow-ului. \textit{"Tabelul 2"} prezintă structura unui task, cu mențiunile necesare acolo unde definiția unui câmp este exact aceeași cu definiția câmpului respectiv din structura unui workflow.
 
 \begin{table}[h]
 	\centering
     \begin{tabular}{|M{2.5cm}|M{1.6cm}|M{9cm}|}
     	\hline 
-    	Nume camp & Tip & Descriere \\ \hline
+    	Nume câmp & Tip & Descriere \\ \hline
     	
     	Id & Text & Identificator unic pentru task \\ \hline
     	
-    	Id Workflow & Text & Identificatorul workflow-ului de care apartine task-ul curent \\ \hline
+    	Id Workflow & Text & Identificatorul workflow-ului de care aparține task-ul curent \\ \hline
     	
-    	Data Incepere & Numeric & Data la care a inceput executia task-ului (engl. epoch milliseconds) \\ \hline
+    	Dată Începere & Numeric & Data la care a inceput execuția task-ului (engl. epoch milliseconds) \\ \hline
     	
-    	Data Finalizare & Numeric & Data la care s-a finalizat executia task-ului(engl. epoch milliseconds) \\ \hline
+    	Dată Finalizare & Numeric & Data la care s-a finalizat execuția task-ului(engl. epoch milliseconds) \\ \hline
     	
-    	Stare & Text & Starea in care se afla task-ul: \textit{Programat, Activ, Esuat, Depasit temporal, Intrerupt} \\ \hline
+    	Stare & Text & Starea în care se află task-ul: \textit{Programat, Activ, Eșuat, Depășit temporal, Întrerupt} \\ \hline
     	
-		Adresa & Text & URL-ul ce trebuie vizitat in vederea extragerii datelor si metadatelor \\ \hline    	
+		Adresă & Text & URL-ul ce trebuie vizitat în vederea extragerii datelor și metadatelor \\ \hline    	
     	
-    	Adancime & Numeric & Nivelul de adancime, in arborele de parcurgere a paginilor web realizat de catre crawler, la care se afla task-ul \\ \hline
+    	Adâncime & Numeric & Nivelul de adâncime, în arborele de parcurgere a paginilor web realizat de către crawler, la care se află task-ul \\ \hline
     	
-    	Erori & Lista & Esecurile inregistrate in decursul executiei task-ului (ca structuri JSON) \\ \hline
+    	Erori & Listă & Eșecurile înregistrate în decursul execuției task-ului (ca structuri JSON) \\ \hline
     	
-    	Politica de selectie & JSON & \textit{vezi Tabelul 1} \\ \hline
+    	Politică de selecție & JSON & \textit{vezi Tabelul 1} \\ \hline
     	
-    	Dimensiune maxima pagina & Numeric & \textit{vezi Tabelul 1} \\ \hline
+    	Dimensiune maximă pagină & Numeric & \textit{vezi Tabelul 1} \\ \hline
     	
     	Selector URL & Text & \textit{vezi Tabelul 1} \\ \hline
     	
@@ -33,28 +33,28 @@ Functiile ce au ca scop vizitarea paginilor web sunt grupate, ca stagii de execu
 \clearpage
 
 \noindent
-Procesul de parcurgere a unei pagini web presupune urmatoarele etape:
+Procesul de parcurgere a unei pagini web presupune următoarele etape:
 
 \begin{enumerate}
-	\item{Actualizarea starii task-ului in vederea reflectarii conditiei sale actuale (e.g. "in executie" sau "esuat");}
+	\item{Actualizarea stării task-ului în vederea reflectării condiției sale actuale (e.g. "în execuție" sau "eșuat");}
 	
-	\item{Verificarea dreptului de acces asupra URL-ului configurat in cadrul definitiei task-ului, prin consultarea fisierului robots.txt (daca acesta exista), aflat in calea de baza (engl. \textit{root}) a sitului web de la URL-ul respectiv, in concordanta cu politica de configurare a procesului de crawling;}
+	\item{Verificarea dreptului de acces asupra URL-ului configurat în cadrul definiției task-ului, prin consultarea fișierului robots.txt (dacă acesta există), aflat în calea de bază (engl. \textit{root}) a sitului web de la URL-ul respectiv, în concordanță cu politica de configurare a procesului de crawling;}
 	
 	\item{Parcurgerea sitului web:}
 	\begin{enumerate}
-		\item{Extragerea datelor conform politicii de selectie a datelor (configurata in pasul de creare a workflow-ului) si stocarea acestora (daca exista) in S3;}
+		\item{Extragerea datelor conform politicii de selecție a datelor (configurată în pasul de creare a workflow-ului) și stocarea acestora (dacă există) in S3;}
 		
-		\item{Salvarea metadatelor in legatura cu datale extrase, in vederea accesarii sau cautarii facile a locatiei in care au fost salvate in S3;}
+		\item{Salvarea metadatelor în legătură cu datale extrase, în vederea accesării sau căutării facile a locației în care au fost salvate datele în S3;}
 		
-		\item{Selectarea tuturor legaturilor de tip URL catre alte situri web din cadrul paginii vizitate, conform politicii de urmarire a legaturilor catre alte pagini web, definita in pasul de creare a workflow-ului;}
+		\item{Selectarea tuturor legăturilor de tip URL către alte situri web din cadrul paginii vizitate, conform politicii de urmărire a legaturilor către alte pagini web, definită în pasul de creare a workflow-ului;}
 		
-		\item{Crearea de noi task-uri in starea \textit{"Programat"}, configurate cu un nivel de adancime superior celui pe care se afla URL-ul curent parcurs de catre crawler si salvarea acestora in baza de date, doar daca respecta configurarile declarate ca date de intrare ale executiei workflow-ului (e.g. dimensiunea maxima a unei pagini web parcurse); acest pas mai poarta denumirea de \textit{task scheduling\footnote{engl. \textit{task scheduling} = programare temporala a executiei unui task}};}
+		\item{Crearea de noi task-uri în starea \textit{"Programat"}, configurate cu un nivel de adâncime superior celui pe care se află URL-ul curent parcurs de către crawler și salvarea acestora în baza de date, doar dacă respectă configurările declarate ca date de intrare ale execuției workflow-ului (e.g. dimensiunea maximă a unei pagini web parcurse); acest pas mai poartă denumirea de \textit{task scheduling\footnote{engl. \textit{task scheduling} = programare temporală a execuției unui task}};}
 		
 	\end{enumerate}
 	
-	\item{Actualizarea tabelei in care se tine evidenta paginilor parcurse de catre crawler in timpul executiei unui workflow, cu scopul de a nu se parcurge de doua ori acelasi URL;}
+	\item{Actualizarea tabelei în care se ține evidența paginilor parcurse de către crawler în timpul execuției unui workflow, cu scopul de a nu se parcurge de două ori același URL;}
 		
-	\item{Capturarea, rezolvarea si stocarea erorilor survenite in cadrul procesului de parcurgere a paginilor web.}
+	\item{Capturarea, rezolvarea și stocarea erorilor survenite în cadrul procesului de parcurgere a paginilor web.}
 	
 \end{enumerate}
 

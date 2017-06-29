@@ -1,10 +1,10 @@
-Procesul de finalizare a unei sesiuni de crawling are drept obiective centralizarea si analizarea datelor provenite in urma executarii, in paralel, a functiilor responsabile pentru parcurgerea paginilor web. Responsabilitatile functiei de finalizare se pot imparti in doua categorii, in functie de motivul ce a determinat invocarea acesteia:
+Procesul de finalizare a unei sesiuni de crawling are drept obiective centralizarea și analizarea datelor provenite în urma executării, în paralel, a funcțiilor responsabile pentru parcurgerea paginilor web. Responsabilitățile funcției de finalizare se pot împărți în două categorii, în funcție de motivul ce a determinat invocarea acesteia:
 
 \begin{enumerate}
-	\item{Finalizarea unei executii indeplinite cu succes, caz in care nu au intervenit erori extraordinare (i.e. netratate) in cadrul cel putin unuia dintre task-urile executate in paralel;}
-	\item{Finalizarea unei sesiuni de parcurgere in care au existat erori in cadrul executiei cel putin unuia dintre task-urile executate in paralel, caz in care functia de finalizare va indeplini toate sarcinile ce au ramas neindeplinite in urma terminarii bruste a executiei sarcinilor paralele de crawling.}
+	\item{Finalizarea unei execuții îndeplinite cu succes, caz în care nu au intervenit erori extraordinare (i.e. netratate) în cadrul cel puțin unuia dintre task-urile executate în paralel;}
+	\item{Finalizarea unei sesiuni de parcurgere în care au existat erori în cadrul execuției cel puțin unuia dintre task-urile executate în paralel, caz în care funcția de finalizare va îndeplini toate sarcinile ce au ramas neîndeplinite în urma terminării bruște a execuției sarcinilor paralele de crawling.}
 \end{enumerate} 
 
 \noindent
-Indiferent de situatia in care se afla executia worfklow-ului, functia de finalizare a sesiunii de crawling are in vedere inregistrarea metadatelor cu privire la progresul workflow-ului (e.g. metrici Cloudwatch) si luarea deciziei conform careia invocarea recursiva a urmatoarei sesiuni de crawling se face incepand cu acelasi nivel de adancime sau cu unul superior (i.e. mai mare), in concordanta cu numarul maxim de pagini ce poate fi vizitat pe un anumit nivel de adancime, de catre crawler.
+Indiferent de situația în care se află execuția worfklow-ului, funcția de finalizare a sesiunii de crawling are în vedere înregistrarea metadatelor cu privire la progresul workflow-ului (e.g. metrici Cloudwatch) și luarea deciziei conform căreia invocarea recursivă a următoarei sesiuni de crawling se face începand cu același nivel de adâncime sau cu unul superior (i.e. mai mare), în concordanță cu numarul maxim de pagini ce poate fi vizitat pe un anumit nivel de adâncime, de catre crawler.
 

@@ -1,4 +1,4 @@
-Odata ce o cerere de incepere a unei executii a unui workflow este primita de catre crawler, functia Lambda corespunzatoare inceperii executiei (i.e. \textit{"Pornire workflow"}) este invocata. Aceasta creeaza si salveaza metadatele necesare in baza de date (e.g. timpul la care a inceput workflow-ul, cu scopul de a putea contoriza cat a durat executia), apoi invoca functia Lambda responsabila pentru initializarea mecanismului de distributie si sincronizare a executiei in paralel a functiilor ce parcurg paginile web. \textit{"Figura 7"} descrie modul in care functia de initializare a unui workflow este utilizata, precum si rolul pe care aceasta il indeplineste in procesul recursiv de crawling.
+Odată ce o cerere de începere a unei execuții a unui workflow este primită de către crawler, funcția Lambda corespunzatoare începerii execuției (i.e. \textit{"Pornire workflow"}) este invocată. Aceasta creează și salvează metadatele necesare în baza de date (e.g. timpul la care a inceput workflow-ul, cu scopul de a putea contoriza cât a durat execuția), apoi invocă funcția Lambda responsabilă pentru inițializarea mecanismului de distribuție și sincronizare a execuției în paralel a funcțiilor ce parcurg paginile web. \textit{"Figura 7"} descrie modul în care funcția de inițializare a unui workflow este utilizată, precum și rolul pe care aceasta îl îndeplinește în procesul recursiv de crawling.
 
 \begin{figure}[ht]
 \begin{center}
@@ -9,10 +9,10 @@ Odata ce o cerere de incepere a unei executii a unui workflow este primita de ca
 \end{figure}
 
 \noindent
-Responsabilitatile functiei de initializare a workflow-ului sunt urmatoarele:
+Responsabilitățile funcției de inițializare a workflow-ului sunt următoarele:
 
 \begin{itemize}
-	\item{Verificarea nivelului de adancime la care s-a ajuns in urma procesului de crawling si finalizarea workflow-ului, in caz ca nivelul de adancime maxim a fost depasit;}
-	\item{Interogatea bazei de date in vederea extragerii task-urilor pentru parcurgerea paginilor web, task-uri ce sunt executate in cadrul automatului orchestrat de catre "AWS Step Functions";}
-	\item{Crearea si pornirea automatului finit construit in cadrul "AWS Step Functions", pe baza task-urilor extrase din baza de date. Acest automat este definit prin doua stagii secventiale. Primul stagiu are ca scop orchestrarea distribuita a sarcinilor de crawling executate in paralel, iar cel de-al doilea are ca scop agregarea, interpretarea si salvarea datelor provenite din executia task-urilor concurente.}
+	\item{Verificarea nivelului de adâncime la care s-a ajuns în urma procesului de crawling și finalizarea workflow-ului, în caz că nivelul de adâncime maxim a fost depășit;}
+	\item{Interogarea bazei de date în vederea extragerii task-urilor pentru parcurgerea paginilor web, task-uri ce sunt executate în cadrul automatului orchestrat de către "AWS Step Functions";}
+	\item{Crearea și pornirea automatului finit construit în cadrul "AWS Step Functions", pe baza task-urilor extrase din baza de date. Acest automat este definit prin două stagii secvențiale. Primul stagiu are ca scop orchestrarea distribuită a sarcinilor de crawling executate în paralel, iar cel de-al doilea are ca scop agregarea, interpretarea și salvarea datelor provenite din execuția task-urilor concurente.}
 \end{itemize}
