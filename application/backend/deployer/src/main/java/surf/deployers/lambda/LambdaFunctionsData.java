@@ -16,6 +16,8 @@ public class LambdaFunctionsData {
     private LambdaData finalizeCrawlSessionData;
     private LambdaData listWorkflowExecutionsData;
     private LambdaData apiAuthorizerData;
+    private LambdaData listVisitedPagesForWorkflowExecutionData;
+    private LambdaData getS3PresignedUrlData;
 
     public LambdaData getListCoreWorkersData() {
         return listCoreWorkersData;
@@ -57,6 +59,14 @@ public class LambdaFunctionsData {
         return apiAuthorizerData;
     }
 
+    public LambdaData getListVisitedPagesForWorkflowExecutionData() {
+        return listVisitedPagesForWorkflowExecutionData;
+    }
+
+    public LambdaData getGetS3PresignedUrlData() {
+        return getS3PresignedUrlData;
+    }
+
     public static class Builder {
 
         private LambdaData listCoreWorkersData;
@@ -69,6 +79,8 @@ public class LambdaFunctionsData {
         private LambdaData finalizeCrawlSessionData;
         private LambdaData listWorkflowExecutionsData;
         private LambdaData apiAuthorizerData;
+        private LambdaData listVisitedPagesForWorkflowExecutionData;
+        private LambdaData getS3PresignedUrlData;
 
         public LambdaFunctionsData build() {
             Preconditions.checkNotNull(listCoreWorkersData);
@@ -81,6 +93,8 @@ public class LambdaFunctionsData {
             Preconditions.checkNotNull(finalizeCrawlSessionData);
             Preconditions.checkNotNull(listWorkflowExecutionsData);
             Preconditions.checkNotNull(apiAuthorizerData);
+            Preconditions.checkNotNull(listVisitedPagesForWorkflowExecutionData);
+            Preconditions.checkNotNull(getS3PresignedUrlData);
 
             final LambdaFunctionsData lambdaFunctionsData = new LambdaFunctionsData();
             lambdaFunctionsData.setListCoreWorkersData(listCoreWorkersData);
@@ -93,6 +107,8 @@ public class LambdaFunctionsData {
             lambdaFunctionsData.setFinalizeCrawlSessionData(finalizeCrawlSessionData);
             lambdaFunctionsData.setListWorkflowExecutionsData(listWorkflowExecutionsData);
             lambdaFunctionsData.setApiAuthorizerData(apiAuthorizerData);
+            lambdaFunctionsData.setListVisitedPagesForWorkflowExecutionData(listVisitedPagesForWorkflowExecutionData);
+            lambdaFunctionsData.setGetS3PresignedUrlData(getS3PresignedUrlData);
             return lambdaFunctionsData;
         }
 
@@ -155,6 +171,18 @@ public class LambdaFunctionsData {
             this.apiAuthorizerData = lambdaData;
             return this;
         }
+
+        public Builder withListVisitedPagesForWorkflowExecutionData(LambdaData lambdaData) {
+            Preconditions.checkNotNull(lambdaData);
+            this.listVisitedPagesForWorkflowExecutionData = lambdaData;
+            return this;
+        }
+
+        public Builder withGetS3PresignedUrlData(LambdaData lambdaData) {
+            Preconditions.checkNotNull(lambdaData);
+            this.getS3PresignedUrlData = lambdaData;
+            return this;
+        }
     }
 
     private void setListCoreWorkersData(final LambdaData listCoreWorkersData) {
@@ -199,6 +227,14 @@ public class LambdaFunctionsData {
         this.apiAuthorizerData = apiAuthorizerData;
     }
 
+    private void setListVisitedPagesForWorkflowExecutionData(LambdaData listVisitedPagesForWorkflowExecutionData) {
+        this.listVisitedPagesForWorkflowExecutionData = listVisitedPagesForWorkflowExecutionData;
+    }
+
+    private void setGetS3PresignedUrlData(LambdaData getS3PresignedUrlData) {
+        this.getS3PresignedUrlData = getS3PresignedUrlData;
+    }
+
     @Override
     public String toString() {
         return "LambdaFunctionsData{" +
@@ -212,6 +248,8 @@ public class LambdaFunctionsData {
                 ", finalizeCrawlSessionData=" + finalizeCrawlSessionData +
                 ", listWorkflowExecutionsData=" + listWorkflowExecutionsData +
                 ", apiAuthorizerData=" + apiAuthorizerData +
+                ", listVisitedPagesForWorkflowExecutionData=" + listVisitedPagesForWorkflowExecutionData +
+                ", getS3PresignedUrlData=" + getS3PresignedUrlData +
                 '}';
     }
 }

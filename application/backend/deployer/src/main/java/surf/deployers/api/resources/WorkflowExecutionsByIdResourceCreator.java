@@ -15,19 +15,19 @@ import surf.utility.ObjectConverter;
 import javax.annotation.Nonnull;
 import java.util.Collections;
 
-public class WorkflowsByIdResourceCreator extends SkeletalResourceCreator {
+public class WorkflowExecutionsByIdResourceCreator extends SkeletalResourceCreator {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkflowsResourceCreator.class);
 
     private static final String GET_INTEGRATION_TEMPLATE_FILE_PATH
-            = "src/main/resources/api/integration_templates/workflows_by_id.get.template";
+            = "src/main/resources/api/integration_templates/workflow_executions_by_id.get.template";
     private static final String GET_METHOD_FRIENDLY_NAME
-            = "GetWorkflow";
+            = "GetVisitedPages";
 
     private final DeployerConfiguration deployerConfiguration;
     private final Context context;
 
-    public WorkflowsByIdResourceCreator(@Nonnull final CreateRestApiResult restApi,
+    public WorkflowExecutionsByIdResourceCreator(@Nonnull final CreateRestApiResult restApi,
                                         @Nonnull final AmazonApiGateway apiClient,
                                         @Nonnull final DeployerConfiguration deployerConfiguration,
                                         @Nonnull final Context context) {
@@ -53,7 +53,7 @@ public class WorkflowsByIdResourceCreator extends SkeletalResourceCreator {
                 resource,
                 GET_INTEGRATION_TEMPLATE_FILE_PATH,
                 GET_METHOD_FRIENDLY_NAME,
-                context.getLambdaFunctionsData().getGetWorkflowData(),
+                context.getLambdaFunctionsData().getListVisitedPagesForWorkflowExecutionData(),
                 context.getApiAuthorizer().getId(),
                 Collections.singletonMap("method.request.path.id", true));
 

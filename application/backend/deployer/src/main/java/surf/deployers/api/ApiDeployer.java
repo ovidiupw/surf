@@ -79,6 +79,15 @@ public class ApiDeployer implements Deployer {
                 restApi, apiClient, deployerConfiguration, context);
         final Resource workflowExecutionsResource = workflowExecutionsResourceCreator.create(workflowsResource, "executions");
 
+        final ResourceCreator workflowExecutionsByIdResourceCreator = new WorkflowExecutionsByIdResourceCreator(
+                restApi, apiClient, deployerConfiguration, context);
+        final Resource workflowExecutionsByIdResource = workflowExecutionsByIdResourceCreator.create(workflowExecutionsResource, "{id}");
+
+        final ResourceCreator s3CrawledDataResourceCreator = new S3CrawledDataResourceCreator(
+                restApi, apiClient, deployerConfiguration, context);
+        final Resource s3CrawledDataResource = s3CrawledDataResourceCreator.create(workflowExecutionsByIdResource, "data");
+
+
         final ResourceCreator workflowsByIdResourceCreator = new WorkflowsByIdResourceCreator(
                 restApi, apiClient, deployerConfiguration, context);
         final Resource workflowsByIdResource = workflowsByIdResourceCreator.create(workflowsResource, "{id}");
@@ -96,7 +105,9 @@ public class ApiDeployer implements Deployer {
                 workersResource,
                 workflowsResource,
                 workflowsByIdResource,
-                workflowExecutionsResource
+                workflowExecutionsResource,
+                workflowExecutionsByIdResource,
+                s3CrawledDataResource
         ));
         // Add other resources to the context as you create them in the API
         context.setApiKey(apiKey.getValue());

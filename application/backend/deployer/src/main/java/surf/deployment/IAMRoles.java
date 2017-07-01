@@ -2,6 +2,7 @@ package surf.deployment;
 
 import com.amazonaws.services.identitymanagement.model.Role;
 import com.google.common.base.Preconditions;
+import surf.deployers.DeployerConfiguration;
 
 import javax.annotation.Nonnull;
 
@@ -21,6 +22,8 @@ public class IAMRoles {
     private Role listWorkflowExecutionsLambdaRole;
     private Role apiAuthorizerLambdaRole;
     private Role apiGatewayInvokeLambdaRole;
+    private Role listVisitedPagesForWorkflowExecutionLambdaRole;
+    private Role getS3CrawledDataLambdaRole;
 
     public Role getListCoreWorkersLambdaRole() {
         return listCoreWorkersLambdaRole;
@@ -78,6 +81,14 @@ public class IAMRoles {
         return apiGatewayInvokeLambdaRole;
     }
 
+    public Role getListVisitedPagesForWorkflowExecutionLambdaRole() {
+        return listVisitedPagesForWorkflowExecutionLambdaRole;
+    }
+
+    public Role getGetS3CrawledDataLambdaRole() {
+        return getS3CrawledDataLambdaRole;
+    }
+
     public static class Builder {
 
         private Role apiGatewayPushToCloudWatchLogsRole;
@@ -94,6 +105,8 @@ public class IAMRoles {
         private Role listWorkflowExecutionsLambdaRole;
         private Role apiAuthorizerLambdaRole;
         private Role apiGatewayInvokeLambdaRole;
+        private Role listVisitedPagesForWorkflowExecutionLambdaRole;
+        private Role getS3CrawledDataLambdaRole;
 
         public IAMRoles build() {
             Preconditions.checkNotNull(apiGatewayPushToCloudWatchLogsRole);
@@ -110,6 +123,8 @@ public class IAMRoles {
             Preconditions.checkNotNull(listWorkflowExecutionsLambdaRole);
             Preconditions.checkNotNull(apiAuthorizerLambdaRole);
             Preconditions.checkNotNull(apiGatewayInvokeLambdaRole);
+            Preconditions.checkNotNull(listVisitedPagesForWorkflowExecutionLambdaRole);
+            Preconditions.checkNotNull(getS3CrawledDataLambdaRole);
 
             final IAMRoles IAMRoles = new IAMRoles();
             IAMRoles.setApiGatewayPushToCloudWatchLogsRole(apiGatewayPushToCloudWatchLogsRole);
@@ -126,6 +141,8 @@ public class IAMRoles {
             IAMRoles.setListWorkflowExecutionsLambdaRole(listWorkflowExecutionsLambdaRole);
             IAMRoles.setApiAuthorizerLambdaRole(apiAuthorizerLambdaRole);
             IAMRoles.setApiGatewayInvokeLambdaRole(apiGatewayInvokeLambdaRole);
+            IAMRoles.setListVisitedPagesForWorkflowExecutionLambdaRole(listVisitedPagesForWorkflowExecutionLambdaRole);
+            IAMRoles.setGetS3CrawledDataLambdaRole(getS3CrawledDataLambdaRole);
             return IAMRoles;
         }
 
@@ -212,6 +229,18 @@ public class IAMRoles {
             this.apiGatewayInvokeLambdaRole = role;
             return this;
         }
+
+        public Builder withListVisitedPagesForWorkflowExecutionLambdaRole(@Nonnull final Role role) {
+            Preconditions.checkNotNull(role);
+            this.listVisitedPagesForWorkflowExecutionLambdaRole = role;
+            return this;
+        }
+
+        public Builder withGetS3CrawledDataLambdaRole(@Nonnull final Role role) {
+            Preconditions.checkNotNull(role);
+            this.getS3CrawledDataLambdaRole = role;
+            return this;
+        }
     }
 
     private void setApiGatewayPushToCloudWatchLogsRole(@Nonnull final Role role) {
@@ -270,6 +299,15 @@ public class IAMRoles {
         this.apiGatewayInvokeLambdaRole = apiGatewayInvokeLambdaRole;
     }
 
+    private void setListVisitedPagesForWorkflowExecutionLambdaRole(Role role) {
+        this.listVisitedPagesForWorkflowExecutionLambdaRole = role;
+    }
+
+    private void setGetS3CrawledDataLambdaRole(Role role) {
+        this.getS3CrawledDataLambdaRole = role;
+    }
+
+
     @Override
     public String toString() {
         return "IAMRoles{" +
@@ -287,6 +325,8 @@ public class IAMRoles {
                 ", listWorkflowExecutionsLambdaRole=" + listWorkflowExecutionsLambdaRole +
                 ", apiAuthorizerLambdaRole=" + apiAuthorizerLambdaRole +
                 ", apiGatewayInvokeLambdaRole=" + apiGatewayInvokeLambdaRole +
+                ", listVisitedPagesForWorkflowExecutionLambdaRole=" + listVisitedPagesForWorkflowExecutionLambdaRole +
+                ", getS3CrawledDataLambdaRole=" + getS3CrawledDataLambdaRole +
                 '}';
     }
 }

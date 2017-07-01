@@ -3,6 +3,20 @@ import FBCredentials from 'modules/entities/FBCredentials';
 import AWSCredentials from 'modules/entities/AWSCredentials';
 
 let LocalStorageHelper = {
+
+  saveNewWorkflowToLocalStorage: function(workflow) {
+    localStorage.setItem("NewWorkflowDefinition", JSON.stringify(workflow));
+  },
+
+  loadNewWorkflowToLocalStorage: function() {
+    try {
+      let jsonWorkflow = localStorage.getItem("NewWorkflowDefinition");
+      return JSON.parse(jsonWorkflow);
+    } catch(Error) {
+      return null;
+    }
+  },
+
   saveFBCredentialsToLocalStorage: function(credentials) {
     if (!(credentials instanceof FBCredentials)) {
       throw new Error('The credentials supplied must be instanceof FBCredentials!');

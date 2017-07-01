@@ -14,6 +14,7 @@ import surf.utility.ObjectConverter;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class WorkflowExecutionsResourceCreator extends SkeletalResourceCreator {
@@ -62,7 +63,7 @@ public class WorkflowExecutionsResourceCreator extends SkeletalResourceCreator {
                 GET_METHOD_FRIENDLY_NAME,
                 context.getLambdaFunctionsData().getListWorkflowExecutionsData(),
                 context.getApiAuthorizer().getId(),
-                new HashMap<>()); // TODO add request parameters
+                Collections.singletonMap("method.request.querystring.workflowId", true));
         this.createPostMethod(deployerConfiguration,
                 resource,
                 POST_INTEGRATION_TEMPLATE_FILE_PATH,

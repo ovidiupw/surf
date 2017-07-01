@@ -157,7 +157,7 @@ public class SurfObjectMother {
             @Nonnull final String ownerId,
             @Nonnull final String workflowExecutionId,
             @Nonnull final String url,
-            @Nonnull final String category) {
+            final String category) {
         Preconditions.checkNotNull(ownerId);
         Preconditions.checkNotNull(workflowExecutionId);
         Preconditions.checkNotNull(url);

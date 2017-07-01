@@ -37,6 +37,7 @@ class ElementalFormTextInput extends React.Component {
               onChange={this.props.onChange}
               placeholder={this.props.placeholder}
               htmlFor={this.props.name}
+              value={this.props.value}
               ref={this.props.refName}/>
           </FormIconField>
         </FormField>

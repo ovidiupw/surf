@@ -33,7 +33,9 @@ class NewWorkflow extends React.Component {
   }
 
   componentDidMount() {
-    this.props.lifecycleMethods.componentDidMount(this.props.apigClient);
+    this.props.lifecycleMethods.componentDidMount(
+      this.props.apigClient,
+      this.props.newWorkflowFromLocalStorage);
 
     let that = this;
     setTimeout(function() {
@@ -193,9 +195,8 @@ class NewWorkflow extends React.Component {
       case "workflow-crawler-timeout": {
         workflowDef.workflow.metadata.crawlerTimeoutSeconds = event.target.value;
         if (workflowDef.workflow.metadata.crawlerTimeoutSeconds == null
-          || workflowDef.workflow.metadata.crawlerTimeoutSeconds.length == 0
           || isNaN(workflowDef.workflow.metadata.crawlerTimeoutSeconds)
-          || workflowDef.workflow.metadata.crawlerTimeoutSeconds < 15
+          || workflowDef.workflow.metadata.crawlerTimeoutSeconds < 1
           || workflowDef.workflow.metadata.crawlerTimeoutSeconds > 115) {
           this.props.showInputValidationError("The crawler timeout (in seconds) must be between 15 and 115 seconds!");
         }
@@ -350,56 +351,64 @@ class NewWorkflow extends React.Component {
                   name="workflow-name"
                   dataTip="A friendly name associated to the workflow"
                   placeholder="Friendly name for your workflow"
-                  onBlur={(e) => this.handleInputChange(e, "workflow-name")}/>
+                  value={this.props.newWorkflowDefinition.workflow.name}
+                  onChange={(e) => this.handleInputChange(e, "workflow-name")}/>
 
                 <ElementalFormTextInput
                   label="Root address"
                   name="workflow-root-addres"
                   dataTip="The URL from which the crawling process is to be started"
                   placeholder="The starting URL for the crawler"
-                  onBlur={(e) => this.handleInputChange(e, "workflow-root-address")}/>
+                  value={this.props.newWorkflowDefinition.workflow.metadata.rootAddress}
+                  onChange={(e) => this.handleInputChange(e, "workflow-root-address")}/>
 
                 <ElementalFormTextInput
                   label="URL matcher"
                   name="workflow-url-matcher"
                   dataTip="A regular expression used to select what links are followed<br/> throughout the crawling process. Any link URL that is not matched by <br/>the regular expression will not be crawled"
                   placeholder="Valid RegExp for matching URLs during crawling"
-                  onBlur={(e) => this.handleInputChange(e, "workflow-url-matcher")}/>
+                  value={this.props.newWorkflowDefinition.workflow.metadata.urlMatcher}
+                  onChange={(e) => this.handleInputChange(e, "workflow-url-matcher")}/>
 
                 <ElementalFormTextInput
                   label="Maximum pages per depth level"
                   name="workflow-max-pages-per-depth-level"
                   dataTip="The maximum number of pages that will be crawled on a certain depth level.<br/> For example, if the rootAddress, which resides on the depth level 0<br/> has N links to other web pages, then the N web-pages will all be crawled only <br/> if maxPagesPerDepthLevel >= N"
                   placeholder="Maximum pages per crawl depth level"
-                  onBlur={(e) => this.handleInputChange(e, "workflow-max-pages-per-depth-level")}/>
+                  value={this.props.newWorkflowDefinition.workflow.metadata.maxPagesPerDepthLevel}
+                  onChange={(e) => this.handleInputChange(e, "workflow-max-pages-per-depth-level")}/>
 
                 <ElementalFormTextInput
                   label="Maximum web page size in bytes"
                   name="workflow-max-page-size-bytes"
                   dataTip="The maximum number of bytes that a web page may have in order to be crawled."
                   placeholder="The maximum web page size (in bytes)"
-                  onBlur={(e) => this.handleInputChange(e, "workflow-max-page-size-bytes")}/>
+                  value={this.props.newWorkflowDefinition.workflow.metadata.maxWebPageSizeBytes}
+                  onChange={(e) => this.handleInputChange(e, "workflow-max-page-size-bytes")}/>
 
                 <ElementalFormTextInput
                   label="Number of parallel crawlers"
                   name="workflow-parallel-crawlers"
                   dataTip="The number of parallel crawlers that may be executed for a certain depth level.<br/> This is important in order to limit the amount of concurrent transactions to the <br/> database and control the implicit costs of having the crawler running. <br/> If this is set to a higher value, then the crawling process will finish faster <br/> (assuming enough read/write capacity units are set on the database), but the <br/> costs will be higher."
                   placeholder="The number of concurrent crawlers"
-                  onBlur={(e) => this.handleInputChange(e, "workflow-parallel-crawlers")}/>
+                  value={this.props.newWorkflowDefinition.workflow.metadata.maxConcurrentCrawlers}
+                  onChange={(e) => this.handleInputChange(e, "workflow-parallel-crawlers")}/>
 
                 <ElementalFormTextInput
                   label="Maximum recursion depth"
                   name="workflow-max-depth"
                   dataTip="The maximum depth which can be reached by subsequently following unvisited<br/> links throughout the crawling process. The recursion depth is defined as<br/> the distance between the {@link #rootAddress} and the current address that<br/> is being crawled."
                   placeholder="Maximum recursion depth"
-                  onBlur={(e) => this.handleInputChange(e, "workflow-max-depth")}/>
+                  value={this.props.newWorkflowDefinition.workflow.metadata.maxRecursionDepth}
+                  onChange={(e) => this.handleInputChange(e, "workflow-max-depth")}/>
 
                 <ElementalFormTextInput
                   label="Crawler timeout in seconds"
                   name="workflow-crawler-timeout"
                   dataTip=" The maximum time, in seconds,<br/> that an instance of a web page crawler is allowed to run."
                   placeholder="Crawler timeout in seconds"
-                  onBlur={(e) => this.handleInputChange(e, "workflow-crawler-timeout")}/>
+                  value={this.props.newWorkflowDefinition.workflow.metadata.crawlerTimeoutSeconds}
+                  onChange={(e) => this.handleInputChange(e, "workflow-crawler-timeout")}/>
               </Form>
 
               <div style={{textAlign:'left'}}>
@@ -506,7 +515,7 @@ class NewWorkflow extends React.Component {
                       label="Retry backoff rate"
                       name="retry-backoff-rate"
                       dataTip="The rate at which the delay between retries is increased. Calculated as follows:<br/> new_delay = previous_delay * backoffRate, if a previous_delay exists<br/>new_delay = intervalSeconds, if a previous_delay does not exist"
-                      placeholder="Retry backoff rate (in seconds)"
+                      placeholder="Retry backoff rate"
                       onBlur={(e) => this.handleInputChange(e, "retry-backoff-rate")}/>
                     <ElementalFormTextInput
                       label="Maximum number of retries"

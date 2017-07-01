@@ -1,0 +1,6 @@
+#set($inputRoot = $input.path('$'))
+{
+"userArn" : "$context.identity.userArn",
+"workflowExecutionId": "$util.urlDecode($input.params('id'))",
+"pageUrl": "$util.urlDecode($input.params('pageUrl'))"
+};

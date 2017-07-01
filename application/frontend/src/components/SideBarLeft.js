@@ -52,12 +52,10 @@ class SideBarLeft extends React.Component {
             </NavLink>
           </li>
           <hr style={{padding:3, margin:3}} />
-          <li role="presentation">
+          <li role="presentation" style={{display:'none'}}>
+            {/* make visible after TODO list executions for user */}
             <NavLink to={Routes.WORKFLOW_EXECUTIONS}>
               Executions&nbsp;
-              <span style={workflowExecutionsCategorySpinnerStyle}>
-                <Spinner type="primary"/>
-              </span>
             </NavLink>
           </li>
         </ul>

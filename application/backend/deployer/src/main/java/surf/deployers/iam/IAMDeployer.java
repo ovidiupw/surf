@@ -63,6 +63,10 @@ public class IAMDeployer implements Deployer {
                 = createRoleWithConfig(iamClient, new ListWorkflowExecutionsLambdaRole());
         final Role getWorkflowLambdaRole
                 = createRoleWithConfig(iamClient, new GetWorkflowLambdaRole());
+        final Role listVisitedPagesForWorkflowExecutionLambdaRole
+                = createRoleWithConfig(iamClient, new ListVisitedPagesForWorkflowExecutionLambdaRole());
+        final Role getS3CrawledDataLambdaRole
+                = createRoleWithConfig(iamClient, new GetS3CrawledDataLambdaRole());
 
         final Role initializeCrawlSessionLambdaRole = createRoleWithConfig(
                 iamClient,
@@ -93,6 +97,8 @@ public class IAMDeployer implements Deployer {
                 .withListWorkflowExecutionsLambdaRole(listWorkflowExecutionsLambdaRole)
                 .withApiAuthorizerLambdaRole(apiAuthorizerLambdaRole)
                 .withApiGatewayInvokeLambdaRole(apiGatewayInvokeLambdaRole)
+                .withListVisitedPagesForWorkflowExecutionLambdaRole(listVisitedPagesForWorkflowExecutionLambdaRole)
+                .withGetS3CrawledDataLambdaRole(getS3CrawledDataLambdaRole)
                 .build();
         context.setIAMRoles(IAMRoles);
 

@@ -10,7 +10,8 @@ function mapStateToProps(state, ownProps) {
     apigClient: state.auth.apigClient,
     workflows: state.workflows.list,
     lastWorkflowOnPage: state.workflows.lastWorkflowOnPage,
-    workflowExecutionsCategorySpinnerActive: state.spinner.workflowExecutionsCategorySpinnerActive
+    workflowExecutionsCategorySpinnerActive: state.spinner.workflowExecutionsCategorySpinnerActive,
+    workflowsCategorySpinnerActive: state.spinner.workflowsCategorySpinnerActive,
   };
 }
 

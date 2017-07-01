@@ -30,9 +30,6 @@ class Dashboard extends React.Component {
             </Col>
           </Row>
         </Card>
-        <Button onClick={(e) => this.props.workersGet(this.props.apigClient)}>
-          Call workersGet()
-        </Button>
       </div>
     );
   };

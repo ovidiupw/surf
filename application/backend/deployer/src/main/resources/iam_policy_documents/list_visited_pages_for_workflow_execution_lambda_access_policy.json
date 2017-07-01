@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "1",
+      "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Query"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:dynamodb:*:*:*"
+    },
+    {
+      "Sid": "2",
+      "Action": [
+        "logs:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}

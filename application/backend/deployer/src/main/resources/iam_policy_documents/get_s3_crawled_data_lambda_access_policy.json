@@ -1,0 +1,21 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "1",
+      "Action": [
+        "s3:Put*"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:s3:::*"
+    },
+    {
+      "Sid": "2",
+      "Action": [
+        "logs:*"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}

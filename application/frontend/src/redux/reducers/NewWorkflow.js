@@ -1,4 +1,5 @@
 import * as AWSStepFunctions from 'constants/AWSStepFunctions';
+import LocalStorageHelper from 'modules/LocalStorageHelper';
 
 const initialState = {
   definition: {
@@ -18,6 +19,18 @@ const initialState = {
         selectionPolicy: {
           textSelectors: [],
           cssSelectors: []
+        },
+        finalizerRetryPolicy: {
+          exponentialBackoffRetriers: []
+        },
+        "finalizerRetryPolicy": {
+          "exponentialBackoffRetriers": []
+        },
+        "orchestratorRetryPolicy": {
+          "exponentialBackoffRetriers": []
+        },
+        "workerRetryPolicy": {
+          "exponentialBackoffRetriers": []
         }
       }
     }
@@ -33,13 +46,15 @@ const initialState = {
   formRetryInterval: undefined,
   formRetryBackoffRate: undefined,
   formRetryMaximumAttempts: undefined,
-  currentSelectedFormError: null
+  currentSelectedFormError: null,
+  newWorkflowFromLocalStorage: LocalStorageHelper.loadNewWorkflowToLocalStorage()
 };
 
 export function newWorkflow(state = initialState, action) {
   switch (action.type) {
     case 'UPDATE_NEW_WORKFLOW_DEFINTION':
       {
+        LocalStorageHelper.saveNewWorkflowToLocalStorage(action.newWorkflowDefinition);
         return Object.assign({}, state, {definition: action.newWorkflowDefinition});
       }
 
