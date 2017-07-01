@@ -66,6 +66,12 @@ public class LambdaDeployer implements Deployer {
         final LambdaData listWorkflowExecutionsData = createFunction(lambdaClient, new ListWorkflowExecutionsLambdaConfig(context), context);
         lambdaNeedingApiGatewayInvokePermissions.add(listWorkflowExecutionsData);
 
+        final LambdaData listVisitedPagesForWorkflowExecutionData = createFunction(lambdaClient, new ListVisitedPagesForWorkflowExecutionLambdaConfig(context), context);
+        lambdaNeedingApiGatewayInvokePermissions.add(listVisitedPagesForWorkflowExecutionData);
+
+        final LambdaData getS3PresignedUrlData = createFunction(lambdaClient, new GetS3PresignedUrlConfig(context), context);
+        lambdaNeedingApiGatewayInvokePermissions.add(getS3PresignedUrlData);
+
         cleanupApiGatewayInvokePermissions(lambdaClient, lambdaNeedingApiGatewayInvokePermissions);
         setupApiGatewayInvokePermissions(lambdaClient, lambdaNeedingApiGatewayInvokePermissions);
 
@@ -92,6 +98,8 @@ public class LambdaDeployer implements Deployer {
                 .withFinalizeCrawlSessionData(finalizeCrawlSessionData)
                 .withListWorkflowExecutionsData(listWorkflowExecutionsData)
                 .withApiAuthorizerData(apiAuthorizerData)
+                .withListVisitedPagesForWorkflowExecutionData(listVisitedPagesForWorkflowExecutionData)
+                .withGetS3PresignedUrlData(getS3PresignedUrlData)
                 .build();
         context.setLambdaFunctionsData(lambdaFunctionsData);
 

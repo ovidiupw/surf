@@ -6,25 +6,25 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import models.config.LambdaConfigurationConstants;
-import models.exceptions.BadRequestException;
-import models.workflow.Workflow;
+import models.workflow.VisitedPage;
 import utils.*;
 import utils.aws.dynamo.DynamoDBClientHelper;
 import utils.aws.dynamo.DynamoDBOperationsHelper;
-import validators.CreateWorkflowInputValidator;
-import validators.GetWorkflowInputValidator;
+import validators.ListVisitedPagesForWorkflowExecutionInputValidator;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
-public class GetWorkflowHandler implements
-        RequestHandler<GetWorkflowHandler.Input, GetWorkflowHandler.Output>,
-        WrappableRequestHandler<GetWorkflowHandler.Input, GetWorkflowHandler.Output>  {
+public class ListVisitedPagesForWorkflowExecutionHandler implements
+        RequestHandler<ListVisitedPagesForWorkflowExecutionHandler.Input, ListVisitedPagesForWorkflowExecutionHandler.Output>,
+        WrappableRequestHandler<ListVisitedPagesForWorkflowExecutionHandler.Input, ListVisitedPagesForWorkflowExecutionHandler.Output>  {
 
     private Logger LOG;
     private DynamoDBOperationsHelper dynamoOperationsHelper;
-    private GetWorkflowInputValidator inputValidator;
+    private ListVisitedPagesForWorkflowExecutionInputValidator inputValidator;
 
-    public GetWorkflowHandler.Output handleRequest(final GetWorkflowHandler.Input input, final Context context) {
+    public ListVisitedPagesForWorkflowExecutionHandler.Output handleRequest(final ListVisitedPagesForWorkflowExecutionHandler.Input input, final Context context) {
         final ExceptionWrapper<Input, Output> exceptionWrapper = new ExceptionWrapper<>(input, context);
         return exceptionWrapper.doHandleRequest(this);
     }
@@ -35,15 +35,15 @@ public class GetWorkflowHandler implements
         LOG.info("Input=%s", input.toString());
 
         inputValidator.validate(input);
-        final Workflow workflow = dynamoOperationsHelper.getWorkflow(input.getWorkflowId());
+        final List<VisitedPage> visitedPages = dynamoOperationsHelper.listVisitedPages(input.getWorkflowExecutionId());
 
-        if (workflow == null) {
-            throw new BadRequestException(String.format(
-                    "There is no workflow with id='%s' in the database!", input.getWorkflowId()));
+        final ListVisitedPagesForWorkflowExecutionHandler.Output output = new ListVisitedPagesForWorkflowExecutionHandler.Output();
+        if (visitedPages == null) {
+            output.setVisitedPages(Collections.emptyList());
+        } else {
+            output.setVisitedPages(visitedPages);
         }
 
-        final Output output = new Output();
-        output.setWorkflow(workflow);
         return output;
     }
 
@@ -56,12 +56,12 @@ public class GetWorkflowHandler implements
 
         final AmazonDynamoDB dynamoClient = new DynamoDBClientHelper(LOG).getDynamoDBClient(config);
         dynamoOperationsHelper = new DynamoDBOperationsHelper(dynamoClient, LOG);
-        inputValidator = new GetWorkflowInputValidator(context);
+        inputValidator = new ListVisitedPagesForWorkflowExecutionInputValidator(context);
     }
 
     public static class Input {
         private String userArn;
-        private String workflowId;
+        private String workflowExecutionId;
 
         public String getUserArn() {
             return userArn;
@@ -71,44 +71,37 @@ public class GetWorkflowHandler implements
             this.userArn = userArn;
         }
 
-        public String getWorkflowId() {
-            return workflowId;
+        public String getWorkflowExecutionId() {
+            return workflowExecutionId;
         }
 
-        public void setWorkflowId(String workflowId) {
-            this.workflowId = workflowId;
+        public void setWorkflowExecutionId(String workflowExecutionId) {
+            this.workflowExecutionId = workflowExecutionId;
         }
 
         @Override
         public String toString() {
             return "Input{" +
                     "userArn='" + userArn + '\'' +
-                    ", workflowId='" + workflowId + '\'' +
+                    ", workflowExecutionId='" + workflowExecutionId + '\'' +
                     '}';
         }
 
         public void validate() {
             Preconditions.checkArgument(!Strings.isNullOrEmpty(userArn), "The userArn cannot be null or empty!");
-            Preconditions.checkArgument(!Strings.isNullOrEmpty(workflowId), "The workflowId cannot be null or empty!");
+            Preconditions.checkArgument(!Strings.isNullOrEmpty(workflowExecutionId), "The workflowExecutionId cannot be null or empty!");
         }
     }
 
     public static class Output {
-        private Workflow workflow;
+        private List<VisitedPage> visitedPages;
 
-        public Workflow getWorkflow() {
-            return workflow;
+        public List<VisitedPage> getVisitedPages() {
+            return visitedPages;
         }
 
-        public void setWorkflow(Workflow workflow) {
-            this.workflow = workflow;
-        }
-
-        @Override
-        public String toString() {
-            return "Output{" +
-                    "workflow=" + workflow +
-                    '}';
+        public void setVisitedPages(List<VisitedPage> visitedPages) {
+            this.visitedPages = visitedPages;
         }
 
         @Override
@@ -116,12 +109,19 @@ public class GetWorkflowHandler implements
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             Output output = (Output) o;
-            return Objects.equals(workflow, output.workflow);
+            return Objects.equals(visitedPages, output.visitedPages);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(workflow);
+            return Objects.hash(visitedPages);
+        }
+
+        @Override
+        public String toString() {
+            return "Output{" +
+                    "visitedPages=" + visitedPages +
+                    '}';
         }
     }
 }

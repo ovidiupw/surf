@@ -35,7 +35,8 @@ function mapStateToProps(state, ownProps) {
     currentSelectedFormError: state.newWorkflow.currentSelectedFormError,
     formRetryInterval: state.newWorkflow.formRetryInterval,
     formRetryBackoffRate: state.newWorkflow.formRetryBackoffRate,
-    formRetryMaximumAttempts: state.newWorkflow.formRetryMaximumAttempts
+    formRetryMaximumAttempts: state.newWorkflow.formRetryMaximumAttempts,
+    newWorkflowFromLocalStorage: state.newWorkflow.newWorkflowFromLocalStorage
   };
 }
 
@@ -43,11 +44,15 @@ function mapDispatchToProps(dispatch, ownProps) {
   let routerHistory = ownProps.history;
   return {
     lifecycleMethods: {
-      componentDidMount: (apigClient) => {
+      componentDidMount: (apigClient, newWorkflowFromLocalStorage) => {
         console.log("New workflow component did mount!");
         if (apigClient == null) {
           Utility.initializeApigClientFromLocalStorage(
             dispatch, routerHistory, Routes.NEW_WORKFLOW);
+        }
+        console.log(newWorkflowFromLocalStorage);
+        if (newWorkflowFromLocalStorage != null) {
+          dispatch(updateNewWorkflowDefinition(newWorkflowFromLocalStorage));
         }
       }
     },
@@ -146,7 +151,10 @@ function mapDispatchToProps(dispatch, ownProps) {
     },
 
     createWorkflow: (apigClient, workflowDefinition) => {
-      dispatch(workflowsPost(apigClient, workflowDefinition));
+      dispatch(workflowsPost(apigClient, workflowDefinition, function() {
+        routerHistory.push(Routes.WORKFLOWS);
+        scroll(0, 0);
+      }));
     }
   };
 }

@@ -129,20 +129,22 @@ public class StateMachineDefinition {
         for (int retrierIndex = 0; retrierIndex < numberOfRetriers; retrierIndex++) {
             final ExponentialBackoffRetrier workflowRetrier = workflowRetriers.get(retrierIndex);
 
-            if (workflowRetrier.getErrors() != null || !workflowRetrier.getRetryAllErrors()) {
+            if (workflowRetrier.getErrors() == null
+                    || workflowRetrier.getErrors().size() < 1
+                    || workflowRetrier.getRetryAllErrors()) {
+                retrierBuilders[retrierIndex] = retrier()
+                        .backoffRate(workflowRetrier.getBackoffRate())
+                        .errorEquals()
+                        .retryOnAllErrors()
+                        .intervalSeconds(workflowRetrier.getIntervalSeconds())
+                        .maxAttempts(workflowRetrier.getMaxAttempts());
+            } else if (workflowRetrier.getErrors() != null && workflowRetrier.getErrors().size() > 0){
                 final String[] errorsToRetry = (String[]) workflowRetrier.getErrors().toArray();
 
                 retrierBuilders[retrierIndex] = retrier()
                         .backoffRate(workflowRetrier.getBackoffRate())
                         .errorEquals()
                         .errorEquals(errorsToRetry)
-                        .intervalSeconds(workflowRetrier.getIntervalSeconds())
-                        .maxAttempts(workflowRetrier.getMaxAttempts());
-            } else {
-                retrierBuilders[retrierIndex] = retrier()
-                        .backoffRate(workflowRetrier.getBackoffRate())
-                        .errorEquals()
-                        .retryOnAllErrors()
                         .intervalSeconds(workflowRetrier.getIntervalSeconds())
                         .maxAttempts(workflowRetrier.getMaxAttempts());
             }

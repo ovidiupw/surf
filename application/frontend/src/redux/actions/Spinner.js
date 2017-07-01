@@ -45,3 +45,51 @@ export function hideNewWorkflowCategorySpinner() {
     type: 'HIDE_NEW_WORKFLOW_CATEGORY_SPINNER'
   };
 };
+
+export function showWorkflowCategorySpinner() {
+  return {
+    type: 'SHOW_WORKFLOW_CATEGORY_SPINNER'
+  };
+}
+
+export function hideWorkflowCategorySpinner() {
+  return {
+    type: 'HIDE_WORKFLOW_CATEGORY_SPINNER'
+  };
+}
+
+export function showWorkflowCategoryStartSpinner() {
+  return {
+    type: 'SHOW_WORKFLOW_CATEGORY_START_SPINNER'
+  };
+}
+
+export function hideWorkflowCategoryStartSpinner() {
+  return {
+    type: 'HIDE_WORKFLOW_CATEGORY_START_SPINNER'
+  };
+}
+
+export function showVisitedPagesSpinner() {
+  return {
+    type: 'SHOW_VISITED_PAGES_SPINNER'
+  };
+}
+
+export function hideVisitedPagesSpinner() {
+  return {
+    type: 'HIDE_VISITED_PAGES_SPINNER'
+  };
+}
+
+export function showS3LinkModalSpinner() {
+  return {
+    type: 'SHOW_S3_LINK_MODAL_SPINNER'
+  };
+}
+
+export function hideS3LinkModalSpinner() {
+  return {
+    type: 'HIDE_S3_LINK_MODAL_SPINNER'
+  };
+}

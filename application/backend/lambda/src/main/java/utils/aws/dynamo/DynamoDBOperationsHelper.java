@@ -394,6 +394,65 @@ public class DynamoDBOperationsHelper {
         return pageToBeVisited;
     }
 
+    public List<WorkflowExecution> listWorkflowExecutions(@Nonnull final String workflowId) {
+        Preconditions.checkArgument(
+                !Strings.isNullOrEmpty(workflowId),
+                "Cannot list workflow executions for which 'workflowId' is null or empty!");
+
+        final WorkflowExecution workflowExecutionModel = new WorkflowExecution();
+        workflowExecutionModel.setWorkflowId(workflowId);
+
+        LOG.info("Trying to get workflow executions for workflowID='%s'...", workflowId);
+        final DynamoDBQueryExpression<WorkflowExecution> query = new DynamoDBQueryExpression<WorkflowExecution>()
+                .withHashKeyValues(workflowExecutionModel)
+                .withIndexName(WorkflowExecution.DDB_WORKFLOW_ID_GSI)
+                .withConsistentRead(false);
+
+        final PaginatedQueryList<WorkflowExecution> executions = dynamoDBMapper.query(WorkflowExecution.class, query);
+
+        if (executions == null || executions.size() == 0) {
+            LOG.warn(
+                    "Found no workflow executions for workflow with id='%s' in the database!", workflowId);
+        } else {
+            LOG.info("Successfully retrieved workflow executions from database!");
+            for (final WorkflowExecution execution : executions) {
+                LOG.info("Workflow execution: '%s'", execution);
+            }
+        }
+
+        return executions;
+    }
+
+    public List<VisitedPage> listVisitedPages(@Nonnull final String workflowExecutionId) {
+        Preconditions.checkArgument(
+                !Strings.isNullOrEmpty(workflowExecutionId),
+                "Cannot list visited pages for which 'workflowExecutionId' is null or empty!");
+
+        final VisitedPage visitedPageModel = new VisitedPage();
+        visitedPageModel.setWorkflowExecutionId(workflowExecutionId);
+
+        LOG.info("Trying to get visited pages form database using model='%s'...", visitedPageModel);
+        final DynamoDBQueryExpression<VisitedPage> query = new DynamoDBQueryExpression<VisitedPage>()
+                .withHashKeyValues(visitedPageModel)
+                .withConsistentRead(true);
+
+        final PaginatedQueryList<VisitedPage> visitedPageList = dynamoDBMapper.query(VisitedPage.class, query);
+
+        if (visitedPageList == null || visitedPageList.size() == 0) {
+            LOG.warn(
+                    "Found no pageVisitData at any depth level with workflowExecutionId='%s' in the database!",
+                    visitedPageModel.getWorkflowExecutionId()
+            );
+        } else {
+            LOG.info("Successfully retrieved visitedPageList at any depth level from database!");
+            for (final VisitedPage visitedPage : visitedPageList) {
+                LOG.info("Visited page: '%s'", visitedPage);
+            }
+        }
+
+        return visitedPageList;
+    }
+
     public List<VisitedPage> listVisitedPages(@Nonnull final String workflowExecutionId, final long depthLevel) {
         Preconditions.checkArgument(
                 !Strings.isNullOrEmpty(workflowExecutionId),
@@ -493,4 +552,5 @@ public class DynamoDBOperationsHelper {
         LOG.info("Successfully saved crawlMetadata to database!");
         return crawlMetadata;
     }
+
 }

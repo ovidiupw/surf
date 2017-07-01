@@ -12,6 +12,7 @@ import WorkflowExecutions from 'containers/WorkflowExecutions';
 import Utility from 'modules/Utility';
 import Routes from 'constants/Routes';
 import NavBarTop from 'containers/NavBarTop';
+import Workflow from 'containers/Workflow';
 
 Utility.requireGlobalErrorHandler();
 Utility.requireStyles();
@@ -35,6 +36,7 @@ ReactDOM.render((
               <Route exact path={Routes.WORKFLOWS} component={Workflows}/>
               <Route exact path={Routes.NEW_WORKFLOW} component={NewWorkflow}/>
               <Route exact path={Routes.WORKFLOW_EXECUTIONS} component={WorkflowExecutions}/>
+              <Route exact path={Routes.WORKFLOW} component={Workflow}/>
             </div>
           </Router>
         </App>
