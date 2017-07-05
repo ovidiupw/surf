@@ -14,7 +14,7 @@ Un \textit{workflow} reprezintă unitatea de bază pe care crawler-ul web "Surf"
 	
 	\item{Crearea sarcinilor pentru parcurgerea paginilor web (\textit{taskuri}\footnote{În contextul execuției unui \textit{workflow}, un \textit{task} reprezintă o unitate de lucru, sub forma unei înregistrări în baza de date, ce poate fi preluată și executată de către un program aflat în execuție (e.g. o funcție Lambda)}), înregistrarea datelor și metadatelor rezultate în urma parcurgerii, precum și a datelor ce modelează execuția procesului de crawling (e.g. timpi maximi de răspus, adrese URL vizitate deja etc.);}
 	
-	\item{Distribuirea \textit{taskurilor} catre funcțiile Lambda (\textit{workers}\footnote{Un \textit{worker} reprezintă un program executabil. În aplicatia "Surf", funcțiile Lambda reprezintă \textit{workerii}}) ce le vor prelua și executa;}
+	\item{Distribuirea \textit{taskurilor} către funcțiile Lambda (\textit{workers}\footnote{Un \textit{worker} reprezintă un program executabil. În aplicatia "Surf", funcțiile Lambda reprezintă \textit{workerii}}) ce le vor prelua și executa;}
 	
 	\item{Executarea funcțiilor Lambda și stocarea/intoarcerea rezultatelor;}
 	

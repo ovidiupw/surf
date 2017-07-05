@@ -23,7 +23,8 @@ Pentru a putea accesa funcționalitățile oferite de API-ul "Surf", utilizatori
 \end{figure}
 
 \noindent
-Prin AWS Identity Access Management (IAM) se vor stabili restricțiile de acces asupra API-ului. Mecanismul de asignare a permisiunilor va fi susținut prin definirea unor roluri. Utilizatorii vor fi grupați, din punct de vedere al drepturilor de acces, în mai multe categorii. Spre exemplu, un utilizator poate avea rolul "administrator" (prescurtat \emph{Ad}), iar un alt utilizator poate avea atât rolul "administrator" (\emph{Ad}), cât și "utilizator de bază" (prescurtat \emph{Ub}). Atât \emph{Ad}, cât și \emph{Ub} vor avea asignate politici de acces asupra datelor AWS. O astfel de politică este următoarea:
+Prin AWS Identity Access Management (IAM) se vor stabili restricțiile de acces asupra API-ului. Mecanismul de asignare a permisiunilor va fi susținut prin definirea unor roluri. Utilizatorii vor fi grupați, din punct de vedere al drepturilor de acces, în mai multe categorii. Spre exemplu, un utilizator poate avea rolul "administrator" (prescurtat \emph{Ad}), iar un alt utilizator poate avea atât rolul "administrator" (\emph{Ad}), cât și "utilizator de bază" (prescurtat \emph{Ub}). Atât \emph{Ad}, cât și \emph{Ub} vor avea asignate politici de acces asupra datelor AWS. O astfel de politică este cea din \textit{"Figura 3"}.
+\\
 
 \begin{figure}[ht]
 \begin{minted}[fontsize=\footnotesize]{json}
@@ -48,14 +49,14 @@ Prin AWS Identity Access Management (IAM) se vor stabili restricțiile de acces 
 \end{figure}
 
 \noindent
-Politica de acces de mai sus îi permite utilizatorului ce îi este asignată accesul la toate resursele API-ului "Surf". Această politică este potrivită pentru un administrator, dar periculoasă pentru un utilizator ce accesează pentru prima data serviciul "Surf". De aceea, se vor defini drepturi de acces granulare care să aibă în vedere restricționarea la nivel "need-to-know"\footnote{http://dictionary.cambridge.org/dictionary/english/on-a-need-to-know-basis} pentru fiecare entitate ce trimite cereri către API (autorizare).
+Politica de acces din \textit{"Figura 3"} îi permite utilizatorului ce îi este asignată accesul la toate resursele API-ului "Surf". Această politică este potrivită pentru un administrator, dar periculoasă pentru un utilizator ce accesează pentru prima dată serviciul "Surf". De aceea, se vor defini drepturi de acces granulare care să aibă în vedere restricționarea la nivel "need-to-know"\footnote{http://dictionary.cambridge.org/dictionary/english/on-a-need-to-know-basis} pentru fiecare entitate ce trimite cereri către API (autorizare).
 \\
 \\
 Procesul de asignare a rolurilor pentru utilizatori este coordonat atât manual (pe bază de ierarhie: administrator - utilizator de baza), cât și automat (i.e. printre altele, toți utilizatorii abia înregistrați sunt utilizatori standard). Asignarea manuală a permisiunilor are prioritate asupra asignării automate. Datele despre rolul fiecărui utilizator vor fi păstrate în baza de date.
 \\
 
 \noindent
-Crawler-ul "Surf" utilizează AWS DynamoDB ca suport pentru baza de date. DynamoDB reprezintă un serviciu cloud scalabil pentru baze de date NoSQL. Datele dintr-o bază de date non-relațională NoSQL) pot fi modelate fără constrângerile unei baze de date relaționale (e.g. tabularitate). Acest lucru atrage, în cadrul aplicației "Surf", elemente operaționale cheie, pentru beneficiul cărora s-a renunțat la o abordare relațională, de tip SQL (e.g. Oracle), printre care:
+Crawler-ul "Surf" utilizează AWS DynamoDB ca suport pentru baza de date. DynamoDB reprezintă un serviciu cloud scalabil pentru baze de date NoSQL. Datele dintr-o bază de date non-relațională NoSQL pot fi modelate fără constrângerile unei baze de date relaționale (e.g. tabularitate). Acest lucru atrage, în cadrul aplicației "Surf", elemente operaționale cheie, pentru beneficiul cărora s-a renunțat la o abordare relațională, de tip SQL (e.g. Oracle), printre care:
 
 
 \begin{itemize}
