@@ -46,8 +46,15 @@ class Workflow extends React.Component {
         Header: 'Minutes elapsed',
         id: "minutesElapsed",
         accessor: execution => {
-          let millisElapsed = Math.abs(
-            new Date(execution.startDateMillis) - new Date(execution.endDateMillis));
+          let millisElapsed = 1;
+          if (execution.endDateMillis == 0) {
+            millisElapsed = Math.abs(
+              new Date(execution.startDateMillis) - new Date());
+          } else {
+            millisElapsed = Math.abs(
+              new Date(execution.startDateMillis) - new Date(execution.endDateMillis));
+          }
+
           return Math.ceil(millisElapsed / 1000 / 60);
         },
         Cell: props => {
@@ -69,7 +76,7 @@ class Workflow extends React.Component {
           let execution = props.row;
           return (
             <NavLink to={Routes.WORKFLOW_EXECUTIONS
-              .replace(":workflow_id", execution.workflowId)
+              .replace(":workflow_id", this.props.workflowId)
               .replace(":id", execution.id)}>
                 View execution
             </NavLink>
